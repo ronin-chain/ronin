@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/big"
 	"os"
 	"runtime"
 	"strconv"
@@ -219,6 +220,20 @@ func initGenesis(ctx *cli.Context) error {
 	if err := json.NewDecoder(file).Decode(genesis); err != nil {
 		utils.Fatalf("invalid genesis file: %v", err)
 	}
+
+	// shadow fork block can be set via environment variable, prefer it over
+	if shadowForkBlock := os.Getenv("SHADOW_FORK_BLOCK"); shadowForkBlock != "" {
+		blockNum, err := strconv.ParseInt(shadowForkBlock, 10, 64)
+		if err != nil {
+			log.Warn("Invalid SHADOW_FORK_BLOCK value from env", "value", shadowForkBlock)
+		} else {
+			genesis.Config.ShadowForkBlock = big.NewInt(blockNum)
+			log.Info("Set SHADOW_FORK_BLOCK from env", "block", genesis.Config.ShadowForkBlock)
+		}
+	} else {
+		log.Info("No SHADOW_FORK_BLOCK set from env, loading from genesis file", "block", genesis.Config.ShadowForkBlock)
+	}
+
 	var overrideChainConfig bool
 	if ctx.IsSet(utils.ForceOverrideChainConfigFlag.Name) {
 		overrideChainConfig = ctx.Bool(utils.ForceOverrideChainConfigFlag.Name)

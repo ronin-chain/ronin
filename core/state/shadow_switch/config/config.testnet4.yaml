@@ -1,0 +1,220 @@
+validator_set_address: "0x54B3AC74a90E64E8dDE60671b6fE8F8DDf18eC9d"
+profile_address: "0x3b67c8D22a91572a6AB18acC9F70787Af04A4043"
+staking_address: "0x9C245671791834daf3885533D24dce516B763B28"
+trusted_org_address: "0x7507dc433a98E1fE105d69f19f3B40E4315A4F32"
+slash_indicator_address: "0xF7837778b6E180Df6696C8Fa986d62f8b6186752"
+validator_set_storage_slot:
+  candidateIds_slot: 115
+  candidate_index_slot: 116
+  candidate_info_slot: 117
+  validator_map_slot: 172
+  validatorIds_slot: 171
+  validator_count_slot: 170
+  validator_candidate_offset:
+    admin_offset: 0
+    consensus_addr_offset: 1
+    treasury_addr_offset: 2
+    commission_rate_offset: 4
+profile_storage_slot:
+  id2profile_slot: 0
+  registry_slot: 1
+  consensus2Id_slot: 2
+  candidate_profile_offset:
+    id_offset: 0
+    consensus_offset: 1
+    admin_offset: 2
+    treasury_offset: 3
+    governor_offset: 4
+    pubkey_offset: 5
+staking_storage_slot:
+  pool_detail_slot: 55
+  staking_pool_slot: 3
+  user_reward_slot: 2
+  admin_of_active_pool_mapping_slot: 58
+  pool_detail_offset:
+    pid_offset: 0
+    shadowed_pool_admin_offset: 1
+    staking_amount_offset: 2
+    staking_total_offset: 3
+    delegating_amount_offset: 4
+    last_delegating_timestamp_offset: 5
+  pool_fields_offset:
+    shares_inner_offset: 1
+    shares_last_period_offset: 2
+  user_reward_fields_offset:
+    lowest_amount_offset: 2
+    last_period_offset: 3
+trusted_org_slot:
+  consensus_list_slot: 9
+  governor_list_slot: 10
+  added_block_slot: 8
+  total_weight_slot: 3
+  consensus_weight_slot: 5
+  governor_weight_slot: 6
+slash_indicator_slot:
+  credit_score_slot: 220
+
+new_validator_configs:
+  - candidate_admin: "0x3922667f9dfA14f0F34222707018cd5a4D97AeFB"
+    consensus_addr: "0x6D863059CF618cC03d314cfbC41707105DD3BB3d"
+    treasury_addr: "0x3922667f9dfA14f0F34222707018cd5a4D97AeFB"
+    commission_rate: "1000"
+    pubkey: "b949e6e3fb327dc3a369f6a379fb92d8788ed99ce4d3d59ea8dce730bda291a0fb0a4097eded9a02acdc5e10d452a8a9"
+    governor_addr: "0x529502C69356E9f48C8D5427B030020941F9ef42"
+  - candidate_admin: "0x041Eff1FB8179131C15E4c6a54480334967a66A2"
+    consensus_addr: "0x412cA41498e0522f054ebBA32fCaf59C9e55F099"
+    treasury_addr: "0x041Eff1FB8179131C15E4c6a54480334967a66A2"
+    commission_rate: "1000"
+    pubkey: "86e4b390c2f0aebc7e4e9fc2ebc1d514bb48548d1ee5926662c41f6bb9ae93b23d2f5ba706e9cab14e3e7f468998c81c"
+    governor_addr: "0x85C5dBfadcBc36AeE39DD32365183c5E38A67E37"
+  - candidate_admin: "0x13c6f0780874cC24a942549487A5D194Df168BDA"
+    consensus_addr: "0x7CcE47da0E161BE6fA1c7D09A9d12986b03621A3"
+    treasury_addr: "0x13c6f0780874cC24a942549487A5D194Df168BDA"
+    commission_rate: "1000"
+    pubkey: "a9e0e6bcc0ce5128000c5cef2cf28f67f8fe37383c025fe993369ae8026c394fd351f40638c2669c98df6027a52e7c83"
+    governor_addr: "0x947AB99ad90302b5ec1840c9b5CF4205554C72af"
+  - candidate_admin: "0x23DdE6c8f37Bc709C3EE070536d0B6ef9e6c9e7C"
+    consensus_addr: "0x2a3A855BaC121DB727E856377c8c7DF59d9FeD51"
+    treasury_addr: "0x23DdE6c8f37Bc709C3EE070536d0B6ef9e6c9e7C"
+    commission_rate: "1000"
+    pubkey: "8f608f92f151e2be60776319b6edf4c068fe8949d6cb87f4c423d2fbfefb9d2d3de6e50faac11e5c22d5c7acb3b6917a"
+    governor_addr: "0x6a0397bDF0275Ad0201174afc05D3CFa27A5e1f1"
+  # - candidate_admin: "0x0d150919BEd130032e512fB9906822946BB90427"
+  #   consensus_addr: "0xDbbD955b836Bb3C1b6fE234cd6E6d5c5Db8e0C8f"
+  #   treasury_addr: "0x0d150919BEd130032e512fB9906822946BB90427"
+  #   commission_rate: "1000"
+  #   pubkey: "ae39affdfd395215e8cc0e8380f691b797401f23fc7eb44666a161a703cf6ef37a9c3eef13cf63299ddec4d0550b9be3"
+  #   governor_addr: "0x96262418638f93119429b8824fc22DFe7f428063"
+  # - candidate_admin: "0x0Eac99A705D736D110092A5AB9a2712E254bC679"
+  #   consensus_addr: "0x49ca56b3CbD522D1CAD03B2A4bfD073026704FFF"
+  #   treasury_addr: "0x0Eac99A705D736D110092A5AB9a2712E254bC679"
+  #   commission_rate: "1000"
+  #   pubkey: "ab7d5c3d1d9fa9d785e0669986a12fb93277d776b3891101cce9fc74cd444b194d830c415350cb5d0857ced09aa6547d"
+  #   governor_addr: "0x32dA26032Ef488Ffe7d5A4Af23FD3bbBbCacA4C7"
+  # - candidate_admin: "0x33b262eD191A8262185bfE00901e162acB0AC04f"
+  #   consensus_addr: "0x538cC55f1A0D61ff670aD37a673fBed4260bfF33"
+  #   treasury_addr: "0x33b262eD191A8262185bfE00901e162acB0AC04f"
+  #   commission_rate: "1000"
+  #   pubkey: "8be8a6d847084dabbf4ad2466620a51293ea82cfc09de1a5b1d17a728ffd8c5a5f982a4a47e799a463796d7715a12f27"
+  #   governor_addr: "0x0a9C03fe1833526B4bB16d50EF334f0C393a1C2F"
+  # - candidate_admin: "0x6609E8DFe0a2813257BC281cC23FfE924c1a33A6"
+  #   consensus_addr: "0xD64894e65a9F7887607603d3e29eD4DA4F2B08f1"
+  #   treasury_addr: "0x6609E8DFe0a2813257BC281cC23FfE924c1a33A6"
+  #   commission_rate: "1000"
+  #   pubkey: "aacbd8aadc29eef196c9756350b97239930b07ec127830641b3fa7356fc694271834625c4c592e5846ba71aec4994e80"
+  #   governor_addr: "0x085C0a5F097911AeB63c825342B295d977deb30d"
+  # - candidate_admin: "0x5CA715f29346b2aDda63D0B3bd88071175E2179c"
+  #   consensus_addr: "0xd5d2447DaF602803cBfc106095e323E69Be70Bb9"
+  #   treasury_addr: "0x5CA715f29346b2aDda63D0B3bd88071175E2179c"
+  #   commission_rate: "1000"
+  #   pubkey: "87c973e4032433f449667ce8baa991df32a94dd15b05d7585d3f606f61341198b4a217d459a076582e803d0829b289fb"
+  #   governor_addr: "0x5CA715f29346b2aDda63D0B3bd88071175E2179c"
+  # - candidate_admin: "0x7365D1e1965eaF0E474B4FA051267f2Bc90E0737"
+  #   consensus_addr: "0xd561D40f977e1A6B61F9d1B17B74B53E03E901b9"
+  #   treasury_addr: "0x7365D1e1965eaF0E474B4FA051267f2Bc90E0737"
+  #   commission_rate: "1000"
+  #   pubkey: "91250345446aad3fb0ea0d3db3a2d8f854c3da261dc51966c614573ae96c40efd009ff9238d98b4530710a8a41786e1d"
+  #   governor_addr: "0x66383f9DF6DADF626462b4c3fb2E0bA4706F33fD"
+  # - candidate_admin: "0x11728c9097Eb47D49a7106c981B78D524D033EE8"
+  #   consensus_addr: "0x120C607b84F82182726127FF70296baBd7A5c450" 
+  #   treasury_addr: "0x11728c9097Eb47D49a7106c981B78D524D033EE8"
+  #   commission_rate: 1000
+  #   pubkey: "a1eb24c8a4d32128d243abebc36640b4c23d30e80b9e7789300be470c7d137863c324cb423332fe6514da64ac29c2d6e" 
+  #   governor_addr: "0x168eCd0Fe667bac8e7f5244F785Ef94B5BD4FF9c" 
+  # - candidate_admin: "0x75681155bCf4B5ee5F7B0859f5aD7b4867df33A8"
+  #   consensus_addr: "0x094bb07EeE279f1C67dd57A89c28db60e4C20305" 
+  #   treasury_addr: "0x75681155bCf4B5ee5F7B0859f5aD7b4867df33A8"
+  #   commission_rate: "1000"
+  #   pubkey: "8bdc0ff591394e059946dcc8baf05fba31a139de4cc06fabf2dcca82e5a191cd7ca1b2c129246f026df65d7e4260c48c" 
+  #   governor_addr: "0x533F79C9e868D8DFa2E9738a38F37F59bF36E720" 
+  # - candidate_admin: "0x04eBF9a47fF4D7757A21cb5eEd17A19706a903D9"
+  #   consensus_addr: "0x3Ca7362AC970A98B180be961191ABD10daAc412C" 
+  #   treasury_addr: "0x04eBF9a47fF4D7757A21cb5eEd17A19706a903D9"
+  #   commission_rate: "1000"
+  #   pubkey: "aebfef1da3614d50672c762a73e4ea6f452d1b7b754e11f58ff7a7f37f5b2facf9aa11256807e562b16fbb25b24a2c7b" 
+  #   governor_addr: "0xF14a0989d30a0eC0E735F69Bd98178fA74B54068" 
+  # - candidate_admin: "0xACF5EC1dd14d974fDca6e9629324682f779c7a96"
+  #   consensus_addr: "0x68A193ECb9114A13f8f4FE8fe16a9E6E55bc6313" 
+  #   treasury_addr: "0xACF5EC1dd14d974fDca6e9629324682f779c7a96"
+  #   commission_rate: "1000"
+  #   pubkey: "ae3f2a6a774e1f150c8007de0615f5d7a0b9a61b3d945995da7e3e8b8a5f0beebe4dc317f66223c97dcd8d553f439742" 
+  #   governor_addr: "0xe988C14192DBB3b8A6c56c76d82b1eddF1dfC413" 
+  # - candidate_admin: "0x03Fa00E515B50649AF9cdFd97ED0055A59fF5956"
+  #   consensus_addr: "0x56b53e397fe55626121C1947d6c2e5aB16B2E360" 
+  #   treasury_addr: "0x03Fa00E515B50649AF9cdFd97ED0055A59fF5956"
+  #   commission_rate: "1000"
+  #   pubkey: "94b347d7504ab0525dd1f341e382517bc6d0e03a8bca77af17b51ba13e5da856b699338e16571a048b669184614e6234"
+  #   governor_addr: "0x20A624778a698ad1d5d260f23D5a65b2cF647601" 
+  # - candidate_admin: "0xa1e321e35D3B5b06a3EfdBFD50C7f23d274907E2"
+  #   consensus_addr: "0xE242d8E936F18A5d0bD9CAe24615Aa8A42793CC6" 
+  #   treasury_addr: "0xa1e321e35D3B5b06a3EfdBFD50C7f23d274907E2"
+  #   commission_rate: "1000"
+  #   pubkey: "98809ed6c274416201a4dd58d270e7478865a06b12883c033e50530b1969a1a2f56736aaff4a7d03183b176835d3604e" 
+  #   governor_addr: "0x3c6C315C4BD4032fC73b35Fe12eCAaeF74e63Cc9" 
+  # - candidate_admin: "0x4561C42145dD3523d6F278915150cF62B94fccde"
+  #   consensus_addr: "0x3Ff8Aeb2BFd2d275997159320F7d9c46B07298ea" 
+  #   treasury_addr: "0x4561C42145dD3523d6F278915150cF62B94fccde"
+  #   commission_rate: "1000"
+  #   pubkey: "90138d2ede42a57261f6afc3a4410ac01392a4a5b069610d1d24b0314f95abd7632f8298bb8596b8b56aec0ee2029242" 
+  #   governor_addr: "0x28F281C9a2Ac96BF52D0AC9de3d1842D06C92422" 
+  # - candidate_admin: "0xa4af645DD5c5053115731cd8701508Bf027c937F"
+  #   consensus_addr: "0x4221e3e2E0F86A82A6f6c86411e08BfEB7b78c39" 
+  #   treasury_addr: "0xa4af645DD5c5053115731cd8701508Bf027c937F"
+  #   commission_rate: "1000"
+  #   pubkey: "af4ff8d783a9334f280e2042d4e4d2fe1cc31cb29ed3ea85e6158f3291892769354bf763e930ce42cc2117ca6159c00f" 
+  #   governor_addr: "0x5fe708bbe37f2870c458C4d5FeAe4A022F0DA5Bd" 
+  # - candidate_admin: "0xBF517878F55635D8714B5866449327933240C496"
+  #   consensus_addr: "0x40Ed83D35d390cD48e293aB80438E25c6D22fBDc" 
+  #   treasury_addr: "0xBF517878F55635D8714B5866449327933240C496"
+  #   commission_rate: "1000"
+  #   pubkey: "b71cfa3d157431364df39002deaa9158f579730361ef6c48504a0508fc264db99a1031c43b4bc44d1cfb6d5d47bdf66e" 
+  #   governor_addr: "0x8cb6DCeD751dB50C0B4a902D30a638B8E7e466B0" 
+
+
+new_blank_wallets:
+  - wallet_addr: "0x4a6c63a216711A4ec59938b784223967A2206aeE" 
+  - wallet_addr: "0xd3f52d3837Db34c644372ADaE7b0f8c0Cf44BB4D"
+  - wallet_addr: "0xFE490b68E64B190B415Bb92F8D2F7566243E6ea0" 
+  - wallet_addr: "0x29973913ab9D66fd7744e126f2E5029294de1317"
+  - wallet_addr: "0xF43e76f1E97e81571fe8165676F774D757Da9aE8"
+  - wallet_addr: "0x8d57D53fE556376075DafA13d30aA1B98D731945"
+  - wallet_addr: "0xAdc7f35a772F2fEc70b9f0bD79fABD5F4Ed02f06"
+  - wallet_addr: "0xc56e395AFfE1aBa503F57986EDd27ebAd164f4D8"
+  - wallet_addr: "0x5C3d79b9e8f9Df760473CcAe6FA9230EFE646680"
+  - wallet_addr: "0x4c664200fefb2C21F119D4400a807E6aaFF94ee3"
+
+  - wallet_addr: "0x75681155bCf4B5ee5F7B0859f5aD7b4867df33A8"
+  - wallet_addr: "0x094bb07EeE279f1C67dd57A89c28db60e4C20305"
+  - wallet_addr: "0x533F79C9e868D8DFa2E9738a38F37F59bF36E720"
+  - wallet_addr: "0x04eBF9a47fF4D7757A21cb5eEd17A19706a903D9"
+  - wallet_addr: "0x3Ca7362AC970A98B180be961191ABD10daAc412C"
+  - wallet_addr: "0xF14a0989d30a0eC0E735F69Bd98178fA74B54068"
+  - wallet_addr: "0xACF5EC1dd14d974fDca6e9629324682f779c7a96"
+  - wallet_addr: "0x68A193ECb9114A13f8f4FE8fe16a9E6E55bc6313"
+  - wallet_addr: "0xe988C14192DBB3b8A6c56c76d82b1eddF1dfC413"
+  - wallet_addr: "0x03Fa00E515B50649AF9cdFd97ED0055A59fF5956"
+  - wallet_addr: "0x56b53e397fe55626121C1947d6c2e5aB16B2E360"
+  - wallet_addr: "0x20A624778a698ad1d5d260f23D5a65b2cF647601"
+  - wallet_addr: "0xa1e321e35D3B5b06a3EfdBFD50C7f23d274907E2"
+  - wallet_addr: "0xE242d8E936F18A5d0bD9CAe24615Aa8A42793CC6"
+  - wallet_addr: "0x3c6C315C4BD4032fC73b35Fe12eCAaeF74e63Cc9"
+  - wallet_addr: "0x4561C42145dD3523d6F278915150cF62B94fccde"
+  - wallet_addr: "0x3Ff8Aeb2BFd2d275997159320F7d9c46B07298ea"
+  - wallet_addr: "0x28F281C9a2Ac96BF52D0AC9de3d1842D06C92422"
+  - wallet_addr: "0xa4af645DD5c5053115731cd8701508Bf027c937F"
+  - wallet_addr: "0x4221e3e2E0F86A82A6f6c86411e08BfEB7b78c39"
+  - wallet_addr: "0x5fe708bbe37f2870c458C4d5FeAe4A022F0DA5Bd"
+  - wallet_addr: "0xBF517878F55635D8714B5866449327933240C496"
+  - wallet_addr: "0x40Ed83D35d390cD48e293aB80438E25c6D22fBDc"
+  - wallet_addr: "0x8cb6DCeD751dB50C0B4a902D30a638B8E7e466B0" 
+  - wallet_addr: "0xC983d1120909e043820D7FC46E0f2C5fe3130F66"
+  - wallet_addr: "0x46453E2629A96721809Cfb7281E83C4807ec6064"
+  - wallet_addr: "0x3c0d5dFCA641CC5908262909A88f8335c088A313"
+
+blank_wallet_balance: 10000000
+
+# number of period of hardfork - 3
+last_period: 812 # (23492900 - 3 * 28800) / 28800
+# at block timestamp, at which before hardfork - 3 days
+last_delegating_timestamp: 1703919609
+chain_id: 2021

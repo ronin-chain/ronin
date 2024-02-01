@@ -28,20 +28,32 @@ var (
 	_ = event.NewSubscription
 )
 
+// ICandidateManagerCommissionSchedule is an auto generated low-level Go binding around an user-defined struct.
+type ICandidateManagerCommissionSchedule struct {
+	EffectiveTimestamp *big.Int
+	CommissionRate     *big.Int
+}
+
 // ICandidateManagerValidatorCandidate is an auto generated low-level Go binding around an user-defined struct.
 type ICandidateManagerValidatorCandidate struct {
-	Admin              common.Address
-	ConsensusAddr      common.Address
-	TreasuryAddr       common.Address
-	BridgeOperatorAddr common.Address
-	CommissionRate     *big.Int
-	RevokedPeriod      *big.Int
-	ExtraData          []byte
+	ShadowedAdmin                common.Address
+	ShadowedConsensus            common.Address
+	ShadowedTreasury             common.Address
+	DeprecatedBridgeOperatorAddr common.Address
+	CommissionRate               *big.Int
+	RevokingTimestamp            *big.Int
+	TopupDeadline                *big.Int
+}
+
+// ICommonInfoEmergencyExitInfo is an auto generated low-level Go binding around an user-defined struct.
+type ICommonInfoEmergencyExitInfo struct {
+	LockedAmount *big.Int
+	RecyclingAt  *big.Int
 }
 
 // RoninValidatorSetMetaData contains all meta data concerning the RoninValidatorSet contract.
 var RoninValidatorSetMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"period\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address[]\",\"name\":\"consensusAddrs\",\"type\":\"address[]\"}],\"name\":\"BlockProducerSetUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"coinbaseAddr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rewardAmount\",\"type\":\"uint256\"}],\"name\":\"BlockRewardRewardDeprecated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"coinbaseAddr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"submittedAmount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"bonusAmount\",\"type\":\"uint256\"}],\"name\":\"BlockRewardSubmitted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"bridgeOperator\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"recipientAddr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"BridgeOperatorRewardDistributed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"bridgeOperator\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"contractBalance\",\"type\":\"uint256\"}],\"name\":\"BridgeOperatorRewardDistributionFailed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"period\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address[]\",\"name\":\"bridgeOperators\",\"type\":\"address[]\"}],\"name\":\"BridgeOperatorSetUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"BridgeTrackingContractUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"treasuryAddr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"admin\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"bridgeOperator\",\"type\":\"address\"}],\"name\":\"CandidateGranted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"revokedPeriod\",\"type\":\"uint256\"}],\"name\":\"CandidateRevokedPeriodUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address[]\",\"name\":\"consensusAddrs\",\"type\":\"address[]\"}],\"name\":\"CandidatesRevoked\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"version\",\"type\":\"uint8\"}],\"name\":\"Initialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"MaintenanceContractUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"MaxPrioritizedValidatorNumberUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"threshold\",\"type\":\"uint256\"}],\"name\":\"MaxValidatorCandidateUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"MaxValidatorNumberUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"MiningRewardDistributed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"contractBalance\",\"type\":\"uint256\"}],\"name\":\"MiningRewardDistributionFailed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"NumberOfBlocksInEpochUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"RoninTrustedOrganizationContractUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"SlashIndicatorContractUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"StakingContractUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"StakingRewardDistributed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"contractBalance\",\"type\":\"uint256\"}],\"name\":\"StakingRewardDistributionFailed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"StakingVestingContractUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"validator\",\"type\":\"address\"}],\"name\":\"ValidatorLiberated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"period\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"jailedUntil\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"deductedStakingAmount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"blockProducerRewardDeprecated\",\"type\":\"bool\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"bridgeOperatorRewardDeprecated\",\"type\":\"bool\"}],\"name\":\"ValidatorPunished\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"period\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address[]\",\"name\":\"consensusAddrs\",\"type\":\"address[]\"}],\"name\":\"ValidatorSetUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"periodNumber\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"epochNumber\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"periodEnding\",\"type\":\"bool\"}],\"name\":\"WrappedUpEpoch\",\"type\":\"event\"},{\"stateMutability\":\"payable\",\"type\":\"fallback\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_newPeriod\",\"type\":\"uint256\"}],\"name\":\"_isPeriodEnding\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_validatorAddr\",\"type\":\"address\"}],\"name\":\"bailOut\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"bridgeTrackingContract\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"_addrList\",\"type\":\"address[]\"}],\"name\":\"bulkJailed\",\"outputs\":[{\"internalType\":\"bool[]\",\"name\":\"_result\",\"type\":\"bool[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"currentPeriod\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"currentPeriodStartAtBlock\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_block\",\"type\":\"uint256\"}],\"name\":\"epochEndingAt\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_block\",\"type\":\"uint256\"}],\"name\":\"epochOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getBlockProducers\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"_result\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getBridgeOperators\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"_bridgeOperatorList\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_candidate\",\"type\":\"address\"}],\"name\":\"getCandidateInfo\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"admin\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"internalType\":\"addresspayable\",\"name\":\"treasuryAddr\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"bridgeOperatorAddr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"commissionRate\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"revokedPeriod\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"extraData\",\"type\":\"bytes\"}],\"internalType\":\"structICandidateManager.ValidatorCandidate\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCandidateInfos\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"admin\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"internalType\":\"addresspayable\",\"name\":\"treasuryAddr\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"bridgeOperatorAddr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"commissionRate\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"revokedPeriod\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"extraData\",\"type\":\"bytes\"}],\"internalType\":\"structICandidateManager.ValidatorCandidate[]\",\"name\":\"_list\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getLastUpdatedBlock\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getValidatorCandidates\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getValidators\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"_validatorList\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_admin\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_consensusAddr\",\"type\":\"address\"},{\"internalType\":\"addresspayable\",\"name\":\"_treasuryAddr\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_bridgeOperatorAddr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_commissionRate\",\"type\":\"uint256\"}],\"name\":\"grantValidatorCandidate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"__slashIndicatorContract\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"__stakingContract\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"__stakingVestingContract\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"__maintenanceContract\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"__roninTrustedOrganizationContract\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"__bridgeTrackingContract\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"__maxValidatorNumber\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"__maxValidatorCandidate\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"__maxPrioritizedValidatorNumber\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"__numberOfBlocksInEpoch\",\"type\":\"uint256\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"isBlockProducer\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_bridgeOperatorAddr\",\"type\":\"address\"}],\"name\":\"isBridgeOperator\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"_result\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_candidate\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_admin\",\"type\":\"address\"}],\"name\":\"isCandidateAdmin\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"isPeriodEnding\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"isValidator\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"isValidatorCandidate\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"jailed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_blockNum\",\"type\":\"uint256\"}],\"name\":\"jailedAtBlock\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"jailedTimeLeft\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"isJailed_\",\"type\":\"bool\"},{\"internalType\":\"uint256\",\"name\":\"blockLeft_\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"epochLeft_\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_blockNum\",\"type\":\"uint256\"}],\"name\":\"jailedTimeLeftAtBlock\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"isJailed_\",\"type\":\"bool\"},{\"internalType\":\"uint256\",\"name\":\"blockLeft_\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"epochLeft_\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"maintenanceContract\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"maxPrioritizedValidatorNumber\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_maximumPrioritizedValidatorNumber\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"maxValidatorCandidate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"maxValidatorNumber\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_maximumValidatorNumber\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"_blockProducers\",\"type\":\"address[]\"}],\"name\":\"miningRewardDeprecated\",\"outputs\":[{\"internalType\":\"bool[]\",\"name\":\"_result\",\"type\":\"bool[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"_blockProducers\",\"type\":\"address[]\"},{\"internalType\":\"uint256\",\"name\":\"_period\",\"type\":\"uint256\"}],\"name\":\"miningRewardDeprecatedAtPeriod\",\"outputs\":[{\"internalType\":\"bool[]\",\"name\":\"_result\",\"type\":\"bool[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"numberOfBlocksInEpoch\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_numberOfBlocks\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"precompilePickValidatorSetAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"precompileSortValidatorsAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_consensusAddr\",\"type\":\"address\"}],\"name\":\"requestRevokeCandidate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"roninTrustedOrganizationContract\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"setBridgeTrackingContract\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"setMaintenanceContract\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_number\",\"type\":\"uint256\"}],\"name\":\"setMaxValidatorCandidate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_max\",\"type\":\"uint256\"}],\"name\":\"setMaxValidatorNumber\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_number\",\"type\":\"uint256\"}],\"name\":\"setNumberOfBlocksInEpoch\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"setRoninTrustedOrganizationContract\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"setSlashIndicatorContract\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"setStakingContract\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"setStakingVestingContract\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_validatorAddr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_newJailedUntil\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_slashAmount\",\"type\":\"uint256\"}],\"name\":\"slash\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"slashIndicatorContract\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"stakingContract\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"stakingVestingContract\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"submitBlockReward\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalBlockProducers\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_total\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalBridgeOperators\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"validatorCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"wrapUpEpoch\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}]",
+	ABI: "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"ErrAlreadyRequestedEmergencyExit\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ErrAlreadyRequestedRevokingCandidate\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ErrAlreadyRequestedUpdatingCommissionRate\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ErrAlreadyWrappedEpoch\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ErrAtEndOfEpochOnly\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ErrCallPrecompiled\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ErrCallerMustBeCoinbase\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"validator\",\"type\":\"address\"}],\"name\":\"ErrCannotBailout\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"enumContractType\",\"name\":\"contractType\",\"type\":\"uint8\"}],\"name\":\"ErrContractTypeNotFound\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ErrExceedsMaxNumberOfCandidate\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ErrExistentCandidate\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"candidateAdminAddr\",\"type\":\"address\"}],\"name\":\"ErrExistentCandidateAdmin\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_treasuryAddr\",\"type\":\"address\"}],\"name\":\"ErrExistentTreasury\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"msgSig\",\"type\":\"bytes4\"},{\"internalType\":\"uint256\",\"name\":\"currentBalance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"sendAmount\",\"type\":\"uint256\"}],\"name\":\"ErrInsufficientBalance\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ErrInvalidCommissionRate\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ErrInvalidEffectiveDaysOnwards\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ErrInvalidMaxPrioritizedValidatorNumber\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ErrInvalidMinEffectiveDaysOnwards\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"cid\",\"type\":\"address\"}],\"name\":\"ErrLockedFundMightBeRecycled\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"cid\",\"type\":\"address\"}],\"name\":\"ErrLockedFundReleaseInfoNotFound\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ErrNonExistentCandidate\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"msgSig\",\"type\":\"bytes4\"}],\"name\":\"ErrRecipientRevert\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ErrTrustedOrgCannotRenounce\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"msgSig\",\"type\":\"bytes4\"},{\"internalType\":\"enumRoleAccess\",\"name\":\"expectedRole\",\"type\":\"uint8\"}],\"name\":\"ErrUnauthorized\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ErrUnauthorizedReceiveRON\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"msgSig\",\"type\":\"bytes4\"},{\"internalType\":\"enumContractType\",\"name\":\"expectedContractType\",\"type\":\"uint8\"},{\"internalType\":\"address\",\"name\":\"actual\",\"type\":\"address\"}],\"name\":\"ErrUnexpectedInternalCall\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"ErrZeroCodeContract\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NonExistentRecyclingInfo\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"period\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"epoch\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address[]\",\"name\":\"consensusAddrs\",\"type\":\"address[]\"}],\"name\":\"BlockProducerSetUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"coinbaseAddr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rewardAmount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"enumICoinbaseExecution.BlockRewardDeprecatedType\",\"name\":\"deprecatedType\",\"type\":\"uint8\"}],\"name\":\"BlockRewardDeprecated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"coinbaseAddr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"submittedAmount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"bonusAmount\",\"type\":\"uint256\"}],\"name\":\"BlockRewardSubmitted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"bridgeOperator\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"recipientAddr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"BridgeOperatorRewardDistributed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"bridgeOperator\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"contractBalance\",\"type\":\"uint256\"}],\"name\":\"BridgeOperatorRewardDistributionFailed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"period\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"epoch\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address[]\",\"name\":\"bridgeOperators\",\"type\":\"address[]\"}],\"name\":\"BridgeOperatorSetUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"treasuryAddr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"admin\",\"type\":\"address\"}],\"name\":\"CandidateGranted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"cid\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"revokingTimestamp\",\"type\":\"uint256\"}],\"name\":\"CandidateRevokingTimestampUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"cid\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"topupDeadline\",\"type\":\"uint256\"}],\"name\":\"CandidateTopupDeadlineUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address[]\",\"name\":\"consensusAddrs\",\"type\":\"address[]\"}],\"name\":\"CandidatesRevoked\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"effectiveTimestamp\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rate\",\"type\":\"uint256\"}],\"name\":\"CommissionRateUpdateScheduled\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rate\",\"type\":\"uint256\"}],\"name\":\"CommissionRateUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"enumContractType\",\"name\":\"contractType\",\"type\":\"uint8\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"ContractUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"recipientAddr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"name\":\"DeprecatedRewardRecycleFailed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"recipientAddr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"DeprecatedRewardRecycled\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"EmergencyExitLockedAmountUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"unlockedAmount\",\"type\":\"uint256\"}],\"name\":\"EmergencyExitLockedFundReleased\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"unlockedAmount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"contractBalance\",\"type\":\"uint256\"}],\"name\":\"EmergencyExitLockedFundReleasingFailed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"lockedAmount\",\"type\":\"uint256\"}],\"name\":\"EmergencyExitRequested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"EmergencyExpiryDurationUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"FastFinalityRewardDistributed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"contractBalance\",\"type\":\"uint256\"}],\"name\":\"FastFinalityRewardDistributionFailed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"version\",\"type\":\"uint8\"}],\"name\":\"Initialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"MaxPrioritizedValidatorNumberUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"threshold\",\"type\":\"uint256\"}],\"name\":\"MaxValidatorCandidateUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"MaxValidatorNumberUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"numOfDays\",\"type\":\"uint256\"}],\"name\":\"MinEffectiveDaysOnwardsUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"MiningRewardDistributed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"contractBalance\",\"type\":\"uint256\"}],\"name\":\"MiningRewardDistributionFailed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"totalAmount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address[]\",\"name\":\"consensusAddrs\",\"type\":\"address[]\"},{\"indexed\":false,\"internalType\":\"uint256[]\",\"name\":\"amounts\",\"type\":\"uint256[]\"}],\"name\":\"StakingRewardDistributed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"totalAmount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address[]\",\"name\":\"consensusAddrs\",\"type\":\"address[]\"},{\"indexed\":false,\"internalType\":\"uint256[]\",\"name\":\"amounts\",\"type\":\"uint256[]\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"contractBalance\",\"type\":\"uint256\"}],\"name\":\"StakingRewardDistributionFailed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"cid\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"period\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"jailedUntil\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"deductedStakingAmount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"blockProducerRewardDeprecated\",\"type\":\"bool\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"bridgeOperatorRewardDeprecated\",\"type\":\"bool\"}],\"name\":\"ValidatorPunished\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"period\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address[]\",\"name\":\"consensusAddrs\",\"type\":\"address[]\"}],\"name\":\"ValidatorSetUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"cid\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"period\",\"type\":\"uint256\"}],\"name\":\"ValidatorUnjailed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"periodNumber\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"epochNumber\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"periodEnding\",\"type\":\"bool\"}],\"name\":\"WrappedUpEpoch\",\"type\":\"event\"},{\"stateMutability\":\"payable\",\"type\":\"fallback\"},{\"inputs\":[],\"name\":\"DEFAULT_ADDITION_GAS\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"PERIOD_DURATION\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"TConsensus\",\"name\":\"consensus\",\"type\":\"address\"}],\"name\":\"checkJailed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"TConsensus\",\"name\":\"addr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"blockNum\",\"type\":\"uint256\"}],\"name\":\"checkJailedAtBlock\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"TConsensus[]\",\"name\":\"consensusList\",\"type\":\"address[]\"}],\"name\":\"checkManyJailed\",\"outputs\":[{\"internalType\":\"bool[]\",\"name\":\"\",\"type\":\"bool[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"candidateIds\",\"type\":\"address[]\"}],\"name\":\"checkManyJailedById\",\"outputs\":[{\"internalType\":\"bool[]\",\"name\":\"\",\"type\":\"bool[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"TConsensus\",\"name\":\"consensus\",\"type\":\"address\"}],\"name\":\"checkMiningRewardDeprecated\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"TConsensus\",\"name\":\"consensus\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"period\",\"type\":\"uint256\"}],\"name\":\"checkMiningRewardDeprecatedAtPeriod\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"currentPeriod\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"currentPeriodStartAtBlock\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"emergencyExitLockedAmount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"emergencyExpiryDuration\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_block\",\"type\":\"uint256\"}],\"name\":\"epochEndingAt\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_block\",\"type\":\"uint256\"}],\"name\":\"epochOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"candidateAdmin\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"cid\",\"type\":\"address\"},{\"internalType\":\"addresspayable\",\"name\":\"treasuryAddr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"commissionRate\",\"type\":\"uint256\"}],\"name\":\"execApplyValidatorCandidate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"validatorId\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"period\",\"type\":\"uint256\"}],\"name\":\"execBailOut\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"cid\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"newAdmin\",\"type\":\"address\"}],\"name\":\"execChangeAdminAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"cid\",\"type\":\"address\"},{\"internalType\":\"TConsensus\",\"name\":\"newConsensusAddr\",\"type\":\"address\"}],\"name\":\"execChangeConsensusAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"cid\",\"type\":\"address\"},{\"internalType\":\"addresspayable\",\"name\":\"newTreasury\",\"type\":\"address\"}],\"name\":\"execChangeTreasuryAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"cid\",\"type\":\"address\"},{\"internalType\":\"addresspayable\",\"name\":\"recipient\",\"type\":\"address\"}],\"name\":\"execReleaseLockedFundForEmergencyExitRequest\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"cid\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"secLeftToRevoke\",\"type\":\"uint256\"}],\"name\":\"execRequestEmergencyExit\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"cid\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"secsLeft\",\"type\":\"uint256\"}],\"name\":\"execRequestRenounceCandidate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"cid\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"effectiveDaysOnwards\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"commissionRate\",\"type\":\"uint256\"}],\"name\":\"execRequestUpdateCommissionRate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"validatorId\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"newJailedUntil\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"slashAmount\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"cannotBailout\",\"type\":\"bool\"}],\"name\":\"execSlash\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getBlockProducers\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"result\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"TConsensus\",\"name\":\"consensus\",\"type\":\"address\"}],\"name\":\"getCandidateInfo\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"__shadowedAdmin\",\"type\":\"address\"},{\"internalType\":\"TConsensus\",\"name\":\"__shadowedConsensus\",\"type\":\"address\"},{\"internalType\":\"addresspayable\",\"name\":\"__shadowedTreasury\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"____deprecatedBridgeOperatorAddr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"commissionRate\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"revokingTimestamp\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"topupDeadline\",\"type\":\"uint256\"}],\"internalType\":\"structICandidateManager.ValidatorCandidate\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCandidateInfos\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"__shadowedAdmin\",\"type\":\"address\"},{\"internalType\":\"TConsensus\",\"name\":\"__shadowedConsensus\",\"type\":\"address\"},{\"internalType\":\"addresspayable\",\"name\":\"__shadowedTreasury\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"____deprecatedBridgeOperatorAddr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"commissionRate\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"revokingTimestamp\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"topupDeadline\",\"type\":\"uint256\"}],\"internalType\":\"structICandidateManager.ValidatorCandidate[]\",\"name\":\"list\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"TConsensus\",\"name\":\"consensus\",\"type\":\"address\"}],\"name\":\"getCommissionChangeSchedule\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"effectiveTimestamp\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"commissionRate\",\"type\":\"uint256\"}],\"internalType\":\"structICandidateManager.CommissionSchedule\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enumContractType\",\"name\":\"contractType\",\"type\":\"uint8\"}],\"name\":\"getContract\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"contract_\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"TConsensus\",\"name\":\"consensus\",\"type\":\"address\"}],\"name\":\"getEmergencyExitInfo\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"lockedAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"recyclingAt\",\"type\":\"uint256\"}],\"internalType\":\"structICommonInfo.EmergencyExitInfo\",\"name\":\"_info\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"TConsensus\",\"name\":\"consensus\",\"type\":\"address\"}],\"name\":\"getJailedTimeLeft\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"isJailed_\",\"type\":\"bool\"},{\"internalType\":\"uint256\",\"name\":\"blockLeft_\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"epochLeft_\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"TConsensus\",\"name\":\"consensus\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_blockNum\",\"type\":\"uint256\"}],\"name\":\"getJailedTimeLeftAtBlock\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"isJailed_\",\"type\":\"bool\"},{\"internalType\":\"uint256\",\"name\":\"blockLeft_\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"epochLeft_\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getLastUpdatedBlock\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getValidatorCandidates\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getValidators\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"validatorList_\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"__slashIndicatorContract\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"__stakingContract\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"__stakingVestingContract\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"__maintenanceContract\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"__roninTrustedOrganizationContract\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"__maxValidatorNumber\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"__maxValidatorCandidate\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"__maxPrioritizedValidatorNumber\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"__minEffectiveDaysOnwards\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"__numberOfBlocksInEpoch\",\"type\":\"uint256\"},{\"internalType\":\"uint256[2]\",\"name\":\"__emergencyExitConfigs\",\"type\":\"uint256[2]\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"initializeV2\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"fastFinalityTrackingContract\",\"type\":\"address\"}],\"name\":\"initializeV3\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"profileContract\",\"type\":\"address\"}],\"name\":\"initializeV4\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"TConsensus\",\"name\":\"consensusAddr\",\"type\":\"address\"}],\"name\":\"isBlockProducer\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"TConsensus\",\"name\":\"consensusAddr\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"admin\",\"type\":\"address\"}],\"name\":\"isCandidateAdmin\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"isPeriodEnding\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"TConsensus\",\"name\":\"consensus\",\"type\":\"address\"}],\"name\":\"isValidatorCandidate\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"maxPrioritizedValidatorNumber\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_maximumPrioritizedValidatorNumber\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"maxValidatorCandidate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"maxValidatorNumber\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_maximumValidatorNumber\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"minEffectiveDaysOnward\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"numberOfBlocksInEpoch\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_numberOfBlocks\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"precompilePickValidatorSetAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"precompileSortValidatorsAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enumContractType\",\"name\":\"contractType\",\"type\":\"uint8\"},{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"setContract\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"setEmergencyExitLockedAmount\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"duration\",\"type\":\"uint256\"}],\"name\":\"setEmergencyExpiryDuration\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_number\",\"type\":\"uint256\"}],\"name\":\"setMaxPrioritizedValidatorNumber\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_number\",\"type\":\"uint256\"}],\"name\":\"setMaxValidatorCandidate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_max\",\"type\":\"uint256\"}],\"name\":\"setMaxValidatorNumber\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_numOfDays\",\"type\":\"uint256\"}],\"name\":\"setMinEffectiveDaysOnwards\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"submitBlockReward\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalBlockProducer\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"total\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalDeprecatedReward\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_epoch\",\"type\":\"uint256\"}],\"name\":\"tryGetPeriodOfEpoch\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"_filled\",\"type\":\"bool\"},{\"internalType\":\"uint256\",\"name\":\"_periodNumber\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"validatorCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"wrapUpEpoch\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}]",
 }
 
 // RoninValidatorSetABI is the input ABI used to generate the binding from.
@@ -190,12 +202,74 @@ func (_RoninValidatorSet *RoninValidatorSetTransactorRaw) Transact(opts *bind.Tr
 	return _RoninValidatorSet.Contract.contract.Transact(opts, method, params...)
 }
 
-// IsPeriodEnding is a free data retrieval call binding the contract method 0x9b8c334b.
+// DEFAULTADDITIONGAS is a free data retrieval call binding the contract method 0x03827884.
 //
-// Solidity: function _isPeriodEnding(uint256 _newPeriod) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetCaller) IsPeriodEnding(opts *bind.CallOpts, _newPeriod *big.Int) (bool, error) {
+// Solidity: function DEFAULT_ADDITION_GAS() view returns(uint256)
+func (_RoninValidatorSet *RoninValidatorSetCaller) DEFAULTADDITIONGAS(opts *bind.CallOpts) (*big.Int, error) {
 	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "_isPeriodEnding", _newPeriod)
+	err := _RoninValidatorSet.contract.Call(opts, &out, "DEFAULT_ADDITION_GAS")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// DEFAULTADDITIONGAS is a free data retrieval call binding the contract method 0x03827884.
+//
+// Solidity: function DEFAULT_ADDITION_GAS() view returns(uint256)
+func (_RoninValidatorSet *RoninValidatorSetSession) DEFAULTADDITIONGAS() (*big.Int, error) {
+	return _RoninValidatorSet.Contract.DEFAULTADDITIONGAS(&_RoninValidatorSet.CallOpts)
+}
+
+// DEFAULTADDITIONGAS is a free data retrieval call binding the contract method 0x03827884.
+//
+// Solidity: function DEFAULT_ADDITION_GAS() view returns(uint256)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) DEFAULTADDITIONGAS() (*big.Int, error) {
+	return _RoninValidatorSet.Contract.DEFAULTADDITIONGAS(&_RoninValidatorSet.CallOpts)
+}
+
+// PERIODDURATION is a free data retrieval call binding the contract method 0x6558954f.
+//
+// Solidity: function PERIOD_DURATION() view returns(uint256)
+func (_RoninValidatorSet *RoninValidatorSetCaller) PERIODDURATION(opts *bind.CallOpts) (*big.Int, error) {
+	var out []interface{}
+	err := _RoninValidatorSet.contract.Call(opts, &out, "PERIOD_DURATION")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// PERIODDURATION is a free data retrieval call binding the contract method 0x6558954f.
+//
+// Solidity: function PERIOD_DURATION() view returns(uint256)
+func (_RoninValidatorSet *RoninValidatorSetSession) PERIODDURATION() (*big.Int, error) {
+	return _RoninValidatorSet.Contract.PERIODDURATION(&_RoninValidatorSet.CallOpts)
+}
+
+// PERIODDURATION is a free data retrieval call binding the contract method 0x6558954f.
+//
+// Solidity: function PERIOD_DURATION() view returns(uint256)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) PERIODDURATION() (*big.Int, error) {
+	return _RoninValidatorSet.Contract.PERIODDURATION(&_RoninValidatorSet.CallOpts)
+}
+
+// CheckJailed is a free data retrieval call binding the contract method 0x2924de71.
+//
+// Solidity: function checkJailed(address consensus) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetCaller) CheckJailed(opts *bind.CallOpts, consensus common.Address) (bool, error) {
+	var out []interface{}
+	err := _RoninValidatorSet.contract.Call(opts, &out, "checkJailed", consensus)
 
 	if err != nil {
 		return *new(bool), err
@@ -207,57 +281,57 @@ func (_RoninValidatorSet *RoninValidatorSetCaller) IsPeriodEnding(opts *bind.Cal
 
 }
 
-// IsPeriodEnding is a free data retrieval call binding the contract method 0x9b8c334b.
+// CheckJailed is a free data retrieval call binding the contract method 0x2924de71.
 //
-// Solidity: function _isPeriodEnding(uint256 _newPeriod) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetSession) IsPeriodEnding(_newPeriod *big.Int) (bool, error) {
-	return _RoninValidatorSet.Contract.IsPeriodEnding(&_RoninValidatorSet.CallOpts, _newPeriod)
+// Solidity: function checkJailed(address consensus) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetSession) CheckJailed(consensus common.Address) (bool, error) {
+	return _RoninValidatorSet.Contract.CheckJailed(&_RoninValidatorSet.CallOpts, consensus)
 }
 
-// IsPeriodEnding is a free data retrieval call binding the contract method 0x9b8c334b.
+// CheckJailed is a free data retrieval call binding the contract method 0x2924de71.
 //
-// Solidity: function _isPeriodEnding(uint256 _newPeriod) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) IsPeriodEnding(_newPeriod *big.Int) (bool, error) {
-	return _RoninValidatorSet.Contract.IsPeriodEnding(&_RoninValidatorSet.CallOpts, _newPeriod)
+// Solidity: function checkJailed(address consensus) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) CheckJailed(consensus common.Address) (bool, error) {
+	return _RoninValidatorSet.Contract.CheckJailed(&_RoninValidatorSet.CallOpts, consensus)
 }
 
-// BridgeTrackingContract is a free data retrieval call binding the contract method 0x4493421e.
+// CheckJailedAtBlock is a free data retrieval call binding the contract method 0x23c65eb0.
 //
-// Solidity: function bridgeTrackingContract() view returns(address)
-func (_RoninValidatorSet *RoninValidatorSetCaller) BridgeTrackingContract(opts *bind.CallOpts) (common.Address, error) {
+// Solidity: function checkJailedAtBlock(address addr, uint256 blockNum) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetCaller) CheckJailedAtBlock(opts *bind.CallOpts, addr common.Address, blockNum *big.Int) (bool, error) {
 	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "bridgeTrackingContract")
+	err := _RoninValidatorSet.contract.Call(opts, &out, "checkJailedAtBlock", addr, blockNum)
 
 	if err != nil {
-		return *new(common.Address), err
+		return *new(bool), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
 
 	return out0, err
 
 }
 
-// BridgeTrackingContract is a free data retrieval call binding the contract method 0x4493421e.
+// CheckJailedAtBlock is a free data retrieval call binding the contract method 0x23c65eb0.
 //
-// Solidity: function bridgeTrackingContract() view returns(address)
-func (_RoninValidatorSet *RoninValidatorSetSession) BridgeTrackingContract() (common.Address, error) {
-	return _RoninValidatorSet.Contract.BridgeTrackingContract(&_RoninValidatorSet.CallOpts)
+// Solidity: function checkJailedAtBlock(address addr, uint256 blockNum) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetSession) CheckJailedAtBlock(addr common.Address, blockNum *big.Int) (bool, error) {
+	return _RoninValidatorSet.Contract.CheckJailedAtBlock(&_RoninValidatorSet.CallOpts, addr, blockNum)
 }
 
-// BridgeTrackingContract is a free data retrieval call binding the contract method 0x4493421e.
+// CheckJailedAtBlock is a free data retrieval call binding the contract method 0x23c65eb0.
 //
-// Solidity: function bridgeTrackingContract() view returns(address)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) BridgeTrackingContract() (common.Address, error) {
-	return _RoninValidatorSet.Contract.BridgeTrackingContract(&_RoninValidatorSet.CallOpts)
+// Solidity: function checkJailedAtBlock(address addr, uint256 blockNum) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) CheckJailedAtBlock(addr common.Address, blockNum *big.Int) (bool, error) {
+	return _RoninValidatorSet.Contract.CheckJailedAtBlock(&_RoninValidatorSet.CallOpts, addr, blockNum)
 }
 
-// BulkJailed is a free data retrieval call binding the contract method 0x428483c3.
+// CheckManyJailed is a free data retrieval call binding the contract method 0x4de2b735.
 //
-// Solidity: function bulkJailed(address[] _addrList) view returns(bool[] _result)
-func (_RoninValidatorSet *RoninValidatorSetCaller) BulkJailed(opts *bind.CallOpts, _addrList []common.Address) ([]bool, error) {
+// Solidity: function checkManyJailed(address[] consensusList) view returns(bool[])
+func (_RoninValidatorSet *RoninValidatorSetCaller) CheckManyJailed(opts *bind.CallOpts, consensusList []common.Address) ([]bool, error) {
 	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "bulkJailed", _addrList)
+	err := _RoninValidatorSet.contract.Call(opts, &out, "checkManyJailed", consensusList)
 
 	if err != nil {
 		return *new([]bool), err
@@ -269,18 +343,111 @@ func (_RoninValidatorSet *RoninValidatorSetCaller) BulkJailed(opts *bind.CallOpt
 
 }
 
-// BulkJailed is a free data retrieval call binding the contract method 0x428483c3.
+// CheckManyJailed is a free data retrieval call binding the contract method 0x4de2b735.
 //
-// Solidity: function bulkJailed(address[] _addrList) view returns(bool[] _result)
-func (_RoninValidatorSet *RoninValidatorSetSession) BulkJailed(_addrList []common.Address) ([]bool, error) {
-	return _RoninValidatorSet.Contract.BulkJailed(&_RoninValidatorSet.CallOpts, _addrList)
+// Solidity: function checkManyJailed(address[] consensusList) view returns(bool[])
+func (_RoninValidatorSet *RoninValidatorSetSession) CheckManyJailed(consensusList []common.Address) ([]bool, error) {
+	return _RoninValidatorSet.Contract.CheckManyJailed(&_RoninValidatorSet.CallOpts, consensusList)
 }
 
-// BulkJailed is a free data retrieval call binding the contract method 0x428483c3.
+// CheckManyJailed is a free data retrieval call binding the contract method 0x4de2b735.
 //
-// Solidity: function bulkJailed(address[] _addrList) view returns(bool[] _result)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) BulkJailed(_addrList []common.Address) ([]bool, error) {
-	return _RoninValidatorSet.Contract.BulkJailed(&_RoninValidatorSet.CallOpts, _addrList)
+// Solidity: function checkManyJailed(address[] consensusList) view returns(bool[])
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) CheckManyJailed(consensusList []common.Address) ([]bool, error) {
+	return _RoninValidatorSet.Contract.CheckManyJailed(&_RoninValidatorSet.CallOpts, consensusList)
+}
+
+// CheckManyJailedById is a free data retrieval call binding the contract method 0x7e1dc16f.
+//
+// Solidity: function checkManyJailedById(address[] candidateIds) view returns(bool[])
+func (_RoninValidatorSet *RoninValidatorSetCaller) CheckManyJailedById(opts *bind.CallOpts, candidateIds []common.Address) ([]bool, error) {
+	var out []interface{}
+	err := _RoninValidatorSet.contract.Call(opts, &out, "checkManyJailedById", candidateIds)
+
+	if err != nil {
+		return *new([]bool), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new([]bool)).(*[]bool)
+
+	return out0, err
+
+}
+
+// CheckManyJailedById is a free data retrieval call binding the contract method 0x7e1dc16f.
+//
+// Solidity: function checkManyJailedById(address[] candidateIds) view returns(bool[])
+func (_RoninValidatorSet *RoninValidatorSetSession) CheckManyJailedById(candidateIds []common.Address) ([]bool, error) {
+	return _RoninValidatorSet.Contract.CheckManyJailedById(&_RoninValidatorSet.CallOpts, candidateIds)
+}
+
+// CheckManyJailedById is a free data retrieval call binding the contract method 0x7e1dc16f.
+//
+// Solidity: function checkManyJailedById(address[] candidateIds) view returns(bool[])
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) CheckManyJailedById(candidateIds []common.Address) ([]bool, error) {
+	return _RoninValidatorSet.Contract.CheckManyJailedById(&_RoninValidatorSet.CallOpts, candidateIds)
+}
+
+// CheckMiningRewardDeprecated is a free data retrieval call binding the contract method 0x873a5a70.
+//
+// Solidity: function checkMiningRewardDeprecated(address consensus) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetCaller) CheckMiningRewardDeprecated(opts *bind.CallOpts, consensus common.Address) (bool, error) {
+	var out []interface{}
+	err := _RoninValidatorSet.contract.Call(opts, &out, "checkMiningRewardDeprecated", consensus)
+
+	if err != nil {
+		return *new(bool), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
+
+	return out0, err
+
+}
+
+// CheckMiningRewardDeprecated is a free data retrieval call binding the contract method 0x873a5a70.
+//
+// Solidity: function checkMiningRewardDeprecated(address consensus) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetSession) CheckMiningRewardDeprecated(consensus common.Address) (bool, error) {
+	return _RoninValidatorSet.Contract.CheckMiningRewardDeprecated(&_RoninValidatorSet.CallOpts, consensus)
+}
+
+// CheckMiningRewardDeprecated is a free data retrieval call binding the contract method 0x873a5a70.
+//
+// Solidity: function checkMiningRewardDeprecated(address consensus) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) CheckMiningRewardDeprecated(consensus common.Address) (bool, error) {
+	return _RoninValidatorSet.Contract.CheckMiningRewardDeprecated(&_RoninValidatorSet.CallOpts, consensus)
+}
+
+// CheckMiningRewardDeprecatedAtPeriod is a free data retrieval call binding the contract method 0x31a8aef5.
+//
+// Solidity: function checkMiningRewardDeprecatedAtPeriod(address consensus, uint256 period) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetCaller) CheckMiningRewardDeprecatedAtPeriod(opts *bind.CallOpts, consensus common.Address, period *big.Int) (bool, error) {
+	var out []interface{}
+	err := _RoninValidatorSet.contract.Call(opts, &out, "checkMiningRewardDeprecatedAtPeriod", consensus, period)
+
+	if err != nil {
+		return *new(bool), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
+
+	return out0, err
+
+}
+
+// CheckMiningRewardDeprecatedAtPeriod is a free data retrieval call binding the contract method 0x31a8aef5.
+//
+// Solidity: function checkMiningRewardDeprecatedAtPeriod(address consensus, uint256 period) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetSession) CheckMiningRewardDeprecatedAtPeriod(consensus common.Address, period *big.Int) (bool, error) {
+	return _RoninValidatorSet.Contract.CheckMiningRewardDeprecatedAtPeriod(&_RoninValidatorSet.CallOpts, consensus, period)
+}
+
+// CheckMiningRewardDeprecatedAtPeriod is a free data retrieval call binding the contract method 0x31a8aef5.
+//
+// Solidity: function checkMiningRewardDeprecatedAtPeriod(address consensus, uint256 period) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) CheckMiningRewardDeprecatedAtPeriod(consensus common.Address, period *big.Int) (bool, error) {
+	return _RoninValidatorSet.Contract.CheckMiningRewardDeprecatedAtPeriod(&_RoninValidatorSet.CallOpts, consensus, period)
 }
 
 // CurrentPeriod is a free data retrieval call binding the contract method 0x06040618.
@@ -343,6 +510,68 @@ func (_RoninValidatorSet *RoninValidatorSetSession) CurrentPeriodStartAtBlock() 
 // Solidity: function currentPeriodStartAtBlock() view returns(uint256)
 func (_RoninValidatorSet *RoninValidatorSetCallerSession) CurrentPeriodStartAtBlock() (*big.Int, error) {
 	return _RoninValidatorSet.Contract.CurrentPeriodStartAtBlock(&_RoninValidatorSet.CallOpts)
+}
+
+// EmergencyExitLockedAmount is a free data retrieval call binding the contract method 0x690b7536.
+//
+// Solidity: function emergencyExitLockedAmount() view returns(uint256)
+func (_RoninValidatorSet *RoninValidatorSetCaller) EmergencyExitLockedAmount(opts *bind.CallOpts) (*big.Int, error) {
+	var out []interface{}
+	err := _RoninValidatorSet.contract.Call(opts, &out, "emergencyExitLockedAmount")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// EmergencyExitLockedAmount is a free data retrieval call binding the contract method 0x690b7536.
+//
+// Solidity: function emergencyExitLockedAmount() view returns(uint256)
+func (_RoninValidatorSet *RoninValidatorSetSession) EmergencyExitLockedAmount() (*big.Int, error) {
+	return _RoninValidatorSet.Contract.EmergencyExitLockedAmount(&_RoninValidatorSet.CallOpts)
+}
+
+// EmergencyExitLockedAmount is a free data retrieval call binding the contract method 0x690b7536.
+//
+// Solidity: function emergencyExitLockedAmount() view returns(uint256)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) EmergencyExitLockedAmount() (*big.Int, error) {
+	return _RoninValidatorSet.Contract.EmergencyExitLockedAmount(&_RoninValidatorSet.CallOpts)
+}
+
+// EmergencyExpiryDuration is a free data retrieval call binding the contract method 0xa66c0f77.
+//
+// Solidity: function emergencyExpiryDuration() view returns(uint256)
+func (_RoninValidatorSet *RoninValidatorSetCaller) EmergencyExpiryDuration(opts *bind.CallOpts) (*big.Int, error) {
+	var out []interface{}
+	err := _RoninValidatorSet.contract.Call(opts, &out, "emergencyExpiryDuration")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// EmergencyExpiryDuration is a free data retrieval call binding the contract method 0xa66c0f77.
+//
+// Solidity: function emergencyExpiryDuration() view returns(uint256)
+func (_RoninValidatorSet *RoninValidatorSetSession) EmergencyExpiryDuration() (*big.Int, error) {
+	return _RoninValidatorSet.Contract.EmergencyExpiryDuration(&_RoninValidatorSet.CallOpts)
+}
+
+// EmergencyExpiryDuration is a free data retrieval call binding the contract method 0xa66c0f77.
+//
+// Solidity: function emergencyExpiryDuration() view returns(uint256)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) EmergencyExpiryDuration() (*big.Int, error) {
+	return _RoninValidatorSet.Contract.EmergencyExpiryDuration(&_RoninValidatorSet.CallOpts)
 }
 
 // EpochEndingAt is a free data retrieval call binding the contract method 0x7593ff71.
@@ -409,7 +638,7 @@ func (_RoninValidatorSet *RoninValidatorSetCallerSession) EpochOf(_block *big.In
 
 // GetBlockProducers is a free data retrieval call binding the contract method 0x49096d26.
 //
-// Solidity: function getBlockProducers() view returns(address[] _result)
+// Solidity: function getBlockProducers() view returns(address[] result)
 func (_RoninValidatorSet *RoninValidatorSetCaller) GetBlockProducers(opts *bind.CallOpts) ([]common.Address, error) {
 	var out []interface{}
 	err := _RoninValidatorSet.contract.Call(opts, &out, "getBlockProducers")
@@ -426,55 +655,24 @@ func (_RoninValidatorSet *RoninValidatorSetCaller) GetBlockProducers(opts *bind.
 
 // GetBlockProducers is a free data retrieval call binding the contract method 0x49096d26.
 //
-// Solidity: function getBlockProducers() view returns(address[] _result)
+// Solidity: function getBlockProducers() view returns(address[] result)
 func (_RoninValidatorSet *RoninValidatorSetSession) GetBlockProducers() ([]common.Address, error) {
 	return _RoninValidatorSet.Contract.GetBlockProducers(&_RoninValidatorSet.CallOpts)
 }
 
 // GetBlockProducers is a free data retrieval call binding the contract method 0x49096d26.
 //
-// Solidity: function getBlockProducers() view returns(address[] _result)
+// Solidity: function getBlockProducers() view returns(address[] result)
 func (_RoninValidatorSet *RoninValidatorSetCallerSession) GetBlockProducers() ([]common.Address, error) {
 	return _RoninValidatorSet.Contract.GetBlockProducers(&_RoninValidatorSet.CallOpts)
 }
 
-// GetBridgeOperators is a free data retrieval call binding the contract method 0x9b19dbfd.
-//
-// Solidity: function getBridgeOperators() view returns(address[] _bridgeOperatorList)
-func (_RoninValidatorSet *RoninValidatorSetCaller) GetBridgeOperators(opts *bind.CallOpts) ([]common.Address, error) {
-	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "getBridgeOperators")
-
-	if err != nil {
-		return *new([]common.Address), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new([]common.Address)).(*[]common.Address)
-
-	return out0, err
-
-}
-
-// GetBridgeOperators is a free data retrieval call binding the contract method 0x9b19dbfd.
-//
-// Solidity: function getBridgeOperators() view returns(address[] _bridgeOperatorList)
-func (_RoninValidatorSet *RoninValidatorSetSession) GetBridgeOperators() ([]common.Address, error) {
-	return _RoninValidatorSet.Contract.GetBridgeOperators(&_RoninValidatorSet.CallOpts)
-}
-
-// GetBridgeOperators is a free data retrieval call binding the contract method 0x9b19dbfd.
-//
-// Solidity: function getBridgeOperators() view returns(address[] _bridgeOperatorList)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) GetBridgeOperators() ([]common.Address, error) {
-	return _RoninValidatorSet.Contract.GetBridgeOperators(&_RoninValidatorSet.CallOpts)
-}
-
 // GetCandidateInfo is a free data retrieval call binding the contract method 0x28bde1e1.
 //
-// Solidity: function getCandidateInfo(address _candidate) view returns((address,address,address,address,uint256,uint256,bytes))
-func (_RoninValidatorSet *RoninValidatorSetCaller) GetCandidateInfo(opts *bind.CallOpts, _candidate common.Address) (ICandidateManagerValidatorCandidate, error) {
+// Solidity: function getCandidateInfo(address consensus) view returns((address,address,address,address,uint256,uint256,uint256))
+func (_RoninValidatorSet *RoninValidatorSetCaller) GetCandidateInfo(opts *bind.CallOpts, consensus common.Address) (ICandidateManagerValidatorCandidate, error) {
 	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "getCandidateInfo", _candidate)
+	err := _RoninValidatorSet.contract.Call(opts, &out, "getCandidateInfo", consensus)
 
 	if err != nil {
 		return *new(ICandidateManagerValidatorCandidate), err
@@ -488,21 +686,21 @@ func (_RoninValidatorSet *RoninValidatorSetCaller) GetCandidateInfo(opts *bind.C
 
 // GetCandidateInfo is a free data retrieval call binding the contract method 0x28bde1e1.
 //
-// Solidity: function getCandidateInfo(address _candidate) view returns((address,address,address,address,uint256,uint256,bytes))
-func (_RoninValidatorSet *RoninValidatorSetSession) GetCandidateInfo(_candidate common.Address) (ICandidateManagerValidatorCandidate, error) {
-	return _RoninValidatorSet.Contract.GetCandidateInfo(&_RoninValidatorSet.CallOpts, _candidate)
+// Solidity: function getCandidateInfo(address consensus) view returns((address,address,address,address,uint256,uint256,uint256))
+func (_RoninValidatorSet *RoninValidatorSetSession) GetCandidateInfo(consensus common.Address) (ICandidateManagerValidatorCandidate, error) {
+	return _RoninValidatorSet.Contract.GetCandidateInfo(&_RoninValidatorSet.CallOpts, consensus)
 }
 
 // GetCandidateInfo is a free data retrieval call binding the contract method 0x28bde1e1.
 //
-// Solidity: function getCandidateInfo(address _candidate) view returns((address,address,address,address,uint256,uint256,bytes))
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) GetCandidateInfo(_candidate common.Address) (ICandidateManagerValidatorCandidate, error) {
-	return _RoninValidatorSet.Contract.GetCandidateInfo(&_RoninValidatorSet.CallOpts, _candidate)
+// Solidity: function getCandidateInfo(address consensus) view returns((address,address,address,address,uint256,uint256,uint256))
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) GetCandidateInfo(consensus common.Address) (ICandidateManagerValidatorCandidate, error) {
+	return _RoninValidatorSet.Contract.GetCandidateInfo(&_RoninValidatorSet.CallOpts, consensus)
 }
 
 // GetCandidateInfos is a free data retrieval call binding the contract method 0x5248184a.
 //
-// Solidity: function getCandidateInfos() view returns((address,address,address,address,uint256,uint256,bytes)[] _list)
+// Solidity: function getCandidateInfos() view returns((address,address,address,address,uint256,uint256,uint256)[] list)
 func (_RoninValidatorSet *RoninValidatorSetCaller) GetCandidateInfos(opts *bind.CallOpts) ([]ICandidateManagerValidatorCandidate, error) {
 	var out []interface{}
 	err := _RoninValidatorSet.contract.Call(opts, &out, "getCandidateInfos")
@@ -519,16 +717,209 @@ func (_RoninValidatorSet *RoninValidatorSetCaller) GetCandidateInfos(opts *bind.
 
 // GetCandidateInfos is a free data retrieval call binding the contract method 0x5248184a.
 //
-// Solidity: function getCandidateInfos() view returns((address,address,address,address,uint256,uint256,bytes)[] _list)
+// Solidity: function getCandidateInfos() view returns((address,address,address,address,uint256,uint256,uint256)[] list)
 func (_RoninValidatorSet *RoninValidatorSetSession) GetCandidateInfos() ([]ICandidateManagerValidatorCandidate, error) {
 	return _RoninValidatorSet.Contract.GetCandidateInfos(&_RoninValidatorSet.CallOpts)
 }
 
 // GetCandidateInfos is a free data retrieval call binding the contract method 0x5248184a.
 //
-// Solidity: function getCandidateInfos() view returns((address,address,address,address,uint256,uint256,bytes)[] _list)
+// Solidity: function getCandidateInfos() view returns((address,address,address,address,uint256,uint256,uint256)[] list)
 func (_RoninValidatorSet *RoninValidatorSetCallerSession) GetCandidateInfos() ([]ICandidateManagerValidatorCandidate, error) {
 	return _RoninValidatorSet.Contract.GetCandidateInfos(&_RoninValidatorSet.CallOpts)
+}
+
+// GetCommissionChangeSchedule is a free data retrieval call binding the contract method 0xedb194bb.
+//
+// Solidity: function getCommissionChangeSchedule(address consensus) view returns((uint256,uint256))
+func (_RoninValidatorSet *RoninValidatorSetCaller) GetCommissionChangeSchedule(opts *bind.CallOpts, consensus common.Address) (ICandidateManagerCommissionSchedule, error) {
+	var out []interface{}
+	err := _RoninValidatorSet.contract.Call(opts, &out, "getCommissionChangeSchedule", consensus)
+
+	if err != nil {
+		return *new(ICandidateManagerCommissionSchedule), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(ICandidateManagerCommissionSchedule)).(*ICandidateManagerCommissionSchedule)
+
+	return out0, err
+
+}
+
+// GetCommissionChangeSchedule is a free data retrieval call binding the contract method 0xedb194bb.
+//
+// Solidity: function getCommissionChangeSchedule(address consensus) view returns((uint256,uint256))
+func (_RoninValidatorSet *RoninValidatorSetSession) GetCommissionChangeSchedule(consensus common.Address) (ICandidateManagerCommissionSchedule, error) {
+	return _RoninValidatorSet.Contract.GetCommissionChangeSchedule(&_RoninValidatorSet.CallOpts, consensus)
+}
+
+// GetCommissionChangeSchedule is a free data retrieval call binding the contract method 0xedb194bb.
+//
+// Solidity: function getCommissionChangeSchedule(address consensus) view returns((uint256,uint256))
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) GetCommissionChangeSchedule(consensus common.Address) (ICandidateManagerCommissionSchedule, error) {
+	return _RoninValidatorSet.Contract.GetCommissionChangeSchedule(&_RoninValidatorSet.CallOpts, consensus)
+}
+
+// GetContract is a free data retrieval call binding the contract method 0xde981f1b.
+//
+// Solidity: function getContract(uint8 contractType) view returns(address contract_)
+func (_RoninValidatorSet *RoninValidatorSetCaller) GetContract(opts *bind.CallOpts, contractType uint8) (common.Address, error) {
+	var out []interface{}
+	err := _RoninValidatorSet.contract.Call(opts, &out, "getContract", contractType)
+
+	if err != nil {
+		return *new(common.Address), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+
+	return out0, err
+
+}
+
+// GetContract is a free data retrieval call binding the contract method 0xde981f1b.
+//
+// Solidity: function getContract(uint8 contractType) view returns(address contract_)
+func (_RoninValidatorSet *RoninValidatorSetSession) GetContract(contractType uint8) (common.Address, error) {
+	return _RoninValidatorSet.Contract.GetContract(&_RoninValidatorSet.CallOpts, contractType)
+}
+
+// GetContract is a free data retrieval call binding the contract method 0xde981f1b.
+//
+// Solidity: function getContract(uint8 contractType) view returns(address contract_)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) GetContract(contractType uint8) (common.Address, error) {
+	return _RoninValidatorSet.Contract.GetContract(&_RoninValidatorSet.CallOpts, contractType)
+}
+
+// GetEmergencyExitInfo is a free data retrieval call binding the contract method 0x2d784a98.
+//
+// Solidity: function getEmergencyExitInfo(address consensus) view returns((uint256,uint256) _info)
+func (_RoninValidatorSet *RoninValidatorSetCaller) GetEmergencyExitInfo(opts *bind.CallOpts, consensus common.Address) (ICommonInfoEmergencyExitInfo, error) {
+	var out []interface{}
+	err := _RoninValidatorSet.contract.Call(opts, &out, "getEmergencyExitInfo", consensus)
+
+	if err != nil {
+		return *new(ICommonInfoEmergencyExitInfo), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(ICommonInfoEmergencyExitInfo)).(*ICommonInfoEmergencyExitInfo)
+
+	return out0, err
+
+}
+
+// GetEmergencyExitInfo is a free data retrieval call binding the contract method 0x2d784a98.
+//
+// Solidity: function getEmergencyExitInfo(address consensus) view returns((uint256,uint256) _info)
+func (_RoninValidatorSet *RoninValidatorSetSession) GetEmergencyExitInfo(consensus common.Address) (ICommonInfoEmergencyExitInfo, error) {
+	return _RoninValidatorSet.Contract.GetEmergencyExitInfo(&_RoninValidatorSet.CallOpts, consensus)
+}
+
+// GetEmergencyExitInfo is a free data retrieval call binding the contract method 0x2d784a98.
+//
+// Solidity: function getEmergencyExitInfo(address consensus) view returns((uint256,uint256) _info)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) GetEmergencyExitInfo(consensus common.Address) (ICommonInfoEmergencyExitInfo, error) {
+	return _RoninValidatorSet.Contract.GetEmergencyExitInfo(&_RoninValidatorSet.CallOpts, consensus)
+}
+
+// GetJailedTimeLeft is a free data retrieval call binding the contract method 0x96585fc2.
+//
+// Solidity: function getJailedTimeLeft(address consensus) view returns(bool isJailed_, uint256 blockLeft_, uint256 epochLeft_)
+func (_RoninValidatorSet *RoninValidatorSetCaller) GetJailedTimeLeft(opts *bind.CallOpts, consensus common.Address) (struct {
+	IsJailed  bool
+	BlockLeft *big.Int
+	EpochLeft *big.Int
+}, error) {
+	var out []interface{}
+	err := _RoninValidatorSet.contract.Call(opts, &out, "getJailedTimeLeft", consensus)
+
+	outstruct := new(struct {
+		IsJailed  bool
+		BlockLeft *big.Int
+		EpochLeft *big.Int
+	})
+	if err != nil {
+		return *outstruct, err
+	}
+
+	outstruct.IsJailed = *abi.ConvertType(out[0], new(bool)).(*bool)
+	outstruct.BlockLeft = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
+	outstruct.EpochLeft = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
+
+	return *outstruct, err
+
+}
+
+// GetJailedTimeLeft is a free data retrieval call binding the contract method 0x96585fc2.
+//
+// Solidity: function getJailedTimeLeft(address consensus) view returns(bool isJailed_, uint256 blockLeft_, uint256 epochLeft_)
+func (_RoninValidatorSet *RoninValidatorSetSession) GetJailedTimeLeft(consensus common.Address) (struct {
+	IsJailed  bool
+	BlockLeft *big.Int
+	EpochLeft *big.Int
+}, error) {
+	return _RoninValidatorSet.Contract.GetJailedTimeLeft(&_RoninValidatorSet.CallOpts, consensus)
+}
+
+// GetJailedTimeLeft is a free data retrieval call binding the contract method 0x96585fc2.
+//
+// Solidity: function getJailedTimeLeft(address consensus) view returns(bool isJailed_, uint256 blockLeft_, uint256 epochLeft_)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) GetJailedTimeLeft(consensus common.Address) (struct {
+	IsJailed  bool
+	BlockLeft *big.Int
+	EpochLeft *big.Int
+}, error) {
+	return _RoninValidatorSet.Contract.GetJailedTimeLeft(&_RoninValidatorSet.CallOpts, consensus)
+}
+
+// GetJailedTimeLeftAtBlock is a free data retrieval call binding the contract method 0x11662dc2.
+//
+// Solidity: function getJailedTimeLeftAtBlock(address consensus, uint256 _blockNum) view returns(bool isJailed_, uint256 blockLeft_, uint256 epochLeft_)
+func (_RoninValidatorSet *RoninValidatorSetCaller) GetJailedTimeLeftAtBlock(opts *bind.CallOpts, consensus common.Address, _blockNum *big.Int) (struct {
+	IsJailed  bool
+	BlockLeft *big.Int
+	EpochLeft *big.Int
+}, error) {
+	var out []interface{}
+	err := _RoninValidatorSet.contract.Call(opts, &out, "getJailedTimeLeftAtBlock", consensus, _blockNum)
+
+	outstruct := new(struct {
+		IsJailed  bool
+		BlockLeft *big.Int
+		EpochLeft *big.Int
+	})
+	if err != nil {
+		return *outstruct, err
+	}
+
+	outstruct.IsJailed = *abi.ConvertType(out[0], new(bool)).(*bool)
+	outstruct.BlockLeft = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
+	outstruct.EpochLeft = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
+
+	return *outstruct, err
+
+}
+
+// GetJailedTimeLeftAtBlock is a free data retrieval call binding the contract method 0x11662dc2.
+//
+// Solidity: function getJailedTimeLeftAtBlock(address consensus, uint256 _blockNum) view returns(bool isJailed_, uint256 blockLeft_, uint256 epochLeft_)
+func (_RoninValidatorSet *RoninValidatorSetSession) GetJailedTimeLeftAtBlock(consensus common.Address, _blockNum *big.Int) (struct {
+	IsJailed  bool
+	BlockLeft *big.Int
+	EpochLeft *big.Int
+}, error) {
+	return _RoninValidatorSet.Contract.GetJailedTimeLeftAtBlock(&_RoninValidatorSet.CallOpts, consensus, _blockNum)
+}
+
+// GetJailedTimeLeftAtBlock is a free data retrieval call binding the contract method 0x11662dc2.
+//
+// Solidity: function getJailedTimeLeftAtBlock(address consensus, uint256 _blockNum) view returns(bool isJailed_, uint256 blockLeft_, uint256 epochLeft_)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) GetJailedTimeLeftAtBlock(consensus common.Address, _blockNum *big.Int) (struct {
+	IsJailed  bool
+	BlockLeft *big.Int
+	EpochLeft *big.Int
+}, error) {
+	return _RoninValidatorSet.Contract.GetJailedTimeLeftAtBlock(&_RoninValidatorSet.CallOpts, consensus, _blockNum)
 }
 
 // GetLastUpdatedBlock is a free data retrieval call binding the contract method 0x87c891bd.
@@ -595,7 +986,7 @@ func (_RoninValidatorSet *RoninValidatorSetCallerSession) GetValidatorCandidates
 
 // GetValidators is a free data retrieval call binding the contract method 0xb7ab4db5.
 //
-// Solidity: function getValidators() view returns(address[] _validatorList)
+// Solidity: function getValidators() view returns(address[] validatorList_)
 func (_RoninValidatorSet *RoninValidatorSetCaller) GetValidators(opts *bind.CallOpts) ([]common.Address, error) {
 	var out []interface{}
 	err := _RoninValidatorSet.contract.Call(opts, &out, "getValidators")
@@ -612,24 +1003,24 @@ func (_RoninValidatorSet *RoninValidatorSetCaller) GetValidators(opts *bind.Call
 
 // GetValidators is a free data retrieval call binding the contract method 0xb7ab4db5.
 //
-// Solidity: function getValidators() view returns(address[] _validatorList)
+// Solidity: function getValidators() view returns(address[] validatorList_)
 func (_RoninValidatorSet *RoninValidatorSetSession) GetValidators() ([]common.Address, error) {
 	return _RoninValidatorSet.Contract.GetValidators(&_RoninValidatorSet.CallOpts)
 }
 
 // GetValidators is a free data retrieval call binding the contract method 0xb7ab4db5.
 //
-// Solidity: function getValidators() view returns(address[] _validatorList)
+// Solidity: function getValidators() view returns(address[] validatorList_)
 func (_RoninValidatorSet *RoninValidatorSetCallerSession) GetValidators() ([]common.Address, error) {
 	return _RoninValidatorSet.Contract.GetValidators(&_RoninValidatorSet.CallOpts)
 }
 
 // IsBlockProducer is a free data retrieval call binding the contract method 0x65244ece.
 //
-// Solidity: function isBlockProducer(address _addr) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetCaller) IsBlockProducer(opts *bind.CallOpts, _addr common.Address) (bool, error) {
+// Solidity: function isBlockProducer(address consensusAddr) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetCaller) IsBlockProducer(opts *bind.CallOpts, consensusAddr common.Address) (bool, error) {
 	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "isBlockProducer", _addr)
+	err := _RoninValidatorSet.contract.Call(opts, &out, "isBlockProducer", consensusAddr)
 
 	if err != nil {
 		return *new(bool), err
@@ -643,55 +1034,24 @@ func (_RoninValidatorSet *RoninValidatorSetCaller) IsBlockProducer(opts *bind.Ca
 
 // IsBlockProducer is a free data retrieval call binding the contract method 0x65244ece.
 //
-// Solidity: function isBlockProducer(address _addr) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetSession) IsBlockProducer(_addr common.Address) (bool, error) {
-	return _RoninValidatorSet.Contract.IsBlockProducer(&_RoninValidatorSet.CallOpts, _addr)
+// Solidity: function isBlockProducer(address consensusAddr) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetSession) IsBlockProducer(consensusAddr common.Address) (bool, error) {
+	return _RoninValidatorSet.Contract.IsBlockProducer(&_RoninValidatorSet.CallOpts, consensusAddr)
 }
 
 // IsBlockProducer is a free data retrieval call binding the contract method 0x65244ece.
 //
-// Solidity: function isBlockProducer(address _addr) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) IsBlockProducer(_addr common.Address) (bool, error) {
-	return _RoninValidatorSet.Contract.IsBlockProducer(&_RoninValidatorSet.CallOpts, _addr)
-}
-
-// IsBridgeOperator is a free data retrieval call binding the contract method 0xb405aaf2.
-//
-// Solidity: function isBridgeOperator(address _bridgeOperatorAddr) view returns(bool _result)
-func (_RoninValidatorSet *RoninValidatorSetCaller) IsBridgeOperator(opts *bind.CallOpts, _bridgeOperatorAddr common.Address) (bool, error) {
-	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "isBridgeOperator", _bridgeOperatorAddr)
-
-	if err != nil {
-		return *new(bool), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-
-	return out0, err
-
-}
-
-// IsBridgeOperator is a free data retrieval call binding the contract method 0xb405aaf2.
-//
-// Solidity: function isBridgeOperator(address _bridgeOperatorAddr) view returns(bool _result)
-func (_RoninValidatorSet *RoninValidatorSetSession) IsBridgeOperator(_bridgeOperatorAddr common.Address) (bool, error) {
-	return _RoninValidatorSet.Contract.IsBridgeOperator(&_RoninValidatorSet.CallOpts, _bridgeOperatorAddr)
-}
-
-// IsBridgeOperator is a free data retrieval call binding the contract method 0xb405aaf2.
-//
-// Solidity: function isBridgeOperator(address _bridgeOperatorAddr) view returns(bool _result)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) IsBridgeOperator(_bridgeOperatorAddr common.Address) (bool, error) {
-	return _RoninValidatorSet.Contract.IsBridgeOperator(&_RoninValidatorSet.CallOpts, _bridgeOperatorAddr)
+// Solidity: function isBlockProducer(address consensusAddr) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) IsBlockProducer(consensusAddr common.Address) (bool, error) {
+	return _RoninValidatorSet.Contract.IsBlockProducer(&_RoninValidatorSet.CallOpts, consensusAddr)
 }
 
 // IsCandidateAdmin is a free data retrieval call binding the contract method 0x04d971ab.
 //
-// Solidity: function isCandidateAdmin(address _candidate, address _admin) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetCaller) IsCandidateAdmin(opts *bind.CallOpts, _candidate common.Address, _admin common.Address) (bool, error) {
+// Solidity: function isCandidateAdmin(address consensusAddr, address admin) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetCaller) IsCandidateAdmin(opts *bind.CallOpts, consensusAddr common.Address, admin common.Address) (bool, error) {
 	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "isCandidateAdmin", _candidate, _admin)
+	err := _RoninValidatorSet.contract.Call(opts, &out, "isCandidateAdmin", consensusAddr, admin)
 
 	if err != nil {
 		return *new(bool), err
@@ -705,22 +1065,22 @@ func (_RoninValidatorSet *RoninValidatorSetCaller) IsCandidateAdmin(opts *bind.C
 
 // IsCandidateAdmin is a free data retrieval call binding the contract method 0x04d971ab.
 //
-// Solidity: function isCandidateAdmin(address _candidate, address _admin) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetSession) IsCandidateAdmin(_candidate common.Address, _admin common.Address) (bool, error) {
-	return _RoninValidatorSet.Contract.IsCandidateAdmin(&_RoninValidatorSet.CallOpts, _candidate, _admin)
+// Solidity: function isCandidateAdmin(address consensusAddr, address admin) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetSession) IsCandidateAdmin(consensusAddr common.Address, admin common.Address) (bool, error) {
+	return _RoninValidatorSet.Contract.IsCandidateAdmin(&_RoninValidatorSet.CallOpts, consensusAddr, admin)
 }
 
 // IsCandidateAdmin is a free data retrieval call binding the contract method 0x04d971ab.
 //
-// Solidity: function isCandidateAdmin(address _candidate, address _admin) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) IsCandidateAdmin(_candidate common.Address, _admin common.Address) (bool, error) {
-	return _RoninValidatorSet.Contract.IsCandidateAdmin(&_RoninValidatorSet.CallOpts, _candidate, _admin)
+// Solidity: function isCandidateAdmin(address consensusAddr, address admin) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) IsCandidateAdmin(consensusAddr common.Address, admin common.Address) (bool, error) {
+	return _RoninValidatorSet.Contract.IsCandidateAdmin(&_RoninValidatorSet.CallOpts, consensusAddr, admin)
 }
 
-// IsCurrentPeriodEnding is a free data retrieval call binding the contract method 0x217f35c2.
+// IsPeriodEnding is a free data retrieval call binding the contract method 0x217f35c2.
 //
 // Solidity: function isPeriodEnding() view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetCaller) IsCurrentPeriodEnding(opts *bind.CallOpts) (bool, error) {
+func (_RoninValidatorSet *RoninValidatorSetCaller) IsPeriodEnding(opts *bind.CallOpts) (bool, error) {
 	var out []interface{}
 	err := _RoninValidatorSet.contract.Call(opts, &out, "isPeriodEnding")
 
@@ -734,57 +1094,26 @@ func (_RoninValidatorSet *RoninValidatorSetCaller) IsCurrentPeriodEnding(opts *b
 
 }
 
-// IsCurrentPeriodEnding is a free data retrieval call binding the contract method 0x217f35c2.
+// IsPeriodEnding is a free data retrieval call binding the contract method 0x217f35c2.
 //
 // Solidity: function isPeriodEnding() view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetSession) IsCurrentPeriodEnding() (bool, error) {
-	return _RoninValidatorSet.Contract.IsCurrentPeriodEnding(&_RoninValidatorSet.CallOpts)
+func (_RoninValidatorSet *RoninValidatorSetSession) IsPeriodEnding() (bool, error) {
+	return _RoninValidatorSet.Contract.IsPeriodEnding(&_RoninValidatorSet.CallOpts)
 }
 
-// IsCurrentPeriodEnding is a free data retrieval call binding the contract method 0x217f35c2.
+// IsPeriodEnding is a free data retrieval call binding the contract method 0x217f35c2.
 //
 // Solidity: function isPeriodEnding() view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) IsCurrentPeriodEnding() (bool, error) {
-	return _RoninValidatorSet.Contract.IsCurrentPeriodEnding(&_RoninValidatorSet.CallOpts)
-}
-
-// IsValidator is a free data retrieval call binding the contract method 0xfacd743b.
-//
-// Solidity: function isValidator(address _addr) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetCaller) IsValidator(opts *bind.CallOpts, _addr common.Address) (bool, error) {
-	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "isValidator", _addr)
-
-	if err != nil {
-		return *new(bool), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-
-	return out0, err
-
-}
-
-// IsValidator is a free data retrieval call binding the contract method 0xfacd743b.
-//
-// Solidity: function isValidator(address _addr) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetSession) IsValidator(_addr common.Address) (bool, error) {
-	return _RoninValidatorSet.Contract.IsValidator(&_RoninValidatorSet.CallOpts, _addr)
-}
-
-// IsValidator is a free data retrieval call binding the contract method 0xfacd743b.
-//
-// Solidity: function isValidator(address _addr) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) IsValidator(_addr common.Address) (bool, error) {
-	return _RoninValidatorSet.Contract.IsValidator(&_RoninValidatorSet.CallOpts, _addr)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) IsPeriodEnding() (bool, error) {
+	return _RoninValidatorSet.Contract.IsPeriodEnding(&_RoninValidatorSet.CallOpts)
 }
 
 // IsValidatorCandidate is a free data retrieval call binding the contract method 0xa0c3f2d2.
 //
-// Solidity: function isValidatorCandidate(address _addr) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetCaller) IsValidatorCandidate(opts *bind.CallOpts, _addr common.Address) (bool, error) {
+// Solidity: function isValidatorCandidate(address consensus) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetCaller) IsValidatorCandidate(opts *bind.CallOpts, consensus common.Address) (bool, error) {
 	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "isValidatorCandidate", _addr)
+	err := _RoninValidatorSet.contract.Call(opts, &out, "isValidatorCandidate", consensus)
 
 	if err != nil {
 		return *new(bool), err
@@ -798,209 +1127,16 @@ func (_RoninValidatorSet *RoninValidatorSetCaller) IsValidatorCandidate(opts *bi
 
 // IsValidatorCandidate is a free data retrieval call binding the contract method 0xa0c3f2d2.
 //
-// Solidity: function isValidatorCandidate(address _addr) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetSession) IsValidatorCandidate(_addr common.Address) (bool, error) {
-	return _RoninValidatorSet.Contract.IsValidatorCandidate(&_RoninValidatorSet.CallOpts, _addr)
+// Solidity: function isValidatorCandidate(address consensus) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetSession) IsValidatorCandidate(consensus common.Address) (bool, error) {
+	return _RoninValidatorSet.Contract.IsValidatorCandidate(&_RoninValidatorSet.CallOpts, consensus)
 }
 
 // IsValidatorCandidate is a free data retrieval call binding the contract method 0xa0c3f2d2.
 //
-// Solidity: function isValidatorCandidate(address _addr) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) IsValidatorCandidate(_addr common.Address) (bool, error) {
-	return _RoninValidatorSet.Contract.IsValidatorCandidate(&_RoninValidatorSet.CallOpts, _addr)
-}
-
-// Jailed is a free data retrieval call binding the contract method 0x7043e5dd.
-//
-// Solidity: function jailed(address _addr) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetCaller) Jailed(opts *bind.CallOpts, _addr common.Address) (bool, error) {
-	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "jailed", _addr)
-
-	if err != nil {
-		return *new(bool), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-
-	return out0, err
-
-}
-
-// Jailed is a free data retrieval call binding the contract method 0x7043e5dd.
-//
-// Solidity: function jailed(address _addr) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetSession) Jailed(_addr common.Address) (bool, error) {
-	return _RoninValidatorSet.Contract.Jailed(&_RoninValidatorSet.CallOpts, _addr)
-}
-
-// Jailed is a free data retrieval call binding the contract method 0x7043e5dd.
-//
-// Solidity: function jailed(address _addr) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) Jailed(_addr common.Address) (bool, error) {
-	return _RoninValidatorSet.Contract.Jailed(&_RoninValidatorSet.CallOpts, _addr)
-}
-
-// JailedAtBlock is a free data retrieval call binding the contract method 0x2607d919.
-//
-// Solidity: function jailedAtBlock(address _addr, uint256 _blockNum) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetCaller) JailedAtBlock(opts *bind.CallOpts, _addr common.Address, _blockNum *big.Int) (bool, error) {
-	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "jailedAtBlock", _addr, _blockNum)
-
-	if err != nil {
-		return *new(bool), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-
-	return out0, err
-
-}
-
-// JailedAtBlock is a free data retrieval call binding the contract method 0x2607d919.
-//
-// Solidity: function jailedAtBlock(address _addr, uint256 _blockNum) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetSession) JailedAtBlock(_addr common.Address, _blockNum *big.Int) (bool, error) {
-	return _RoninValidatorSet.Contract.JailedAtBlock(&_RoninValidatorSet.CallOpts, _addr, _blockNum)
-}
-
-// JailedAtBlock is a free data retrieval call binding the contract method 0x2607d919.
-//
-// Solidity: function jailedAtBlock(address _addr, uint256 _blockNum) view returns(bool)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) JailedAtBlock(_addr common.Address, _blockNum *big.Int) (bool, error) {
-	return _RoninValidatorSet.Contract.JailedAtBlock(&_RoninValidatorSet.CallOpts, _addr, _blockNum)
-}
-
-// JailedTimeLeft is a free data retrieval call binding the contract method 0x81f9535f.
-//
-// Solidity: function jailedTimeLeft(address _addr) view returns(bool isJailed_, uint256 blockLeft_, uint256 epochLeft_)
-func (_RoninValidatorSet *RoninValidatorSetCaller) JailedTimeLeft(opts *bind.CallOpts, _addr common.Address) (struct {
-	IsJailed  bool
-	BlockLeft *big.Int
-	EpochLeft *big.Int
-}, error) {
-	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "jailedTimeLeft", _addr)
-
-	outstruct := new(struct {
-		IsJailed  bool
-		BlockLeft *big.Int
-		EpochLeft *big.Int
-	})
-	if err != nil {
-		return *outstruct, err
-	}
-
-	outstruct.IsJailed = *abi.ConvertType(out[0], new(bool)).(*bool)
-	outstruct.BlockLeft = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
-	outstruct.EpochLeft = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
-
-	return *outstruct, err
-
-}
-
-// JailedTimeLeft is a free data retrieval call binding the contract method 0x81f9535f.
-//
-// Solidity: function jailedTimeLeft(address _addr) view returns(bool isJailed_, uint256 blockLeft_, uint256 epochLeft_)
-func (_RoninValidatorSet *RoninValidatorSetSession) JailedTimeLeft(_addr common.Address) (struct {
-	IsJailed  bool
-	BlockLeft *big.Int
-	EpochLeft *big.Int
-}, error) {
-	return _RoninValidatorSet.Contract.JailedTimeLeft(&_RoninValidatorSet.CallOpts, _addr)
-}
-
-// JailedTimeLeft is a free data retrieval call binding the contract method 0x81f9535f.
-//
-// Solidity: function jailedTimeLeft(address _addr) view returns(bool isJailed_, uint256 blockLeft_, uint256 epochLeft_)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) JailedTimeLeft(_addr common.Address) (struct {
-	IsJailed  bool
-	BlockLeft *big.Int
-	EpochLeft *big.Int
-}, error) {
-	return _RoninValidatorSet.Contract.JailedTimeLeft(&_RoninValidatorSet.CallOpts, _addr)
-}
-
-// JailedTimeLeftAtBlock is a free data retrieval call binding the contract method 0x85ad5aec.
-//
-// Solidity: function jailedTimeLeftAtBlock(address _addr, uint256 _blockNum) view returns(bool isJailed_, uint256 blockLeft_, uint256 epochLeft_)
-func (_RoninValidatorSet *RoninValidatorSetCaller) JailedTimeLeftAtBlock(opts *bind.CallOpts, _addr common.Address, _blockNum *big.Int) (struct {
-	IsJailed  bool
-	BlockLeft *big.Int
-	EpochLeft *big.Int
-}, error) {
-	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "jailedTimeLeftAtBlock", _addr, _blockNum)
-
-	outstruct := new(struct {
-		IsJailed  bool
-		BlockLeft *big.Int
-		EpochLeft *big.Int
-	})
-	if err != nil {
-		return *outstruct, err
-	}
-
-	outstruct.IsJailed = *abi.ConvertType(out[0], new(bool)).(*bool)
-	outstruct.BlockLeft = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
-	outstruct.EpochLeft = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
-
-	return *outstruct, err
-
-}
-
-// JailedTimeLeftAtBlock is a free data retrieval call binding the contract method 0x85ad5aec.
-//
-// Solidity: function jailedTimeLeftAtBlock(address _addr, uint256 _blockNum) view returns(bool isJailed_, uint256 blockLeft_, uint256 epochLeft_)
-func (_RoninValidatorSet *RoninValidatorSetSession) JailedTimeLeftAtBlock(_addr common.Address, _blockNum *big.Int) (struct {
-	IsJailed  bool
-	BlockLeft *big.Int
-	EpochLeft *big.Int
-}, error) {
-	return _RoninValidatorSet.Contract.JailedTimeLeftAtBlock(&_RoninValidatorSet.CallOpts, _addr, _blockNum)
-}
-
-// JailedTimeLeftAtBlock is a free data retrieval call binding the contract method 0x85ad5aec.
-//
-// Solidity: function jailedTimeLeftAtBlock(address _addr, uint256 _blockNum) view returns(bool isJailed_, uint256 blockLeft_, uint256 epochLeft_)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) JailedTimeLeftAtBlock(_addr common.Address, _blockNum *big.Int) (struct {
-	IsJailed  bool
-	BlockLeft *big.Int
-	EpochLeft *big.Int
-}, error) {
-	return _RoninValidatorSet.Contract.JailedTimeLeftAtBlock(&_RoninValidatorSet.CallOpts, _addr, _blockNum)
-}
-
-// MaintenanceContract is a free data retrieval call binding the contract method 0xd2cb215e.
-//
-// Solidity: function maintenanceContract() view returns(address)
-func (_RoninValidatorSet *RoninValidatorSetCaller) MaintenanceContract(opts *bind.CallOpts) (common.Address, error) {
-	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "maintenanceContract")
-
-	if err != nil {
-		return *new(common.Address), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-
-	return out0, err
-
-}
-
-// MaintenanceContract is a free data retrieval call binding the contract method 0xd2cb215e.
-//
-// Solidity: function maintenanceContract() view returns(address)
-func (_RoninValidatorSet *RoninValidatorSetSession) MaintenanceContract() (common.Address, error) {
-	return _RoninValidatorSet.Contract.MaintenanceContract(&_RoninValidatorSet.CallOpts)
-}
-
-// MaintenanceContract is a free data retrieval call binding the contract method 0xd2cb215e.
-//
-// Solidity: function maintenanceContract() view returns(address)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) MaintenanceContract() (common.Address, error) {
-	return _RoninValidatorSet.Contract.MaintenanceContract(&_RoninValidatorSet.CallOpts)
+// Solidity: function isValidatorCandidate(address consensus) view returns(bool)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) IsValidatorCandidate(consensus common.Address) (bool, error) {
+	return _RoninValidatorSet.Contract.IsValidatorCandidate(&_RoninValidatorSet.CallOpts, consensus)
 }
 
 // MaxPrioritizedValidatorNumber is a free data retrieval call binding the contract method 0xeeb629a8.
@@ -1096,66 +1232,35 @@ func (_RoninValidatorSet *RoninValidatorSetCallerSession) MaxValidatorNumber() (
 	return _RoninValidatorSet.Contract.MaxValidatorNumber(&_RoninValidatorSet.CallOpts)
 }
 
-// MiningRewardDeprecated is a free data retrieval call binding the contract method 0x4a68f8c6.
+// MinEffectiveDaysOnward is a free data retrieval call binding the contract method 0x612c8d98.
 //
-// Solidity: function miningRewardDeprecated(address[] _blockProducers) view returns(bool[] _result)
-func (_RoninValidatorSet *RoninValidatorSetCaller) MiningRewardDeprecated(opts *bind.CallOpts, _blockProducers []common.Address) ([]bool, error) {
+// Solidity: function minEffectiveDaysOnward() view returns(uint256)
+func (_RoninValidatorSet *RoninValidatorSetCaller) MinEffectiveDaysOnward(opts *bind.CallOpts) (*big.Int, error) {
 	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "miningRewardDeprecated", _blockProducers)
+	err := _RoninValidatorSet.contract.Call(opts, &out, "minEffectiveDaysOnward")
 
 	if err != nil {
-		return *new([]bool), err
+		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new([]bool)).(*[]bool)
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
 }
 
-// MiningRewardDeprecated is a free data retrieval call binding the contract method 0x4a68f8c6.
+// MinEffectiveDaysOnward is a free data retrieval call binding the contract method 0x612c8d98.
 //
-// Solidity: function miningRewardDeprecated(address[] _blockProducers) view returns(bool[] _result)
-func (_RoninValidatorSet *RoninValidatorSetSession) MiningRewardDeprecated(_blockProducers []common.Address) ([]bool, error) {
-	return _RoninValidatorSet.Contract.MiningRewardDeprecated(&_RoninValidatorSet.CallOpts, _blockProducers)
+// Solidity: function minEffectiveDaysOnward() view returns(uint256)
+func (_RoninValidatorSet *RoninValidatorSetSession) MinEffectiveDaysOnward() (*big.Int, error) {
+	return _RoninValidatorSet.Contract.MinEffectiveDaysOnward(&_RoninValidatorSet.CallOpts)
 }
 
-// MiningRewardDeprecated is a free data retrieval call binding the contract method 0x4a68f8c6.
+// MinEffectiveDaysOnward is a free data retrieval call binding the contract method 0x612c8d98.
 //
-// Solidity: function miningRewardDeprecated(address[] _blockProducers) view returns(bool[] _result)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) MiningRewardDeprecated(_blockProducers []common.Address) ([]bool, error) {
-	return _RoninValidatorSet.Contract.MiningRewardDeprecated(&_RoninValidatorSet.CallOpts, _blockProducers)
-}
-
-// MiningRewardDeprecatedAtPeriod is a free data retrieval call binding the contract method 0x92a8c2e8.
-//
-// Solidity: function miningRewardDeprecatedAtPeriod(address[] _blockProducers, uint256 _period) view returns(bool[] _result)
-func (_RoninValidatorSet *RoninValidatorSetCaller) MiningRewardDeprecatedAtPeriod(opts *bind.CallOpts, _blockProducers []common.Address, _period *big.Int) ([]bool, error) {
-	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "miningRewardDeprecatedAtPeriod", _blockProducers, _period)
-
-	if err != nil {
-		return *new([]bool), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new([]bool)).(*[]bool)
-
-	return out0, err
-
-}
-
-// MiningRewardDeprecatedAtPeriod is a free data retrieval call binding the contract method 0x92a8c2e8.
-//
-// Solidity: function miningRewardDeprecatedAtPeriod(address[] _blockProducers, uint256 _period) view returns(bool[] _result)
-func (_RoninValidatorSet *RoninValidatorSetSession) MiningRewardDeprecatedAtPeriod(_blockProducers []common.Address, _period *big.Int) ([]bool, error) {
-	return _RoninValidatorSet.Contract.MiningRewardDeprecatedAtPeriod(&_RoninValidatorSet.CallOpts, _blockProducers, _period)
-}
-
-// MiningRewardDeprecatedAtPeriod is a free data retrieval call binding the contract method 0x92a8c2e8.
-//
-// Solidity: function miningRewardDeprecatedAtPeriod(address[] _blockProducers, uint256 _period) view returns(bool[] _result)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) MiningRewardDeprecatedAtPeriod(_blockProducers []common.Address, _period *big.Int) ([]bool, error) {
-	return _RoninValidatorSet.Contract.MiningRewardDeprecatedAtPeriod(&_RoninValidatorSet.CallOpts, _blockProducers, _period)
+// Solidity: function minEffectiveDaysOnward() view returns(uint256)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) MinEffectiveDaysOnward() (*big.Int, error) {
+	return _RoninValidatorSet.Contract.MinEffectiveDaysOnward(&_RoninValidatorSet.CallOpts)
 }
 
 // NumberOfBlocksInEpoch is a free data retrieval call binding the contract method 0x6aa1c2ef.
@@ -1251,136 +1356,12 @@ func (_RoninValidatorSet *RoninValidatorSetCallerSession) PrecompileSortValidato
 	return _RoninValidatorSet.Contract.PrecompileSortValidatorsAddress(&_RoninValidatorSet.CallOpts)
 }
 
-// RoninTrustedOrganizationContract is a free data retrieval call binding the contract method 0x5511cde1.
+// TotalBlockProducer is a free data retrieval call binding the contract method 0xafc69d73.
 //
-// Solidity: function roninTrustedOrganizationContract() view returns(address)
-func (_RoninValidatorSet *RoninValidatorSetCaller) RoninTrustedOrganizationContract(opts *bind.CallOpts) (common.Address, error) {
+// Solidity: function totalBlockProducer() view returns(uint256 total)
+func (_RoninValidatorSet *RoninValidatorSetCaller) TotalBlockProducer(opts *bind.CallOpts) (*big.Int, error) {
 	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "roninTrustedOrganizationContract")
-
-	if err != nil {
-		return *new(common.Address), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-
-	return out0, err
-
-}
-
-// RoninTrustedOrganizationContract is a free data retrieval call binding the contract method 0x5511cde1.
-//
-// Solidity: function roninTrustedOrganizationContract() view returns(address)
-func (_RoninValidatorSet *RoninValidatorSetSession) RoninTrustedOrganizationContract() (common.Address, error) {
-	return _RoninValidatorSet.Contract.RoninTrustedOrganizationContract(&_RoninValidatorSet.CallOpts)
-}
-
-// RoninTrustedOrganizationContract is a free data retrieval call binding the contract method 0x5511cde1.
-//
-// Solidity: function roninTrustedOrganizationContract() view returns(address)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) RoninTrustedOrganizationContract() (common.Address, error) {
-	return _RoninValidatorSet.Contract.RoninTrustedOrganizationContract(&_RoninValidatorSet.CallOpts)
-}
-
-// SlashIndicatorContract is a free data retrieval call binding the contract method 0x5a08482d.
-//
-// Solidity: function slashIndicatorContract() view returns(address)
-func (_RoninValidatorSet *RoninValidatorSetCaller) SlashIndicatorContract(opts *bind.CallOpts) (common.Address, error) {
-	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "slashIndicatorContract")
-
-	if err != nil {
-		return *new(common.Address), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-
-	return out0, err
-
-}
-
-// SlashIndicatorContract is a free data retrieval call binding the contract method 0x5a08482d.
-//
-// Solidity: function slashIndicatorContract() view returns(address)
-func (_RoninValidatorSet *RoninValidatorSetSession) SlashIndicatorContract() (common.Address, error) {
-	return _RoninValidatorSet.Contract.SlashIndicatorContract(&_RoninValidatorSet.CallOpts)
-}
-
-// SlashIndicatorContract is a free data retrieval call binding the contract method 0x5a08482d.
-//
-// Solidity: function slashIndicatorContract() view returns(address)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) SlashIndicatorContract() (common.Address, error) {
-	return _RoninValidatorSet.Contract.SlashIndicatorContract(&_RoninValidatorSet.CallOpts)
-}
-
-// StakingContract is a free data retrieval call binding the contract method 0xee99205c.
-//
-// Solidity: function stakingContract() view returns(address)
-func (_RoninValidatorSet *RoninValidatorSetCaller) StakingContract(opts *bind.CallOpts) (common.Address, error) {
-	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "stakingContract")
-
-	if err != nil {
-		return *new(common.Address), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-
-	return out0, err
-
-}
-
-// StakingContract is a free data retrieval call binding the contract method 0xee99205c.
-//
-// Solidity: function stakingContract() view returns(address)
-func (_RoninValidatorSet *RoninValidatorSetSession) StakingContract() (common.Address, error) {
-	return _RoninValidatorSet.Contract.StakingContract(&_RoninValidatorSet.CallOpts)
-}
-
-// StakingContract is a free data retrieval call binding the contract method 0xee99205c.
-//
-// Solidity: function stakingContract() view returns(address)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) StakingContract() (common.Address, error) {
-	return _RoninValidatorSet.Contract.StakingContract(&_RoninValidatorSet.CallOpts)
-}
-
-// StakingVestingContract is a free data retrieval call binding the contract method 0x3529214b.
-//
-// Solidity: function stakingVestingContract() view returns(address)
-func (_RoninValidatorSet *RoninValidatorSetCaller) StakingVestingContract(opts *bind.CallOpts) (common.Address, error) {
-	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "stakingVestingContract")
-
-	if err != nil {
-		return *new(common.Address), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-
-	return out0, err
-
-}
-
-// StakingVestingContract is a free data retrieval call binding the contract method 0x3529214b.
-//
-// Solidity: function stakingVestingContract() view returns(address)
-func (_RoninValidatorSet *RoninValidatorSetSession) StakingVestingContract() (common.Address, error) {
-	return _RoninValidatorSet.Contract.StakingVestingContract(&_RoninValidatorSet.CallOpts)
-}
-
-// StakingVestingContract is a free data retrieval call binding the contract method 0x3529214b.
-//
-// Solidity: function stakingVestingContract() view returns(address)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) StakingVestingContract() (common.Address, error) {
-	return _RoninValidatorSet.Contract.StakingVestingContract(&_RoninValidatorSet.CallOpts)
-}
-
-// TotalBlockProducers is a free data retrieval call binding the contract method 0x9e94b9ec.
-//
-// Solidity: function totalBlockProducers() view returns(uint256 _total)
-func (_RoninValidatorSet *RoninValidatorSetCaller) TotalBlockProducers(opts *bind.CallOpts) (*big.Int, error) {
-	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "totalBlockProducers")
+	err := _RoninValidatorSet.contract.Call(opts, &out, "totalBlockProducer")
 
 	if err != nil {
 		return *new(*big.Int), err
@@ -1392,26 +1373,26 @@ func (_RoninValidatorSet *RoninValidatorSetCaller) TotalBlockProducers(opts *bin
 
 }
 
-// TotalBlockProducers is a free data retrieval call binding the contract method 0x9e94b9ec.
+// TotalBlockProducer is a free data retrieval call binding the contract method 0xafc69d73.
 //
-// Solidity: function totalBlockProducers() view returns(uint256 _total)
-func (_RoninValidatorSet *RoninValidatorSetSession) TotalBlockProducers() (*big.Int, error) {
-	return _RoninValidatorSet.Contract.TotalBlockProducers(&_RoninValidatorSet.CallOpts)
+// Solidity: function totalBlockProducer() view returns(uint256 total)
+func (_RoninValidatorSet *RoninValidatorSetSession) TotalBlockProducer() (*big.Int, error) {
+	return _RoninValidatorSet.Contract.TotalBlockProducer(&_RoninValidatorSet.CallOpts)
 }
 
-// TotalBlockProducers is a free data retrieval call binding the contract method 0x9e94b9ec.
+// TotalBlockProducer is a free data retrieval call binding the contract method 0xafc69d73.
 //
-// Solidity: function totalBlockProducers() view returns(uint256 _total)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) TotalBlockProducers() (*big.Int, error) {
-	return _RoninValidatorSet.Contract.TotalBlockProducers(&_RoninValidatorSet.CallOpts)
+// Solidity: function totalBlockProducer() view returns(uint256 total)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) TotalBlockProducer() (*big.Int, error) {
+	return _RoninValidatorSet.Contract.TotalBlockProducer(&_RoninValidatorSet.CallOpts)
 }
 
-// TotalBridgeOperators is a free data retrieval call binding the contract method 0x562d5304.
+// TotalDeprecatedReward is a free data retrieval call binding the contract method 0x4ee4d72b.
 //
-// Solidity: function totalBridgeOperators() view returns(uint256)
-func (_RoninValidatorSet *RoninValidatorSetCaller) TotalBridgeOperators(opts *bind.CallOpts) (*big.Int, error) {
+// Solidity: function totalDeprecatedReward() view returns(uint256)
+func (_RoninValidatorSet *RoninValidatorSetCaller) TotalDeprecatedReward(opts *bind.CallOpts) (*big.Int, error) {
 	var out []interface{}
-	err := _RoninValidatorSet.contract.Call(opts, &out, "totalBridgeOperators")
+	err := _RoninValidatorSet.contract.Call(opts, &out, "totalDeprecatedReward")
 
 	if err != nil {
 		return *new(*big.Int), err
@@ -1423,18 +1404,63 @@ func (_RoninValidatorSet *RoninValidatorSetCaller) TotalBridgeOperators(opts *bi
 
 }
 
-// TotalBridgeOperators is a free data retrieval call binding the contract method 0x562d5304.
+// TotalDeprecatedReward is a free data retrieval call binding the contract method 0x4ee4d72b.
 //
-// Solidity: function totalBridgeOperators() view returns(uint256)
-func (_RoninValidatorSet *RoninValidatorSetSession) TotalBridgeOperators() (*big.Int, error) {
-	return _RoninValidatorSet.Contract.TotalBridgeOperators(&_RoninValidatorSet.CallOpts)
+// Solidity: function totalDeprecatedReward() view returns(uint256)
+func (_RoninValidatorSet *RoninValidatorSetSession) TotalDeprecatedReward() (*big.Int, error) {
+	return _RoninValidatorSet.Contract.TotalDeprecatedReward(&_RoninValidatorSet.CallOpts)
 }
 
-// TotalBridgeOperators is a free data retrieval call binding the contract method 0x562d5304.
+// TotalDeprecatedReward is a free data retrieval call binding the contract method 0x4ee4d72b.
 //
-// Solidity: function totalBridgeOperators() view returns(uint256)
-func (_RoninValidatorSet *RoninValidatorSetCallerSession) TotalBridgeOperators() (*big.Int, error) {
-	return _RoninValidatorSet.Contract.TotalBridgeOperators(&_RoninValidatorSet.CallOpts)
+// Solidity: function totalDeprecatedReward() view returns(uint256)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) TotalDeprecatedReward() (*big.Int, error) {
+	return _RoninValidatorSet.Contract.TotalDeprecatedReward(&_RoninValidatorSet.CallOpts)
+}
+
+// TryGetPeriodOfEpoch is a free data retrieval call binding the contract method 0x468c96ae.
+//
+// Solidity: function tryGetPeriodOfEpoch(uint256 _epoch) view returns(bool _filled, uint256 _periodNumber)
+func (_RoninValidatorSet *RoninValidatorSetCaller) TryGetPeriodOfEpoch(opts *bind.CallOpts, _epoch *big.Int) (struct {
+	Filled       bool
+	PeriodNumber *big.Int
+}, error) {
+	var out []interface{}
+	err := _RoninValidatorSet.contract.Call(opts, &out, "tryGetPeriodOfEpoch", _epoch)
+
+	outstruct := new(struct {
+		Filled       bool
+		PeriodNumber *big.Int
+	})
+	if err != nil {
+		return *outstruct, err
+	}
+
+	outstruct.Filled = *abi.ConvertType(out[0], new(bool)).(*bool)
+	outstruct.PeriodNumber = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
+
+	return *outstruct, err
+
+}
+
+// TryGetPeriodOfEpoch is a free data retrieval call binding the contract method 0x468c96ae.
+//
+// Solidity: function tryGetPeriodOfEpoch(uint256 _epoch) view returns(bool _filled, uint256 _periodNumber)
+func (_RoninValidatorSet *RoninValidatorSetSession) TryGetPeriodOfEpoch(_epoch *big.Int) (struct {
+	Filled       bool
+	PeriodNumber *big.Int
+}, error) {
+	return _RoninValidatorSet.Contract.TryGetPeriodOfEpoch(&_RoninValidatorSet.CallOpts, _epoch)
+}
+
+// TryGetPeriodOfEpoch is a free data retrieval call binding the contract method 0x468c96ae.
+//
+// Solidity: function tryGetPeriodOfEpoch(uint256 _epoch) view returns(bool _filled, uint256 _periodNumber)
+func (_RoninValidatorSet *RoninValidatorSetCallerSession) TryGetPeriodOfEpoch(_epoch *big.Int) (struct {
+	Filled       bool
+	PeriodNumber *big.Int
+}, error) {
+	return _RoninValidatorSet.Contract.TryGetPeriodOfEpoch(&_RoninValidatorSet.CallOpts, _epoch)
 }
 
 // ValidatorCount is a free data retrieval call binding the contract method 0x0f43a677.
@@ -1468,130 +1494,382 @@ func (_RoninValidatorSet *RoninValidatorSetCallerSession) ValidatorCount() (*big
 	return _RoninValidatorSet.Contract.ValidatorCount(&_RoninValidatorSet.CallOpts)
 }
 
-// BailOut is a paid mutator transaction binding the contract method 0xd1f992f7.
+// ExecApplyValidatorCandidate is a paid mutator transaction binding the contract method 0xf883afaf.
 //
-// Solidity: function bailOut(address _validatorAddr) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactor) BailOut(opts *bind.TransactOpts, _validatorAddr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.contract.Transact(opts, "bailOut", _validatorAddr)
+// Solidity: function execApplyValidatorCandidate(address candidateAdmin, address cid, address treasuryAddr, uint256 commissionRate) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) ExecApplyValidatorCandidate(opts *bind.TransactOpts, candidateAdmin common.Address, cid common.Address, treasuryAddr common.Address, commissionRate *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "execApplyValidatorCandidate", candidateAdmin, cid, treasuryAddr, commissionRate)
 }
 
-// BailOut is a paid mutator transaction binding the contract method 0xd1f992f7.
+// ExecApplyValidatorCandidate is a paid mutator transaction binding the contract method 0xf883afaf.
 //
-// Solidity: function bailOut(address _validatorAddr) returns()
-func (_RoninValidatorSet *RoninValidatorSetSession) BailOut(_validatorAddr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.BailOut(&_RoninValidatorSet.TransactOpts, _validatorAddr)
+// Solidity: function execApplyValidatorCandidate(address candidateAdmin, address cid, address treasuryAddr, uint256 commissionRate) returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) ExecApplyValidatorCandidate(candidateAdmin common.Address, cid common.Address, treasuryAddr common.Address, commissionRate *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecApplyValidatorCandidate(&_RoninValidatorSet.TransactOpts, candidateAdmin, cid, treasuryAddr, commissionRate)
 }
 
-// BailOut is a paid mutator transaction binding the contract method 0xd1f992f7.
+// ExecApplyValidatorCandidate is a paid mutator transaction binding the contract method 0xf883afaf.
 //
-// Solidity: function bailOut(address _validatorAddr) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactorSession) BailOut(_validatorAddr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.BailOut(&_RoninValidatorSet.TransactOpts, _validatorAddr)
+// Solidity: function execApplyValidatorCandidate(address candidateAdmin, address cid, address treasuryAddr, uint256 commissionRate) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) ExecApplyValidatorCandidate(candidateAdmin common.Address, cid common.Address, treasuryAddr common.Address, commissionRate *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecApplyValidatorCandidate(&_RoninValidatorSet.TransactOpts, candidateAdmin, cid, treasuryAddr, commissionRate)
 }
 
-// GrantValidatorCandidate is a paid mutator transaction binding the contract method 0x733ec970.
+// ExecBailOut is a paid mutator transaction binding the contract method 0x15b5ebde.
 //
-// Solidity: function grantValidatorCandidate(address _admin, address _consensusAddr, address _treasuryAddr, address _bridgeOperatorAddr, uint256 _commissionRate) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactor) GrantValidatorCandidate(opts *bind.TransactOpts, _admin common.Address, _consensusAddr common.Address, _treasuryAddr common.Address, _bridgeOperatorAddr common.Address, _commissionRate *big.Int) (*types.Transaction, error) {
-	return _RoninValidatorSet.contract.Transact(opts, "grantValidatorCandidate", _admin, _consensusAddr, _treasuryAddr, _bridgeOperatorAddr, _commissionRate)
+// Solidity: function execBailOut(address validatorId, uint256 period) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) ExecBailOut(opts *bind.TransactOpts, validatorId common.Address, period *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "execBailOut", validatorId, period)
 }
 
-// GrantValidatorCandidate is a paid mutator transaction binding the contract method 0x733ec970.
+// ExecBailOut is a paid mutator transaction binding the contract method 0x15b5ebde.
 //
-// Solidity: function grantValidatorCandidate(address _admin, address _consensusAddr, address _treasuryAddr, address _bridgeOperatorAddr, uint256 _commissionRate) returns()
-func (_RoninValidatorSet *RoninValidatorSetSession) GrantValidatorCandidate(_admin common.Address, _consensusAddr common.Address, _treasuryAddr common.Address, _bridgeOperatorAddr common.Address, _commissionRate *big.Int) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.GrantValidatorCandidate(&_RoninValidatorSet.TransactOpts, _admin, _consensusAddr, _treasuryAddr, _bridgeOperatorAddr, _commissionRate)
+// Solidity: function execBailOut(address validatorId, uint256 period) returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) ExecBailOut(validatorId common.Address, period *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecBailOut(&_RoninValidatorSet.TransactOpts, validatorId, period)
 }
 
-// GrantValidatorCandidate is a paid mutator transaction binding the contract method 0x733ec970.
+// ExecBailOut is a paid mutator transaction binding the contract method 0x15b5ebde.
 //
-// Solidity: function grantValidatorCandidate(address _admin, address _consensusAddr, address _treasuryAddr, address _bridgeOperatorAddr, uint256 _commissionRate) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactorSession) GrantValidatorCandidate(_admin common.Address, _consensusAddr common.Address, _treasuryAddr common.Address, _bridgeOperatorAddr common.Address, _commissionRate *big.Int) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.GrantValidatorCandidate(&_RoninValidatorSet.TransactOpts, _admin, _consensusAddr, _treasuryAddr, _bridgeOperatorAddr, _commissionRate)
+// Solidity: function execBailOut(address validatorId, uint256 period) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) ExecBailOut(validatorId common.Address, period *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecBailOut(&_RoninValidatorSet.TransactOpts, validatorId, period)
 }
 
-// Initialize is a paid mutator transaction binding the contract method 0x3986de6a.
+// ExecChangeAdminAddress is a paid mutator transaction binding the contract method 0xea80d67d.
 //
-// Solidity: function initialize(address __slashIndicatorContract, address __stakingContract, address __stakingVestingContract, address __maintenanceContract, address __roninTrustedOrganizationContract, address __bridgeTrackingContract, uint256 __maxValidatorNumber, uint256 __maxValidatorCandidate, uint256 __maxPrioritizedValidatorNumber, uint256 __numberOfBlocksInEpoch) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactor) Initialize(opts *bind.TransactOpts, __slashIndicatorContract common.Address, __stakingContract common.Address, __stakingVestingContract common.Address, __maintenanceContract common.Address, __roninTrustedOrganizationContract common.Address, __bridgeTrackingContract common.Address, __maxValidatorNumber *big.Int, __maxValidatorCandidate *big.Int, __maxPrioritizedValidatorNumber *big.Int, __numberOfBlocksInEpoch *big.Int) (*types.Transaction, error) {
-	return _RoninValidatorSet.contract.Transact(opts, "initialize", __slashIndicatorContract, __stakingContract, __stakingVestingContract, __maintenanceContract, __roninTrustedOrganizationContract, __bridgeTrackingContract, __maxValidatorNumber, __maxValidatorCandidate, __maxPrioritizedValidatorNumber, __numberOfBlocksInEpoch)
+// Solidity: function execChangeAdminAddress(address cid, address newAdmin) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) ExecChangeAdminAddress(opts *bind.TransactOpts, cid common.Address, newAdmin common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "execChangeAdminAddress", cid, newAdmin)
 }
 
-// Initialize is a paid mutator transaction binding the contract method 0x3986de6a.
+// ExecChangeAdminAddress is a paid mutator transaction binding the contract method 0xea80d67d.
 //
-// Solidity: function initialize(address __slashIndicatorContract, address __stakingContract, address __stakingVestingContract, address __maintenanceContract, address __roninTrustedOrganizationContract, address __bridgeTrackingContract, uint256 __maxValidatorNumber, uint256 __maxValidatorCandidate, uint256 __maxPrioritizedValidatorNumber, uint256 __numberOfBlocksInEpoch) returns()
-func (_RoninValidatorSet *RoninValidatorSetSession) Initialize(__slashIndicatorContract common.Address, __stakingContract common.Address, __stakingVestingContract common.Address, __maintenanceContract common.Address, __roninTrustedOrganizationContract common.Address, __bridgeTrackingContract common.Address, __maxValidatorNumber *big.Int, __maxValidatorCandidate *big.Int, __maxPrioritizedValidatorNumber *big.Int, __numberOfBlocksInEpoch *big.Int) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.Initialize(&_RoninValidatorSet.TransactOpts, __slashIndicatorContract, __stakingContract, __stakingVestingContract, __maintenanceContract, __roninTrustedOrganizationContract, __bridgeTrackingContract, __maxValidatorNumber, __maxValidatorCandidate, __maxPrioritizedValidatorNumber, __numberOfBlocksInEpoch)
+// Solidity: function execChangeAdminAddress(address cid, address newAdmin) returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) ExecChangeAdminAddress(cid common.Address, newAdmin common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecChangeAdminAddress(&_RoninValidatorSet.TransactOpts, cid, newAdmin)
 }
 
-// Initialize is a paid mutator transaction binding the contract method 0x3986de6a.
+// ExecChangeAdminAddress is a paid mutator transaction binding the contract method 0xea80d67d.
 //
-// Solidity: function initialize(address __slashIndicatorContract, address __stakingContract, address __stakingVestingContract, address __maintenanceContract, address __roninTrustedOrganizationContract, address __bridgeTrackingContract, uint256 __maxValidatorNumber, uint256 __maxValidatorCandidate, uint256 __maxPrioritizedValidatorNumber, uint256 __numberOfBlocksInEpoch) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactorSession) Initialize(__slashIndicatorContract common.Address, __stakingContract common.Address, __stakingVestingContract common.Address, __maintenanceContract common.Address, __roninTrustedOrganizationContract common.Address, __bridgeTrackingContract common.Address, __maxValidatorNumber *big.Int, __maxValidatorCandidate *big.Int, __maxPrioritizedValidatorNumber *big.Int, __numberOfBlocksInEpoch *big.Int) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.Initialize(&_RoninValidatorSet.TransactOpts, __slashIndicatorContract, __stakingContract, __stakingVestingContract, __maintenanceContract, __roninTrustedOrganizationContract, __bridgeTrackingContract, __maxValidatorNumber, __maxValidatorCandidate, __maxPrioritizedValidatorNumber, __numberOfBlocksInEpoch)
+// Solidity: function execChangeAdminAddress(address cid, address newAdmin) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) ExecChangeAdminAddress(cid common.Address, newAdmin common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecChangeAdminAddress(&_RoninValidatorSet.TransactOpts, cid, newAdmin)
 }
 
-// RequestRevokeCandidate is a paid mutator transaction binding the contract method 0x86b60e1a.
+// ExecChangeConsensusAddress is a paid mutator transaction binding the contract method 0xd93fa306.
 //
-// Solidity: function requestRevokeCandidate(address _consensusAddr) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactor) RequestRevokeCandidate(opts *bind.TransactOpts, _consensusAddr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.contract.Transact(opts, "requestRevokeCandidate", _consensusAddr)
+// Solidity: function execChangeConsensusAddress(address cid, address newConsensusAddr) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) ExecChangeConsensusAddress(opts *bind.TransactOpts, cid common.Address, newConsensusAddr common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "execChangeConsensusAddress", cid, newConsensusAddr)
 }
 
-// RequestRevokeCandidate is a paid mutator transaction binding the contract method 0x86b60e1a.
+// ExecChangeConsensusAddress is a paid mutator transaction binding the contract method 0xd93fa306.
 //
-// Solidity: function requestRevokeCandidate(address _consensusAddr) returns()
-func (_RoninValidatorSet *RoninValidatorSetSession) RequestRevokeCandidate(_consensusAddr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.RequestRevokeCandidate(&_RoninValidatorSet.TransactOpts, _consensusAddr)
+// Solidity: function execChangeConsensusAddress(address cid, address newConsensusAddr) returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) ExecChangeConsensusAddress(cid common.Address, newConsensusAddr common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecChangeConsensusAddress(&_RoninValidatorSet.TransactOpts, cid, newConsensusAddr)
 }
 
-// RequestRevokeCandidate is a paid mutator transaction binding the contract method 0x86b60e1a.
+// ExecChangeConsensusAddress is a paid mutator transaction binding the contract method 0xd93fa306.
 //
-// Solidity: function requestRevokeCandidate(address _consensusAddr) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactorSession) RequestRevokeCandidate(_consensusAddr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.RequestRevokeCandidate(&_RoninValidatorSet.TransactOpts, _consensusAddr)
+// Solidity: function execChangeConsensusAddress(address cid, address newConsensusAddr) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) ExecChangeConsensusAddress(cid common.Address, newConsensusAddr common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecChangeConsensusAddress(&_RoninValidatorSet.TransactOpts, cid, newConsensusAddr)
 }
 
-// SetBridgeTrackingContract is a paid mutator transaction binding the contract method 0x9c8d98da.
+// ExecChangeTreasuryAddress is a paid mutator transaction binding the contract method 0xecd850cc.
 //
-// Solidity: function setBridgeTrackingContract(address _addr) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactor) SetBridgeTrackingContract(opts *bind.TransactOpts, _addr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.contract.Transact(opts, "setBridgeTrackingContract", _addr)
+// Solidity: function execChangeTreasuryAddress(address cid, address newTreasury) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) ExecChangeTreasuryAddress(opts *bind.TransactOpts, cid common.Address, newTreasury common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "execChangeTreasuryAddress", cid, newTreasury)
 }
 
-// SetBridgeTrackingContract is a paid mutator transaction binding the contract method 0x9c8d98da.
+// ExecChangeTreasuryAddress is a paid mutator transaction binding the contract method 0xecd850cc.
 //
-// Solidity: function setBridgeTrackingContract(address _addr) returns()
-func (_RoninValidatorSet *RoninValidatorSetSession) SetBridgeTrackingContract(_addr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.SetBridgeTrackingContract(&_RoninValidatorSet.TransactOpts, _addr)
+// Solidity: function execChangeTreasuryAddress(address cid, address newTreasury) returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) ExecChangeTreasuryAddress(cid common.Address, newTreasury common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecChangeTreasuryAddress(&_RoninValidatorSet.TransactOpts, cid, newTreasury)
 }
 
-// SetBridgeTrackingContract is a paid mutator transaction binding the contract method 0x9c8d98da.
+// ExecChangeTreasuryAddress is a paid mutator transaction binding the contract method 0xecd850cc.
 //
-// Solidity: function setBridgeTrackingContract(address _addr) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactorSession) SetBridgeTrackingContract(_addr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.SetBridgeTrackingContract(&_RoninValidatorSet.TransactOpts, _addr)
+// Solidity: function execChangeTreasuryAddress(address cid, address newTreasury) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) ExecChangeTreasuryAddress(cid common.Address, newTreasury common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecChangeTreasuryAddress(&_RoninValidatorSet.TransactOpts, cid, newTreasury)
 }
 
-// SetMaintenanceContract is a paid mutator transaction binding the contract method 0x46fe9311.
+// ExecReleaseLockedFundForEmergencyExitRequest is a paid mutator transaction binding the contract method 0xc3c8b5d6.
 //
-// Solidity: function setMaintenanceContract(address _addr) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactor) SetMaintenanceContract(opts *bind.TransactOpts, _addr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.contract.Transact(opts, "setMaintenanceContract", _addr)
+// Solidity: function execReleaseLockedFundForEmergencyExitRequest(address cid, address recipient) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) ExecReleaseLockedFundForEmergencyExitRequest(opts *bind.TransactOpts, cid common.Address, recipient common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "execReleaseLockedFundForEmergencyExitRequest", cid, recipient)
 }
 
-// SetMaintenanceContract is a paid mutator transaction binding the contract method 0x46fe9311.
+// ExecReleaseLockedFundForEmergencyExitRequest is a paid mutator transaction binding the contract method 0xc3c8b5d6.
 //
-// Solidity: function setMaintenanceContract(address _addr) returns()
-func (_RoninValidatorSet *RoninValidatorSetSession) SetMaintenanceContract(_addr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.SetMaintenanceContract(&_RoninValidatorSet.TransactOpts, _addr)
+// Solidity: function execReleaseLockedFundForEmergencyExitRequest(address cid, address recipient) returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) ExecReleaseLockedFundForEmergencyExitRequest(cid common.Address, recipient common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecReleaseLockedFundForEmergencyExitRequest(&_RoninValidatorSet.TransactOpts, cid, recipient)
 }
 
-// SetMaintenanceContract is a paid mutator transaction binding the contract method 0x46fe9311.
+// ExecReleaseLockedFundForEmergencyExitRequest is a paid mutator transaction binding the contract method 0xc3c8b5d6.
 //
-// Solidity: function setMaintenanceContract(address _addr) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactorSession) SetMaintenanceContract(_addr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.SetMaintenanceContract(&_RoninValidatorSet.TransactOpts, _addr)
+// Solidity: function execReleaseLockedFundForEmergencyExitRequest(address cid, address recipient) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) ExecReleaseLockedFundForEmergencyExitRequest(cid common.Address, recipient common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecReleaseLockedFundForEmergencyExitRequest(&_RoninValidatorSet.TransactOpts, cid, recipient)
+}
+
+// ExecRequestEmergencyExit is a paid mutator transaction binding the contract method 0xcdaa4e81.
+//
+// Solidity: function execRequestEmergencyExit(address cid, uint256 secLeftToRevoke) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) ExecRequestEmergencyExit(opts *bind.TransactOpts, cid common.Address, secLeftToRevoke *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "execRequestEmergencyExit", cid, secLeftToRevoke)
+}
+
+// ExecRequestEmergencyExit is a paid mutator transaction binding the contract method 0xcdaa4e81.
+//
+// Solidity: function execRequestEmergencyExit(address cid, uint256 secLeftToRevoke) returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) ExecRequestEmergencyExit(cid common.Address, secLeftToRevoke *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecRequestEmergencyExit(&_RoninValidatorSet.TransactOpts, cid, secLeftToRevoke)
+}
+
+// ExecRequestEmergencyExit is a paid mutator transaction binding the contract method 0xcdaa4e81.
+//
+// Solidity: function execRequestEmergencyExit(address cid, uint256 secLeftToRevoke) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) ExecRequestEmergencyExit(cid common.Address, secLeftToRevoke *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecRequestEmergencyExit(&_RoninValidatorSet.TransactOpts, cid, secLeftToRevoke)
+}
+
+// ExecRequestRenounceCandidate is a paid mutator transaction binding the contract method 0xdd716ad3.
+//
+// Solidity: function execRequestRenounceCandidate(address cid, uint256 secsLeft) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) ExecRequestRenounceCandidate(opts *bind.TransactOpts, cid common.Address, secsLeft *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "execRequestRenounceCandidate", cid, secsLeft)
+}
+
+// ExecRequestRenounceCandidate is a paid mutator transaction binding the contract method 0xdd716ad3.
+//
+// Solidity: function execRequestRenounceCandidate(address cid, uint256 secsLeft) returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) ExecRequestRenounceCandidate(cid common.Address, secsLeft *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecRequestRenounceCandidate(&_RoninValidatorSet.TransactOpts, cid, secsLeft)
+}
+
+// ExecRequestRenounceCandidate is a paid mutator transaction binding the contract method 0xdd716ad3.
+//
+// Solidity: function execRequestRenounceCandidate(address cid, uint256 secsLeft) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) ExecRequestRenounceCandidate(cid common.Address, secsLeft *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecRequestRenounceCandidate(&_RoninValidatorSet.TransactOpts, cid, secsLeft)
+}
+
+// ExecRequestUpdateCommissionRate is a paid mutator transaction binding the contract method 0xe5125a1d.
+//
+// Solidity: function execRequestUpdateCommissionRate(address cid, uint256 effectiveDaysOnwards, uint256 commissionRate) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) ExecRequestUpdateCommissionRate(opts *bind.TransactOpts, cid common.Address, effectiveDaysOnwards *big.Int, commissionRate *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "execRequestUpdateCommissionRate", cid, effectiveDaysOnwards, commissionRate)
+}
+
+// ExecRequestUpdateCommissionRate is a paid mutator transaction binding the contract method 0xe5125a1d.
+//
+// Solidity: function execRequestUpdateCommissionRate(address cid, uint256 effectiveDaysOnwards, uint256 commissionRate) returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) ExecRequestUpdateCommissionRate(cid common.Address, effectiveDaysOnwards *big.Int, commissionRate *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecRequestUpdateCommissionRate(&_RoninValidatorSet.TransactOpts, cid, effectiveDaysOnwards, commissionRate)
+}
+
+// ExecRequestUpdateCommissionRate is a paid mutator transaction binding the contract method 0xe5125a1d.
+//
+// Solidity: function execRequestUpdateCommissionRate(address cid, uint256 effectiveDaysOnwards, uint256 commissionRate) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) ExecRequestUpdateCommissionRate(cid common.Address, effectiveDaysOnwards *big.Int, commissionRate *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecRequestUpdateCommissionRate(&_RoninValidatorSet.TransactOpts, cid, effectiveDaysOnwards, commissionRate)
+}
+
+// ExecSlash is a paid mutator transaction binding the contract method 0x2f78204c.
+//
+// Solidity: function execSlash(address validatorId, uint256 newJailedUntil, uint256 slashAmount, bool cannotBailout) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) ExecSlash(opts *bind.TransactOpts, validatorId common.Address, newJailedUntil *big.Int, slashAmount *big.Int, cannotBailout bool) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "execSlash", validatorId, newJailedUntil, slashAmount, cannotBailout)
+}
+
+// ExecSlash is a paid mutator transaction binding the contract method 0x2f78204c.
+//
+// Solidity: function execSlash(address validatorId, uint256 newJailedUntil, uint256 slashAmount, bool cannotBailout) returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) ExecSlash(validatorId common.Address, newJailedUntil *big.Int, slashAmount *big.Int, cannotBailout bool) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecSlash(&_RoninValidatorSet.TransactOpts, validatorId, newJailedUntil, slashAmount, cannotBailout)
+}
+
+// ExecSlash is a paid mutator transaction binding the contract method 0x2f78204c.
+//
+// Solidity: function execSlash(address validatorId, uint256 newJailedUntil, uint256 slashAmount, bool cannotBailout) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) ExecSlash(validatorId common.Address, newJailedUntil *big.Int, slashAmount *big.Int, cannotBailout bool) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.ExecSlash(&_RoninValidatorSet.TransactOpts, validatorId, newJailedUntil, slashAmount, cannotBailout)
+}
+
+// Initialize is a paid mutator transaction binding the contract method 0x367ec12b.
+//
+// Solidity: function initialize(address __slashIndicatorContract, address __stakingContract, address __stakingVestingContract, address __maintenanceContract, address __roninTrustedOrganizationContract, address , uint256 __maxValidatorNumber, uint256 __maxValidatorCandidate, uint256 __maxPrioritizedValidatorNumber, uint256 __minEffectiveDaysOnwards, uint256 __numberOfBlocksInEpoch, uint256[2] __emergencyExitConfigs) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) Initialize(opts *bind.TransactOpts, __slashIndicatorContract common.Address, __stakingContract common.Address, __stakingVestingContract common.Address, __maintenanceContract common.Address, __roninTrustedOrganizationContract common.Address, arg5 common.Address, __maxValidatorNumber *big.Int, __maxValidatorCandidate *big.Int, __maxPrioritizedValidatorNumber *big.Int, __minEffectiveDaysOnwards *big.Int, __numberOfBlocksInEpoch *big.Int, __emergencyExitConfigs [2]*big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "initialize", __slashIndicatorContract, __stakingContract, __stakingVestingContract, __maintenanceContract, __roninTrustedOrganizationContract, arg5, __maxValidatorNumber, __maxValidatorCandidate, __maxPrioritizedValidatorNumber, __minEffectiveDaysOnwards, __numberOfBlocksInEpoch, __emergencyExitConfigs)
+}
+
+// Initialize is a paid mutator transaction binding the contract method 0x367ec12b.
+//
+// Solidity: function initialize(address __slashIndicatorContract, address __stakingContract, address __stakingVestingContract, address __maintenanceContract, address __roninTrustedOrganizationContract, address , uint256 __maxValidatorNumber, uint256 __maxValidatorCandidate, uint256 __maxPrioritizedValidatorNumber, uint256 __minEffectiveDaysOnwards, uint256 __numberOfBlocksInEpoch, uint256[2] __emergencyExitConfigs) returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) Initialize(__slashIndicatorContract common.Address, __stakingContract common.Address, __stakingVestingContract common.Address, __maintenanceContract common.Address, __roninTrustedOrganizationContract common.Address, arg5 common.Address, __maxValidatorNumber *big.Int, __maxValidatorCandidate *big.Int, __maxPrioritizedValidatorNumber *big.Int, __minEffectiveDaysOnwards *big.Int, __numberOfBlocksInEpoch *big.Int, __emergencyExitConfigs [2]*big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.Initialize(&_RoninValidatorSet.TransactOpts, __slashIndicatorContract, __stakingContract, __stakingVestingContract, __maintenanceContract, __roninTrustedOrganizationContract, arg5, __maxValidatorNumber, __maxValidatorCandidate, __maxPrioritizedValidatorNumber, __minEffectiveDaysOnwards, __numberOfBlocksInEpoch, __emergencyExitConfigs)
+}
+
+// Initialize is a paid mutator transaction binding the contract method 0x367ec12b.
+//
+// Solidity: function initialize(address __slashIndicatorContract, address __stakingContract, address __stakingVestingContract, address __maintenanceContract, address __roninTrustedOrganizationContract, address , uint256 __maxValidatorNumber, uint256 __maxValidatorCandidate, uint256 __maxPrioritizedValidatorNumber, uint256 __minEffectiveDaysOnwards, uint256 __numberOfBlocksInEpoch, uint256[2] __emergencyExitConfigs) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) Initialize(__slashIndicatorContract common.Address, __stakingContract common.Address, __stakingVestingContract common.Address, __maintenanceContract common.Address, __roninTrustedOrganizationContract common.Address, arg5 common.Address, __maxValidatorNumber *big.Int, __maxValidatorCandidate *big.Int, __maxPrioritizedValidatorNumber *big.Int, __minEffectiveDaysOnwards *big.Int, __numberOfBlocksInEpoch *big.Int, __emergencyExitConfigs [2]*big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.Initialize(&_RoninValidatorSet.TransactOpts, __slashIndicatorContract, __stakingContract, __stakingVestingContract, __maintenanceContract, __roninTrustedOrganizationContract, arg5, __maxValidatorNumber, __maxValidatorCandidate, __maxPrioritizedValidatorNumber, __minEffectiveDaysOnwards, __numberOfBlocksInEpoch, __emergencyExitConfigs)
+}
+
+// InitializeV2 is a paid mutator transaction binding the contract method 0x5cd8a76b.
+//
+// Solidity: function initializeV2() returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) InitializeV2(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "initializeV2")
+}
+
+// InitializeV2 is a paid mutator transaction binding the contract method 0x5cd8a76b.
+//
+// Solidity: function initializeV2() returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) InitializeV2() (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.InitializeV2(&_RoninValidatorSet.TransactOpts)
+}
+
+// InitializeV2 is a paid mutator transaction binding the contract method 0x5cd8a76b.
+//
+// Solidity: function initializeV2() returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) InitializeV2() (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.InitializeV2(&_RoninValidatorSet.TransactOpts)
+}
+
+// InitializeV3 is a paid mutator transaction binding the contract method 0x3101cfcb.
+//
+// Solidity: function initializeV3(address fastFinalityTrackingContract) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) InitializeV3(opts *bind.TransactOpts, fastFinalityTrackingContract common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "initializeV3", fastFinalityTrackingContract)
+}
+
+// InitializeV3 is a paid mutator transaction binding the contract method 0x3101cfcb.
+//
+// Solidity: function initializeV3(address fastFinalityTrackingContract) returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) InitializeV3(fastFinalityTrackingContract common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.InitializeV3(&_RoninValidatorSet.TransactOpts, fastFinalityTrackingContract)
+}
+
+// InitializeV3 is a paid mutator transaction binding the contract method 0x3101cfcb.
+//
+// Solidity: function initializeV3(address fastFinalityTrackingContract) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) InitializeV3(fastFinalityTrackingContract common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.InitializeV3(&_RoninValidatorSet.TransactOpts, fastFinalityTrackingContract)
+}
+
+// InitializeV4 is a paid mutator transaction binding the contract method 0x110a8308.
+//
+// Solidity: function initializeV4(address profileContract) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) InitializeV4(opts *bind.TransactOpts, profileContract common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "initializeV4", profileContract)
+}
+
+// InitializeV4 is a paid mutator transaction binding the contract method 0x110a8308.
+//
+// Solidity: function initializeV4(address profileContract) returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) InitializeV4(profileContract common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.InitializeV4(&_RoninValidatorSet.TransactOpts, profileContract)
+}
+
+// InitializeV4 is a paid mutator transaction binding the contract method 0x110a8308.
+//
+// Solidity: function initializeV4(address profileContract) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) InitializeV4(profileContract common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.InitializeV4(&_RoninValidatorSet.TransactOpts, profileContract)
+}
+
+// SetContract is a paid mutator transaction binding the contract method 0x865e6fd3.
+//
+// Solidity: function setContract(uint8 contractType, address addr) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) SetContract(opts *bind.TransactOpts, contractType uint8, addr common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "setContract", contractType, addr)
+}
+
+// SetContract is a paid mutator transaction binding the contract method 0x865e6fd3.
+//
+// Solidity: function setContract(uint8 contractType, address addr) returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) SetContract(contractType uint8, addr common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.SetContract(&_RoninValidatorSet.TransactOpts, contractType, addr)
+}
+
+// SetContract is a paid mutator transaction binding the contract method 0x865e6fd3.
+//
+// Solidity: function setContract(uint8 contractType, address addr) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) SetContract(contractType uint8, addr common.Address) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.SetContract(&_RoninValidatorSet.TransactOpts, contractType, addr)
+}
+
+// SetEmergencyExitLockedAmount is a paid mutator transaction binding the contract method 0x6611f843.
+//
+// Solidity: function setEmergencyExitLockedAmount(uint256 amount) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) SetEmergencyExitLockedAmount(opts *bind.TransactOpts, amount *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "setEmergencyExitLockedAmount", amount)
+}
+
+// SetEmergencyExitLockedAmount is a paid mutator transaction binding the contract method 0x6611f843.
+//
+// Solidity: function setEmergencyExitLockedAmount(uint256 amount) returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) SetEmergencyExitLockedAmount(amount *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.SetEmergencyExitLockedAmount(&_RoninValidatorSet.TransactOpts, amount)
+}
+
+// SetEmergencyExitLockedAmount is a paid mutator transaction binding the contract method 0x6611f843.
+//
+// Solidity: function setEmergencyExitLockedAmount(uint256 amount) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) SetEmergencyExitLockedAmount(amount *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.SetEmergencyExitLockedAmount(&_RoninValidatorSet.TransactOpts, amount)
+}
+
+// SetEmergencyExpiryDuration is a paid mutator transaction binding the contract method 0x4d8df063.
+//
+// Solidity: function setEmergencyExpiryDuration(uint256 duration) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) SetEmergencyExpiryDuration(opts *bind.TransactOpts, duration *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "setEmergencyExpiryDuration", duration)
+}
+
+// SetEmergencyExpiryDuration is a paid mutator transaction binding the contract method 0x4d8df063.
+//
+// Solidity: function setEmergencyExpiryDuration(uint256 duration) returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) SetEmergencyExpiryDuration(duration *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.SetEmergencyExpiryDuration(&_RoninValidatorSet.TransactOpts, duration)
+}
+
+// SetEmergencyExpiryDuration is a paid mutator transaction binding the contract method 0x4d8df063.
+//
+// Solidity: function setEmergencyExpiryDuration(uint256 duration) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) SetEmergencyExpiryDuration(duration *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.SetEmergencyExpiryDuration(&_RoninValidatorSet.TransactOpts, duration)
+}
+
+// SetMaxPrioritizedValidatorNumber is a paid mutator transaction binding the contract method 0xc94aaa02.
+//
+// Solidity: function setMaxPrioritizedValidatorNumber(uint256 _number) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) SetMaxPrioritizedValidatorNumber(opts *bind.TransactOpts, _number *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "setMaxPrioritizedValidatorNumber", _number)
+}
+
+// SetMaxPrioritizedValidatorNumber is a paid mutator transaction binding the contract method 0xc94aaa02.
+//
+// Solidity: function setMaxPrioritizedValidatorNumber(uint256 _number) returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) SetMaxPrioritizedValidatorNumber(_number *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.SetMaxPrioritizedValidatorNumber(&_RoninValidatorSet.TransactOpts, _number)
+}
+
+// SetMaxPrioritizedValidatorNumber is a paid mutator transaction binding the contract method 0xc94aaa02.
+//
+// Solidity: function setMaxPrioritizedValidatorNumber(uint256 _number) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) SetMaxPrioritizedValidatorNumber(_number *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.SetMaxPrioritizedValidatorNumber(&_RoninValidatorSet.TransactOpts, _number)
 }
 
 // SetMaxValidatorCandidate is a paid mutator transaction binding the contract method 0x4f2a693f.
@@ -1636,130 +1914,25 @@ func (_RoninValidatorSet *RoninValidatorSetTransactorSession) SetMaxValidatorNum
 	return _RoninValidatorSet.Contract.SetMaxValidatorNumber(&_RoninValidatorSet.TransactOpts, _max)
 }
 
-// SetNumberOfBlocksInEpoch is a paid mutator transaction binding the contract method 0xd72733fc.
+// SetMinEffectiveDaysOnwards is a paid mutator transaction binding the contract method 0x1196ab66.
 //
-// Solidity: function setNumberOfBlocksInEpoch(uint256 _number) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactor) SetNumberOfBlocksInEpoch(opts *bind.TransactOpts, _number *big.Int) (*types.Transaction, error) {
-	return _RoninValidatorSet.contract.Transact(opts, "setNumberOfBlocksInEpoch", _number)
+// Solidity: function setMinEffectiveDaysOnwards(uint256 _numOfDays) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactor) SetMinEffectiveDaysOnwards(opts *bind.TransactOpts, _numOfDays *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.contract.Transact(opts, "setMinEffectiveDaysOnwards", _numOfDays)
 }
 
-// SetNumberOfBlocksInEpoch is a paid mutator transaction binding the contract method 0xd72733fc.
+// SetMinEffectiveDaysOnwards is a paid mutator transaction binding the contract method 0x1196ab66.
 //
-// Solidity: function setNumberOfBlocksInEpoch(uint256 _number) returns()
-func (_RoninValidatorSet *RoninValidatorSetSession) SetNumberOfBlocksInEpoch(_number *big.Int) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.SetNumberOfBlocksInEpoch(&_RoninValidatorSet.TransactOpts, _number)
+// Solidity: function setMinEffectiveDaysOnwards(uint256 _numOfDays) returns()
+func (_RoninValidatorSet *RoninValidatorSetSession) SetMinEffectiveDaysOnwards(_numOfDays *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.SetMinEffectiveDaysOnwards(&_RoninValidatorSet.TransactOpts, _numOfDays)
 }
 
-// SetNumberOfBlocksInEpoch is a paid mutator transaction binding the contract method 0xd72733fc.
+// SetMinEffectiveDaysOnwards is a paid mutator transaction binding the contract method 0x1196ab66.
 //
-// Solidity: function setNumberOfBlocksInEpoch(uint256 _number) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactorSession) SetNumberOfBlocksInEpoch(_number *big.Int) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.SetNumberOfBlocksInEpoch(&_RoninValidatorSet.TransactOpts, _number)
-}
-
-// SetRoninTrustedOrganizationContract is a paid mutator transaction binding the contract method 0xb5e337de.
-//
-// Solidity: function setRoninTrustedOrganizationContract(address _addr) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactor) SetRoninTrustedOrganizationContract(opts *bind.TransactOpts, _addr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.contract.Transact(opts, "setRoninTrustedOrganizationContract", _addr)
-}
-
-// SetRoninTrustedOrganizationContract is a paid mutator transaction binding the contract method 0xb5e337de.
-//
-// Solidity: function setRoninTrustedOrganizationContract(address _addr) returns()
-func (_RoninValidatorSet *RoninValidatorSetSession) SetRoninTrustedOrganizationContract(_addr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.SetRoninTrustedOrganizationContract(&_RoninValidatorSet.TransactOpts, _addr)
-}
-
-// SetRoninTrustedOrganizationContract is a paid mutator transaction binding the contract method 0xb5e337de.
-//
-// Solidity: function setRoninTrustedOrganizationContract(address _addr) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactorSession) SetRoninTrustedOrganizationContract(_addr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.SetRoninTrustedOrganizationContract(&_RoninValidatorSet.TransactOpts, _addr)
-}
-
-// SetSlashIndicatorContract is a paid mutator transaction binding the contract method 0x2bcf3d15.
-//
-// Solidity: function setSlashIndicatorContract(address _addr) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactor) SetSlashIndicatorContract(opts *bind.TransactOpts, _addr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.contract.Transact(opts, "setSlashIndicatorContract", _addr)
-}
-
-// SetSlashIndicatorContract is a paid mutator transaction binding the contract method 0x2bcf3d15.
-//
-// Solidity: function setSlashIndicatorContract(address _addr) returns()
-func (_RoninValidatorSet *RoninValidatorSetSession) SetSlashIndicatorContract(_addr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.SetSlashIndicatorContract(&_RoninValidatorSet.TransactOpts, _addr)
-}
-
-// SetSlashIndicatorContract is a paid mutator transaction binding the contract method 0x2bcf3d15.
-//
-// Solidity: function setSlashIndicatorContract(address _addr) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactorSession) SetSlashIndicatorContract(_addr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.SetSlashIndicatorContract(&_RoninValidatorSet.TransactOpts, _addr)
-}
-
-// SetStakingContract is a paid mutator transaction binding the contract method 0x9dd373b9.
-//
-// Solidity: function setStakingContract(address _addr) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactor) SetStakingContract(opts *bind.TransactOpts, _addr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.contract.Transact(opts, "setStakingContract", _addr)
-}
-
-// SetStakingContract is a paid mutator transaction binding the contract method 0x9dd373b9.
-//
-// Solidity: function setStakingContract(address _addr) returns()
-func (_RoninValidatorSet *RoninValidatorSetSession) SetStakingContract(_addr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.SetStakingContract(&_RoninValidatorSet.TransactOpts, _addr)
-}
-
-// SetStakingContract is a paid mutator transaction binding the contract method 0x9dd373b9.
-//
-// Solidity: function setStakingContract(address _addr) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactorSession) SetStakingContract(_addr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.SetStakingContract(&_RoninValidatorSet.TransactOpts, _addr)
-}
-
-// SetStakingVestingContract is a paid mutator transaction binding the contract method 0xad295783.
-//
-// Solidity: function setStakingVestingContract(address _addr) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactor) SetStakingVestingContract(opts *bind.TransactOpts, _addr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.contract.Transact(opts, "setStakingVestingContract", _addr)
-}
-
-// SetStakingVestingContract is a paid mutator transaction binding the contract method 0xad295783.
-//
-// Solidity: function setStakingVestingContract(address _addr) returns()
-func (_RoninValidatorSet *RoninValidatorSetSession) SetStakingVestingContract(_addr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.SetStakingVestingContract(&_RoninValidatorSet.TransactOpts, _addr)
-}
-
-// SetStakingVestingContract is a paid mutator transaction binding the contract method 0xad295783.
-//
-// Solidity: function setStakingVestingContract(address _addr) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactorSession) SetStakingVestingContract(_addr common.Address) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.SetStakingVestingContract(&_RoninValidatorSet.TransactOpts, _addr)
-}
-
-// Slash is a paid mutator transaction binding the contract method 0x70f81f6c.
-//
-// Solidity: function slash(address _validatorAddr, uint256 _newJailedUntil, uint256 _slashAmount) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactor) Slash(opts *bind.TransactOpts, _validatorAddr common.Address, _newJailedUntil *big.Int, _slashAmount *big.Int) (*types.Transaction, error) {
-	return _RoninValidatorSet.contract.Transact(opts, "slash", _validatorAddr, _newJailedUntil, _slashAmount)
-}
-
-// Slash is a paid mutator transaction binding the contract method 0x70f81f6c.
-//
-// Solidity: function slash(address _validatorAddr, uint256 _newJailedUntil, uint256 _slashAmount) returns()
-func (_RoninValidatorSet *RoninValidatorSetSession) Slash(_validatorAddr common.Address, _newJailedUntil *big.Int, _slashAmount *big.Int) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.Slash(&_RoninValidatorSet.TransactOpts, _validatorAddr, _newJailedUntil, _slashAmount)
-}
-
-// Slash is a paid mutator transaction binding the contract method 0x70f81f6c.
-//
-// Solidity: function slash(address _validatorAddr, uint256 _newJailedUntil, uint256 _slashAmount) returns()
-func (_RoninValidatorSet *RoninValidatorSetTransactorSession) Slash(_validatorAddr common.Address, _newJailedUntil *big.Int, _slashAmount *big.Int) (*types.Transaction, error) {
-	return _RoninValidatorSet.Contract.Slash(&_RoninValidatorSet.TransactOpts, _validatorAddr, _newJailedUntil, _slashAmount)
+// Solidity: function setMinEffectiveDaysOnwards(uint256 _numOfDays) returns()
+func (_RoninValidatorSet *RoninValidatorSetTransactorSession) SetMinEffectiveDaysOnwards(_numOfDays *big.Int) (*types.Transaction, error) {
+	return _RoninValidatorSet.Contract.SetMinEffectiveDaysOnwards(&_RoninValidatorSet.TransactOpts, _numOfDays)
 }
 
 // SubmitBlockReward is a paid mutator transaction binding the contract method 0x52091f17.
@@ -1916,38 +2089,47 @@ func (it *RoninValidatorSetBlockProducerSetUpdatedIterator) Close() error {
 // RoninValidatorSetBlockProducerSetUpdated represents a BlockProducerSetUpdated event raised by the RoninValidatorSet contract.
 type RoninValidatorSetBlockProducerSetUpdated struct {
 	Period         *big.Int
+	Epoch          *big.Int
 	ConsensusAddrs []common.Address
 	Raw            types.Log // Blockchain specific contextual infos
 }
 
-// FilterBlockProducerSetUpdated is a free log retrieval operation binding the contract event 0x60324bb9c8b0d077621d76762c52d6cc937043427992a2f6a602b449315922ef.
+// FilterBlockProducerSetUpdated is a free log retrieval operation binding the contract event 0x283b50d76057d5f828df85bc87724c6af604e9b55c363a07c9faa2a2cd688b82.
 //
-// Solidity: event BlockProducerSetUpdated(uint256 indexed period, address[] consensusAddrs)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterBlockProducerSetUpdated(opts *bind.FilterOpts, period []*big.Int) (*RoninValidatorSetBlockProducerSetUpdatedIterator, error) {
+// Solidity: event BlockProducerSetUpdated(uint256 indexed period, uint256 indexed epoch, address[] consensusAddrs)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterBlockProducerSetUpdated(opts *bind.FilterOpts, period []*big.Int, epoch []*big.Int) (*RoninValidatorSetBlockProducerSetUpdatedIterator, error) {
 
 	var periodRule []interface{}
 	for _, periodItem := range period {
 		periodRule = append(periodRule, periodItem)
 	}
+	var epochRule []interface{}
+	for _, epochItem := range epoch {
+		epochRule = append(epochRule, epochItem)
+	}
 
-	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "BlockProducerSetUpdated", periodRule)
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "BlockProducerSetUpdated", periodRule, epochRule)
 	if err != nil {
 		return nil, err
 	}
 	return &RoninValidatorSetBlockProducerSetUpdatedIterator{contract: _RoninValidatorSet.contract, event: "BlockProducerSetUpdated", logs: logs, sub: sub}, nil
 }
 
-// WatchBlockProducerSetUpdated is a free log subscription operation binding the contract event 0x60324bb9c8b0d077621d76762c52d6cc937043427992a2f6a602b449315922ef.
+// WatchBlockProducerSetUpdated is a free log subscription operation binding the contract event 0x283b50d76057d5f828df85bc87724c6af604e9b55c363a07c9faa2a2cd688b82.
 //
-// Solidity: event BlockProducerSetUpdated(uint256 indexed period, address[] consensusAddrs)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchBlockProducerSetUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetBlockProducerSetUpdated, period []*big.Int) (event.Subscription, error) {
+// Solidity: event BlockProducerSetUpdated(uint256 indexed period, uint256 indexed epoch, address[] consensusAddrs)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchBlockProducerSetUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetBlockProducerSetUpdated, period []*big.Int, epoch []*big.Int) (event.Subscription, error) {
 
 	var periodRule []interface{}
 	for _, periodItem := range period {
 		periodRule = append(periodRule, periodItem)
 	}
+	var epochRule []interface{}
+	for _, epochItem := range epoch {
+		epochRule = append(epochRule, epochItem)
+	}
 
-	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "BlockProducerSetUpdated", periodRule)
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "BlockProducerSetUpdated", periodRule, epochRule)
 	if err != nil {
 		return nil, err
 	}
@@ -1979,9 +2161,9 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchBlockProducerSetUpdate
 	}), nil
 }
 
-// ParseBlockProducerSetUpdated is a log parse operation binding the contract event 0x60324bb9c8b0d077621d76762c52d6cc937043427992a2f6a602b449315922ef.
+// ParseBlockProducerSetUpdated is a log parse operation binding the contract event 0x283b50d76057d5f828df85bc87724c6af604e9b55c363a07c9faa2a2cd688b82.
 //
-// Solidity: event BlockProducerSetUpdated(uint256 indexed period, address[] consensusAddrs)
+// Solidity: event BlockProducerSetUpdated(uint256 indexed period, uint256 indexed epoch, address[] consensusAddrs)
 func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseBlockProducerSetUpdated(log types.Log) (*RoninValidatorSetBlockProducerSetUpdated, error) {
 	event := new(RoninValidatorSetBlockProducerSetUpdated)
 	if err := _RoninValidatorSet.contract.UnpackLog(event, "BlockProducerSetUpdated", log); err != nil {
@@ -1991,9 +2173,9 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseBlockProducerSetUpdate
 	return event, nil
 }
 
-// RoninValidatorSetBlockRewardRewardDeprecatedIterator is returned from FilterBlockRewardRewardDeprecated and is used to iterate over the raw logs and unpacked data for BlockRewardRewardDeprecated events raised by the RoninValidatorSet contract.
-type RoninValidatorSetBlockRewardRewardDeprecatedIterator struct {
-	Event *RoninValidatorSetBlockRewardRewardDeprecated // Event containing the contract specifics and raw log
+// RoninValidatorSetBlockRewardDeprecatedIterator is returned from FilterBlockRewardDeprecated and is used to iterate over the raw logs and unpacked data for BlockRewardDeprecated events raised by the RoninValidatorSet contract.
+type RoninValidatorSetBlockRewardDeprecatedIterator struct {
+	Event *RoninValidatorSetBlockRewardDeprecated // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -2007,7 +2189,7 @@ type RoninValidatorSetBlockRewardRewardDeprecatedIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *RoninValidatorSetBlockRewardRewardDeprecatedIterator) Next() bool {
+func (it *RoninValidatorSetBlockRewardDeprecatedIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -2016,7 +2198,7 @@ func (it *RoninValidatorSetBlockRewardRewardDeprecatedIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(RoninValidatorSetBlockRewardRewardDeprecated)
+			it.Event = new(RoninValidatorSetBlockRewardDeprecated)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -2031,7 +2213,7 @@ func (it *RoninValidatorSetBlockRewardRewardDeprecatedIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(RoninValidatorSetBlockRewardRewardDeprecated)
+		it.Event = new(RoninValidatorSetBlockRewardDeprecated)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -2047,52 +2229,53 @@ func (it *RoninValidatorSetBlockRewardRewardDeprecatedIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *RoninValidatorSetBlockRewardRewardDeprecatedIterator) Error() error {
+func (it *RoninValidatorSetBlockRewardDeprecatedIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *RoninValidatorSetBlockRewardRewardDeprecatedIterator) Close() error {
+func (it *RoninValidatorSetBlockRewardDeprecatedIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// RoninValidatorSetBlockRewardRewardDeprecated represents a BlockRewardRewardDeprecated event raised by the RoninValidatorSet contract.
-type RoninValidatorSetBlockRewardRewardDeprecated struct {
-	CoinbaseAddr common.Address
-	RewardAmount *big.Int
-	Raw          types.Log // Blockchain specific contextual infos
+// RoninValidatorSetBlockRewardDeprecated represents a BlockRewardDeprecated event raised by the RoninValidatorSet contract.
+type RoninValidatorSetBlockRewardDeprecated struct {
+	CoinbaseAddr   common.Address
+	RewardAmount   *big.Int
+	DeprecatedType uint8
+	Raw            types.Log // Blockchain specific contextual infos
 }
 
-// FilterBlockRewardRewardDeprecated is a free log retrieval operation binding the contract event 0xdbb176bd1de20fc558f30c5d00c1f7818d3a9f6835105a2b5b9c2beeffc2d394.
+// FilterBlockRewardDeprecated is a free log retrieval operation binding the contract event 0x4042bb9a70998f80a86d9963f0d2132e9b11c8ad94d207c6141c8e34b05ce53e.
 //
-// Solidity: event BlockRewardRewardDeprecated(address indexed coinbaseAddr, uint256 rewardAmount)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterBlockRewardRewardDeprecated(opts *bind.FilterOpts, coinbaseAddr []common.Address) (*RoninValidatorSetBlockRewardRewardDeprecatedIterator, error) {
+// Solidity: event BlockRewardDeprecated(address indexed coinbaseAddr, uint256 rewardAmount, uint8 deprecatedType)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterBlockRewardDeprecated(opts *bind.FilterOpts, coinbaseAddr []common.Address) (*RoninValidatorSetBlockRewardDeprecatedIterator, error) {
 
 	var coinbaseAddrRule []interface{}
 	for _, coinbaseAddrItem := range coinbaseAddr {
 		coinbaseAddrRule = append(coinbaseAddrRule, coinbaseAddrItem)
 	}
 
-	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "BlockRewardRewardDeprecated", coinbaseAddrRule)
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "BlockRewardDeprecated", coinbaseAddrRule)
 	if err != nil {
 		return nil, err
 	}
-	return &RoninValidatorSetBlockRewardRewardDeprecatedIterator{contract: _RoninValidatorSet.contract, event: "BlockRewardRewardDeprecated", logs: logs, sub: sub}, nil
+	return &RoninValidatorSetBlockRewardDeprecatedIterator{contract: _RoninValidatorSet.contract, event: "BlockRewardDeprecated", logs: logs, sub: sub}, nil
 }
 
-// WatchBlockRewardRewardDeprecated is a free log subscription operation binding the contract event 0xdbb176bd1de20fc558f30c5d00c1f7818d3a9f6835105a2b5b9c2beeffc2d394.
+// WatchBlockRewardDeprecated is a free log subscription operation binding the contract event 0x4042bb9a70998f80a86d9963f0d2132e9b11c8ad94d207c6141c8e34b05ce53e.
 //
-// Solidity: event BlockRewardRewardDeprecated(address indexed coinbaseAddr, uint256 rewardAmount)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchBlockRewardRewardDeprecated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetBlockRewardRewardDeprecated, coinbaseAddr []common.Address) (event.Subscription, error) {
+// Solidity: event BlockRewardDeprecated(address indexed coinbaseAddr, uint256 rewardAmount, uint8 deprecatedType)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchBlockRewardDeprecated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetBlockRewardDeprecated, coinbaseAddr []common.Address) (event.Subscription, error) {
 
 	var coinbaseAddrRule []interface{}
 	for _, coinbaseAddrItem := range coinbaseAddr {
 		coinbaseAddrRule = append(coinbaseAddrRule, coinbaseAddrItem)
 	}
 
-	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "BlockRewardRewardDeprecated", coinbaseAddrRule)
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "BlockRewardDeprecated", coinbaseAddrRule)
 	if err != nil {
 		return nil, err
 	}
@@ -2102,8 +2285,8 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchBlockRewardRewardDepre
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(RoninValidatorSetBlockRewardRewardDeprecated)
-				if err := _RoninValidatorSet.contract.UnpackLog(event, "BlockRewardRewardDeprecated", log); err != nil {
+				event := new(RoninValidatorSetBlockRewardDeprecated)
+				if err := _RoninValidatorSet.contract.UnpackLog(event, "BlockRewardDeprecated", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -2124,12 +2307,12 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchBlockRewardRewardDepre
 	}), nil
 }
 
-// ParseBlockRewardRewardDeprecated is a log parse operation binding the contract event 0xdbb176bd1de20fc558f30c5d00c1f7818d3a9f6835105a2b5b9c2beeffc2d394.
+// ParseBlockRewardDeprecated is a log parse operation binding the contract event 0x4042bb9a70998f80a86d9963f0d2132e9b11c8ad94d207c6141c8e34b05ce53e.
 //
-// Solidity: event BlockRewardRewardDeprecated(address indexed coinbaseAddr, uint256 rewardAmount)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseBlockRewardRewardDeprecated(log types.Log) (*RoninValidatorSetBlockRewardRewardDeprecated, error) {
-	event := new(RoninValidatorSetBlockRewardRewardDeprecated)
-	if err := _RoninValidatorSet.contract.UnpackLog(event, "BlockRewardRewardDeprecated", log); err != nil {
+// Solidity: event BlockRewardDeprecated(address indexed coinbaseAddr, uint256 rewardAmount, uint8 deprecatedType)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseBlockRewardDeprecated(log types.Log) (*RoninValidatorSetBlockRewardDeprecated, error) {
+	event := new(RoninValidatorSetBlockRewardDeprecated)
+	if err := _RoninValidatorSet.contract.UnpackLog(event, "BlockRewardDeprecated", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
@@ -2679,38 +2862,47 @@ func (it *RoninValidatorSetBridgeOperatorSetUpdatedIterator) Close() error {
 // RoninValidatorSetBridgeOperatorSetUpdated represents a BridgeOperatorSetUpdated event raised by the RoninValidatorSet contract.
 type RoninValidatorSetBridgeOperatorSetUpdated struct {
 	Period          *big.Int
+	Epoch           *big.Int
 	BridgeOperators []common.Address
 	Raw             types.Log // Blockchain specific contextual infos
 }
 
-// FilterBridgeOperatorSetUpdated is a free log retrieval operation binding the contract event 0x8d7d519e81c2b8dc67b44fd645fd2c8805110d9ab1d643e3dd68b622bde331ff.
+// FilterBridgeOperatorSetUpdated is a free log retrieval operation binding the contract event 0x773d1888df530d69716b183a92450d45f97fba49f2a4bb34fae3b23da0e2cc6f.
 //
-// Solidity: event BridgeOperatorSetUpdated(uint256 indexed period, address[] bridgeOperators)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterBridgeOperatorSetUpdated(opts *bind.FilterOpts, period []*big.Int) (*RoninValidatorSetBridgeOperatorSetUpdatedIterator, error) {
+// Solidity: event BridgeOperatorSetUpdated(uint256 indexed period, uint256 indexed epoch, address[] bridgeOperators)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterBridgeOperatorSetUpdated(opts *bind.FilterOpts, period []*big.Int, epoch []*big.Int) (*RoninValidatorSetBridgeOperatorSetUpdatedIterator, error) {
 
 	var periodRule []interface{}
 	for _, periodItem := range period {
 		periodRule = append(periodRule, periodItem)
 	}
+	var epochRule []interface{}
+	for _, epochItem := range epoch {
+		epochRule = append(epochRule, epochItem)
+	}
 
-	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "BridgeOperatorSetUpdated", periodRule)
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "BridgeOperatorSetUpdated", periodRule, epochRule)
 	if err != nil {
 		return nil, err
 	}
 	return &RoninValidatorSetBridgeOperatorSetUpdatedIterator{contract: _RoninValidatorSet.contract, event: "BridgeOperatorSetUpdated", logs: logs, sub: sub}, nil
 }
 
-// WatchBridgeOperatorSetUpdated is a free log subscription operation binding the contract event 0x8d7d519e81c2b8dc67b44fd645fd2c8805110d9ab1d643e3dd68b622bde331ff.
+// WatchBridgeOperatorSetUpdated is a free log subscription operation binding the contract event 0x773d1888df530d69716b183a92450d45f97fba49f2a4bb34fae3b23da0e2cc6f.
 //
-// Solidity: event BridgeOperatorSetUpdated(uint256 indexed period, address[] bridgeOperators)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchBridgeOperatorSetUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetBridgeOperatorSetUpdated, period []*big.Int) (event.Subscription, error) {
+// Solidity: event BridgeOperatorSetUpdated(uint256 indexed period, uint256 indexed epoch, address[] bridgeOperators)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchBridgeOperatorSetUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetBridgeOperatorSetUpdated, period []*big.Int, epoch []*big.Int) (event.Subscription, error) {
 
 	var periodRule []interface{}
 	for _, periodItem := range period {
 		periodRule = append(periodRule, periodItem)
 	}
+	var epochRule []interface{}
+	for _, epochItem := range epoch {
+		epochRule = append(epochRule, epochItem)
+	}
 
-	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "BridgeOperatorSetUpdated", periodRule)
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "BridgeOperatorSetUpdated", periodRule, epochRule)
 	if err != nil {
 		return nil, err
 	}
@@ -2742,146 +2934,12 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchBridgeOperatorSetUpdat
 	}), nil
 }
 
-// ParseBridgeOperatorSetUpdated is a log parse operation binding the contract event 0x8d7d519e81c2b8dc67b44fd645fd2c8805110d9ab1d643e3dd68b622bde331ff.
+// ParseBridgeOperatorSetUpdated is a log parse operation binding the contract event 0x773d1888df530d69716b183a92450d45f97fba49f2a4bb34fae3b23da0e2cc6f.
 //
-// Solidity: event BridgeOperatorSetUpdated(uint256 indexed period, address[] bridgeOperators)
+// Solidity: event BridgeOperatorSetUpdated(uint256 indexed period, uint256 indexed epoch, address[] bridgeOperators)
 func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseBridgeOperatorSetUpdated(log types.Log) (*RoninValidatorSetBridgeOperatorSetUpdated, error) {
 	event := new(RoninValidatorSetBridgeOperatorSetUpdated)
 	if err := _RoninValidatorSet.contract.UnpackLog(event, "BridgeOperatorSetUpdated", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// RoninValidatorSetBridgeTrackingContractUpdatedIterator is returned from FilterBridgeTrackingContractUpdated and is used to iterate over the raw logs and unpacked data for BridgeTrackingContractUpdated events raised by the RoninValidatorSet contract.
-type RoninValidatorSetBridgeTrackingContractUpdatedIterator struct {
-	Event *RoninValidatorSetBridgeTrackingContractUpdated // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *RoninValidatorSetBridgeTrackingContractUpdatedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(RoninValidatorSetBridgeTrackingContractUpdated)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(RoninValidatorSetBridgeTrackingContractUpdated)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *RoninValidatorSetBridgeTrackingContractUpdatedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *RoninValidatorSetBridgeTrackingContractUpdatedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// RoninValidatorSetBridgeTrackingContractUpdated represents a BridgeTrackingContractUpdated event raised by the RoninValidatorSet contract.
-type RoninValidatorSetBridgeTrackingContractUpdated struct {
-	Arg0 common.Address
-	Raw  types.Log // Blockchain specific contextual infos
-}
-
-// FilterBridgeTrackingContractUpdated is a free log retrieval operation binding the contract event 0x034c8da497df28467c79ddadbba1cc3cdd41f510ea73faae271e6f16a6111621.
-//
-// Solidity: event BridgeTrackingContractUpdated(address arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterBridgeTrackingContractUpdated(opts *bind.FilterOpts) (*RoninValidatorSetBridgeTrackingContractUpdatedIterator, error) {
-
-	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "BridgeTrackingContractUpdated")
-	if err != nil {
-		return nil, err
-	}
-	return &RoninValidatorSetBridgeTrackingContractUpdatedIterator{contract: _RoninValidatorSet.contract, event: "BridgeTrackingContractUpdated", logs: logs, sub: sub}, nil
-}
-
-// WatchBridgeTrackingContractUpdated is a free log subscription operation binding the contract event 0x034c8da497df28467c79ddadbba1cc3cdd41f510ea73faae271e6f16a6111621.
-//
-// Solidity: event BridgeTrackingContractUpdated(address arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchBridgeTrackingContractUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetBridgeTrackingContractUpdated) (event.Subscription, error) {
-
-	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "BridgeTrackingContractUpdated")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(RoninValidatorSetBridgeTrackingContractUpdated)
-				if err := _RoninValidatorSet.contract.UnpackLog(event, "BridgeTrackingContractUpdated", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseBridgeTrackingContractUpdated is a log parse operation binding the contract event 0x034c8da497df28467c79ddadbba1cc3cdd41f510ea73faae271e6f16a6111621.
-//
-// Solidity: event BridgeTrackingContractUpdated(address arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseBridgeTrackingContractUpdated(log types.Log) (*RoninValidatorSetBridgeTrackingContractUpdated, error) {
-	event := new(RoninValidatorSetBridgeTrackingContractUpdated)
-	if err := _RoninValidatorSet.contract.UnpackLog(event, "BridgeTrackingContractUpdated", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
@@ -2957,16 +3015,15 @@ func (it *RoninValidatorSetCandidateGrantedIterator) Close() error {
 
 // RoninValidatorSetCandidateGranted represents a CandidateGranted event raised by the RoninValidatorSet contract.
 type RoninValidatorSetCandidateGranted struct {
-	ConsensusAddr  common.Address
-	TreasuryAddr   common.Address
-	Admin          common.Address
-	BridgeOperator common.Address
-	Raw            types.Log // Blockchain specific contextual infos
+	ConsensusAddr common.Address
+	TreasuryAddr  common.Address
+	Admin         common.Address
+	Raw           types.Log // Blockchain specific contextual infos
 }
 
-// FilterCandidateGranted is a free log retrieval operation binding the contract event 0xd690f592ed983cfbc05717fbcf06c4e10ae328432c309fe49246cf4a4be69fcd.
+// FilterCandidateGranted is a free log retrieval operation binding the contract event 0x1ca451a9920472b99355a9cf74185bf017604a7849c113f020888ecec9db9366.
 //
-// Solidity: event CandidateGranted(address indexed consensusAddr, address indexed treasuryAddr, address indexed admin, address bridgeOperator)
+// Solidity: event CandidateGranted(address indexed consensusAddr, address indexed treasuryAddr, address indexed admin)
 func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterCandidateGranted(opts *bind.FilterOpts, consensusAddr []common.Address, treasuryAddr []common.Address, admin []common.Address) (*RoninValidatorSetCandidateGrantedIterator, error) {
 
 	var consensusAddrRule []interface{}
@@ -2989,9 +3046,9 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterCandidateGranted(opts
 	return &RoninValidatorSetCandidateGrantedIterator{contract: _RoninValidatorSet.contract, event: "CandidateGranted", logs: logs, sub: sub}, nil
 }
 
-// WatchCandidateGranted is a free log subscription operation binding the contract event 0xd690f592ed983cfbc05717fbcf06c4e10ae328432c309fe49246cf4a4be69fcd.
+// WatchCandidateGranted is a free log subscription operation binding the contract event 0x1ca451a9920472b99355a9cf74185bf017604a7849c113f020888ecec9db9366.
 //
-// Solidity: event CandidateGranted(address indexed consensusAddr, address indexed treasuryAddr, address indexed admin, address bridgeOperator)
+// Solidity: event CandidateGranted(address indexed consensusAddr, address indexed treasuryAddr, address indexed admin)
 func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchCandidateGranted(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetCandidateGranted, consensusAddr []common.Address, treasuryAddr []common.Address, admin []common.Address) (event.Subscription, error) {
 
 	var consensusAddrRule []interface{}
@@ -3039,9 +3096,9 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchCandidateGranted(opts 
 	}), nil
 }
 
-// ParseCandidateGranted is a log parse operation binding the contract event 0xd690f592ed983cfbc05717fbcf06c4e10ae328432c309fe49246cf4a4be69fcd.
+// ParseCandidateGranted is a log parse operation binding the contract event 0x1ca451a9920472b99355a9cf74185bf017604a7849c113f020888ecec9db9366.
 //
-// Solidity: event CandidateGranted(address indexed consensusAddr, address indexed treasuryAddr, address indexed admin, address bridgeOperator)
+// Solidity: event CandidateGranted(address indexed consensusAddr, address indexed treasuryAddr, address indexed admin)
 func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseCandidateGranted(log types.Log) (*RoninValidatorSetCandidateGranted, error) {
 	event := new(RoninValidatorSetCandidateGranted)
 	if err := _RoninValidatorSet.contract.UnpackLog(event, "CandidateGranted", log); err != nil {
@@ -3051,9 +3108,9 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseCandidateGranted(log t
 	return event, nil
 }
 
-// RoninValidatorSetCandidateRevokedPeriodUpdatedIterator is returned from FilterCandidateRevokedPeriodUpdated and is used to iterate over the raw logs and unpacked data for CandidateRevokedPeriodUpdated events raised by the RoninValidatorSet contract.
-type RoninValidatorSetCandidateRevokedPeriodUpdatedIterator struct {
-	Event *RoninValidatorSetCandidateRevokedPeriodUpdated // Event containing the contract specifics and raw log
+// RoninValidatorSetCandidateRevokingTimestampUpdatedIterator is returned from FilterCandidateRevokingTimestampUpdated and is used to iterate over the raw logs and unpacked data for CandidateRevokingTimestampUpdated events raised by the RoninValidatorSet contract.
+type RoninValidatorSetCandidateRevokingTimestampUpdatedIterator struct {
+	Event *RoninValidatorSetCandidateRevokingTimestampUpdated // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -3067,7 +3124,7 @@ type RoninValidatorSetCandidateRevokedPeriodUpdatedIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *RoninValidatorSetCandidateRevokedPeriodUpdatedIterator) Next() bool {
+func (it *RoninValidatorSetCandidateRevokingTimestampUpdatedIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -3076,7 +3133,7 @@ func (it *RoninValidatorSetCandidateRevokedPeriodUpdatedIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(RoninValidatorSetCandidateRevokedPeriodUpdated)
+			it.Event = new(RoninValidatorSetCandidateRevokingTimestampUpdated)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -3091,7 +3148,7 @@ func (it *RoninValidatorSetCandidateRevokedPeriodUpdatedIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(RoninValidatorSetCandidateRevokedPeriodUpdated)
+		it.Event = new(RoninValidatorSetCandidateRevokingTimestampUpdated)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -3107,52 +3164,52 @@ func (it *RoninValidatorSetCandidateRevokedPeriodUpdatedIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *RoninValidatorSetCandidateRevokedPeriodUpdatedIterator) Error() error {
+func (it *RoninValidatorSetCandidateRevokingTimestampUpdatedIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *RoninValidatorSetCandidateRevokedPeriodUpdatedIterator) Close() error {
+func (it *RoninValidatorSetCandidateRevokingTimestampUpdatedIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// RoninValidatorSetCandidateRevokedPeriodUpdated represents a CandidateRevokedPeriodUpdated event raised by the RoninValidatorSet contract.
-type RoninValidatorSetCandidateRevokedPeriodUpdated struct {
-	ConsensusAddr common.Address
-	RevokedPeriod *big.Int
-	Raw           types.Log // Blockchain specific contextual infos
+// RoninValidatorSetCandidateRevokingTimestampUpdated represents a CandidateRevokingTimestampUpdated event raised by the RoninValidatorSet contract.
+type RoninValidatorSetCandidateRevokingTimestampUpdated struct {
+	Cid               common.Address
+	RevokingTimestamp *big.Int
+	Raw               types.Log // Blockchain specific contextual infos
 }
 
-// FilterCandidateRevokedPeriodUpdated is a free log retrieval operation binding the contract event 0xcc3e2d110665b49361ca48964d502edcb29866be463a5aafcff5b6aac69359a3.
+// FilterCandidateRevokingTimestampUpdated is a free log retrieval operation binding the contract event 0xb9a1e33376bfbda9092f2d1e37662c1b435aab0d3fa8da3acc8f37ee222f99e7.
 //
-// Solidity: event CandidateRevokedPeriodUpdated(address indexed consensusAddr, uint256 revokedPeriod)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterCandidateRevokedPeriodUpdated(opts *bind.FilterOpts, consensusAddr []common.Address) (*RoninValidatorSetCandidateRevokedPeriodUpdatedIterator, error) {
+// Solidity: event CandidateRevokingTimestampUpdated(address indexed cid, uint256 revokingTimestamp)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterCandidateRevokingTimestampUpdated(opts *bind.FilterOpts, cid []common.Address) (*RoninValidatorSetCandidateRevokingTimestampUpdatedIterator, error) {
 
-	var consensusAddrRule []interface{}
-	for _, consensusAddrItem := range consensusAddr {
-		consensusAddrRule = append(consensusAddrRule, consensusAddrItem)
+	var cidRule []interface{}
+	for _, cidItem := range cid {
+		cidRule = append(cidRule, cidItem)
 	}
 
-	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "CandidateRevokedPeriodUpdated", consensusAddrRule)
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "CandidateRevokingTimestampUpdated", cidRule)
 	if err != nil {
 		return nil, err
 	}
-	return &RoninValidatorSetCandidateRevokedPeriodUpdatedIterator{contract: _RoninValidatorSet.contract, event: "CandidateRevokedPeriodUpdated", logs: logs, sub: sub}, nil
+	return &RoninValidatorSetCandidateRevokingTimestampUpdatedIterator{contract: _RoninValidatorSet.contract, event: "CandidateRevokingTimestampUpdated", logs: logs, sub: sub}, nil
 }
 
-// WatchCandidateRevokedPeriodUpdated is a free log subscription operation binding the contract event 0xcc3e2d110665b49361ca48964d502edcb29866be463a5aafcff5b6aac69359a3.
+// WatchCandidateRevokingTimestampUpdated is a free log subscription operation binding the contract event 0xb9a1e33376bfbda9092f2d1e37662c1b435aab0d3fa8da3acc8f37ee222f99e7.
 //
-// Solidity: event CandidateRevokedPeriodUpdated(address indexed consensusAddr, uint256 revokedPeriod)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchCandidateRevokedPeriodUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetCandidateRevokedPeriodUpdated, consensusAddr []common.Address) (event.Subscription, error) {
+// Solidity: event CandidateRevokingTimestampUpdated(address indexed cid, uint256 revokingTimestamp)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchCandidateRevokingTimestampUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetCandidateRevokingTimestampUpdated, cid []common.Address) (event.Subscription, error) {
 
-	var consensusAddrRule []interface{}
-	for _, consensusAddrItem := range consensusAddr {
-		consensusAddrRule = append(consensusAddrRule, consensusAddrItem)
+	var cidRule []interface{}
+	for _, cidItem := range cid {
+		cidRule = append(cidRule, cidItem)
 	}
 
-	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "CandidateRevokedPeriodUpdated", consensusAddrRule)
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "CandidateRevokingTimestampUpdated", cidRule)
 	if err != nil {
 		return nil, err
 	}
@@ -3162,8 +3219,8 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchCandidateRevokedPeriod
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(RoninValidatorSetCandidateRevokedPeriodUpdated)
-				if err := _RoninValidatorSet.contract.UnpackLog(event, "CandidateRevokedPeriodUpdated", log); err != nil {
+				event := new(RoninValidatorSetCandidateRevokingTimestampUpdated)
+				if err := _RoninValidatorSet.contract.UnpackLog(event, "CandidateRevokingTimestampUpdated", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -3184,12 +3241,157 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchCandidateRevokedPeriod
 	}), nil
 }
 
-// ParseCandidateRevokedPeriodUpdated is a log parse operation binding the contract event 0xcc3e2d110665b49361ca48964d502edcb29866be463a5aafcff5b6aac69359a3.
+// ParseCandidateRevokingTimestampUpdated is a log parse operation binding the contract event 0xb9a1e33376bfbda9092f2d1e37662c1b435aab0d3fa8da3acc8f37ee222f99e7.
 //
-// Solidity: event CandidateRevokedPeriodUpdated(address indexed consensusAddr, uint256 revokedPeriod)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseCandidateRevokedPeriodUpdated(log types.Log) (*RoninValidatorSetCandidateRevokedPeriodUpdated, error) {
-	event := new(RoninValidatorSetCandidateRevokedPeriodUpdated)
-	if err := _RoninValidatorSet.contract.UnpackLog(event, "CandidateRevokedPeriodUpdated", log); err != nil {
+// Solidity: event CandidateRevokingTimestampUpdated(address indexed cid, uint256 revokingTimestamp)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseCandidateRevokingTimestampUpdated(log types.Log) (*RoninValidatorSetCandidateRevokingTimestampUpdated, error) {
+	event := new(RoninValidatorSetCandidateRevokingTimestampUpdated)
+	if err := _RoninValidatorSet.contract.UnpackLog(event, "CandidateRevokingTimestampUpdated", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// RoninValidatorSetCandidateTopupDeadlineUpdatedIterator is returned from FilterCandidateTopupDeadlineUpdated and is used to iterate over the raw logs and unpacked data for CandidateTopupDeadlineUpdated events raised by the RoninValidatorSet contract.
+type RoninValidatorSetCandidateTopupDeadlineUpdatedIterator struct {
+	Event *RoninValidatorSetCandidateTopupDeadlineUpdated // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *RoninValidatorSetCandidateTopupDeadlineUpdatedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(RoninValidatorSetCandidateTopupDeadlineUpdated)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(RoninValidatorSetCandidateTopupDeadlineUpdated)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *RoninValidatorSetCandidateTopupDeadlineUpdatedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *RoninValidatorSetCandidateTopupDeadlineUpdatedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// RoninValidatorSetCandidateTopupDeadlineUpdated represents a CandidateTopupDeadlineUpdated event raised by the RoninValidatorSet contract.
+type RoninValidatorSetCandidateTopupDeadlineUpdated struct {
+	Cid           common.Address
+	TopupDeadline *big.Int
+	Raw           types.Log // Blockchain specific contextual infos
+}
+
+// FilterCandidateTopupDeadlineUpdated is a free log retrieval operation binding the contract event 0x88f854e137380c14d63f6ed99781bf13402167cf55bac49bcd44d4f2d6a34275.
+//
+// Solidity: event CandidateTopupDeadlineUpdated(address indexed cid, uint256 topupDeadline)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterCandidateTopupDeadlineUpdated(opts *bind.FilterOpts, cid []common.Address) (*RoninValidatorSetCandidateTopupDeadlineUpdatedIterator, error) {
+
+	var cidRule []interface{}
+	for _, cidItem := range cid {
+		cidRule = append(cidRule, cidItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "CandidateTopupDeadlineUpdated", cidRule)
+	if err != nil {
+		return nil, err
+	}
+	return &RoninValidatorSetCandidateTopupDeadlineUpdatedIterator{contract: _RoninValidatorSet.contract, event: "CandidateTopupDeadlineUpdated", logs: logs, sub: sub}, nil
+}
+
+// WatchCandidateTopupDeadlineUpdated is a free log subscription operation binding the contract event 0x88f854e137380c14d63f6ed99781bf13402167cf55bac49bcd44d4f2d6a34275.
+//
+// Solidity: event CandidateTopupDeadlineUpdated(address indexed cid, uint256 topupDeadline)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchCandidateTopupDeadlineUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetCandidateTopupDeadlineUpdated, cid []common.Address) (event.Subscription, error) {
+
+	var cidRule []interface{}
+	for _, cidItem := range cid {
+		cidRule = append(cidRule, cidItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "CandidateTopupDeadlineUpdated", cidRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(RoninValidatorSetCandidateTopupDeadlineUpdated)
+				if err := _RoninValidatorSet.contract.UnpackLog(event, "CandidateTopupDeadlineUpdated", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseCandidateTopupDeadlineUpdated is a log parse operation binding the contract event 0x88f854e137380c14d63f6ed99781bf13402167cf55bac49bcd44d4f2d6a34275.
+//
+// Solidity: event CandidateTopupDeadlineUpdated(address indexed cid, uint256 topupDeadline)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseCandidateTopupDeadlineUpdated(log types.Log) (*RoninValidatorSetCandidateTopupDeadlineUpdated, error) {
+	event := new(RoninValidatorSetCandidateTopupDeadlineUpdated)
+	if err := _RoninValidatorSet.contract.UnpackLog(event, "CandidateTopupDeadlineUpdated", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
@@ -3330,6 +3532,1772 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseCandidatesRevoked(log 
 	return event, nil
 }
 
+// RoninValidatorSetCommissionRateUpdateScheduledIterator is returned from FilterCommissionRateUpdateScheduled and is used to iterate over the raw logs and unpacked data for CommissionRateUpdateScheduled events raised by the RoninValidatorSet contract.
+type RoninValidatorSetCommissionRateUpdateScheduledIterator struct {
+	Event *RoninValidatorSetCommissionRateUpdateScheduled // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *RoninValidatorSetCommissionRateUpdateScheduledIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(RoninValidatorSetCommissionRateUpdateScheduled)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(RoninValidatorSetCommissionRateUpdateScheduled)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *RoninValidatorSetCommissionRateUpdateScheduledIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *RoninValidatorSetCommissionRateUpdateScheduledIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// RoninValidatorSetCommissionRateUpdateScheduled represents a CommissionRateUpdateScheduled event raised by the RoninValidatorSet contract.
+type RoninValidatorSetCommissionRateUpdateScheduled struct {
+	ConsensusAddr      common.Address
+	EffectiveTimestamp *big.Int
+	Rate               *big.Int
+	Raw                types.Log // Blockchain specific contextual infos
+}
+
+// FilterCommissionRateUpdateScheduled is a free log retrieval operation binding the contract event 0x6ebafd1bb6316b2f63198a81b05cff2149c6eaae1784466a6d062b4391900f21.
+//
+// Solidity: event CommissionRateUpdateScheduled(address indexed consensusAddr, uint256 effectiveTimestamp, uint256 rate)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterCommissionRateUpdateScheduled(opts *bind.FilterOpts, consensusAddr []common.Address) (*RoninValidatorSetCommissionRateUpdateScheduledIterator, error) {
+
+	var consensusAddrRule []interface{}
+	for _, consensusAddrItem := range consensusAddr {
+		consensusAddrRule = append(consensusAddrRule, consensusAddrItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "CommissionRateUpdateScheduled", consensusAddrRule)
+	if err != nil {
+		return nil, err
+	}
+	return &RoninValidatorSetCommissionRateUpdateScheduledIterator{contract: _RoninValidatorSet.contract, event: "CommissionRateUpdateScheduled", logs: logs, sub: sub}, nil
+}
+
+// WatchCommissionRateUpdateScheduled is a free log subscription operation binding the contract event 0x6ebafd1bb6316b2f63198a81b05cff2149c6eaae1784466a6d062b4391900f21.
+//
+// Solidity: event CommissionRateUpdateScheduled(address indexed consensusAddr, uint256 effectiveTimestamp, uint256 rate)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchCommissionRateUpdateScheduled(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetCommissionRateUpdateScheduled, consensusAddr []common.Address) (event.Subscription, error) {
+
+	var consensusAddrRule []interface{}
+	for _, consensusAddrItem := range consensusAddr {
+		consensusAddrRule = append(consensusAddrRule, consensusAddrItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "CommissionRateUpdateScheduled", consensusAddrRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(RoninValidatorSetCommissionRateUpdateScheduled)
+				if err := _RoninValidatorSet.contract.UnpackLog(event, "CommissionRateUpdateScheduled", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseCommissionRateUpdateScheduled is a log parse operation binding the contract event 0x6ebafd1bb6316b2f63198a81b05cff2149c6eaae1784466a6d062b4391900f21.
+//
+// Solidity: event CommissionRateUpdateScheduled(address indexed consensusAddr, uint256 effectiveTimestamp, uint256 rate)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseCommissionRateUpdateScheduled(log types.Log) (*RoninValidatorSetCommissionRateUpdateScheduled, error) {
+	event := new(RoninValidatorSetCommissionRateUpdateScheduled)
+	if err := _RoninValidatorSet.contract.UnpackLog(event, "CommissionRateUpdateScheduled", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// RoninValidatorSetCommissionRateUpdatedIterator is returned from FilterCommissionRateUpdated and is used to iterate over the raw logs and unpacked data for CommissionRateUpdated events raised by the RoninValidatorSet contract.
+type RoninValidatorSetCommissionRateUpdatedIterator struct {
+	Event *RoninValidatorSetCommissionRateUpdated // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *RoninValidatorSetCommissionRateUpdatedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(RoninValidatorSetCommissionRateUpdated)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(RoninValidatorSetCommissionRateUpdated)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *RoninValidatorSetCommissionRateUpdatedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *RoninValidatorSetCommissionRateUpdatedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// RoninValidatorSetCommissionRateUpdated represents a CommissionRateUpdated event raised by the RoninValidatorSet contract.
+type RoninValidatorSetCommissionRateUpdated struct {
+	ConsensusAddr common.Address
+	Rate          *big.Int
+	Raw           types.Log // Blockchain specific contextual infos
+}
+
+// FilterCommissionRateUpdated is a free log retrieval operation binding the contract event 0x86d576c20e383fc2413ef692209cc48ddad5e52f25db5b32f8f7ec5076461ae9.
+//
+// Solidity: event CommissionRateUpdated(address indexed consensusAddr, uint256 rate)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterCommissionRateUpdated(opts *bind.FilterOpts, consensusAddr []common.Address) (*RoninValidatorSetCommissionRateUpdatedIterator, error) {
+
+	var consensusAddrRule []interface{}
+	for _, consensusAddrItem := range consensusAddr {
+		consensusAddrRule = append(consensusAddrRule, consensusAddrItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "CommissionRateUpdated", consensusAddrRule)
+	if err != nil {
+		return nil, err
+	}
+	return &RoninValidatorSetCommissionRateUpdatedIterator{contract: _RoninValidatorSet.contract, event: "CommissionRateUpdated", logs: logs, sub: sub}, nil
+}
+
+// WatchCommissionRateUpdated is a free log subscription operation binding the contract event 0x86d576c20e383fc2413ef692209cc48ddad5e52f25db5b32f8f7ec5076461ae9.
+//
+// Solidity: event CommissionRateUpdated(address indexed consensusAddr, uint256 rate)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchCommissionRateUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetCommissionRateUpdated, consensusAddr []common.Address) (event.Subscription, error) {
+
+	var consensusAddrRule []interface{}
+	for _, consensusAddrItem := range consensusAddr {
+		consensusAddrRule = append(consensusAddrRule, consensusAddrItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "CommissionRateUpdated", consensusAddrRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(RoninValidatorSetCommissionRateUpdated)
+				if err := _RoninValidatorSet.contract.UnpackLog(event, "CommissionRateUpdated", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseCommissionRateUpdated is a log parse operation binding the contract event 0x86d576c20e383fc2413ef692209cc48ddad5e52f25db5b32f8f7ec5076461ae9.
+//
+// Solidity: event CommissionRateUpdated(address indexed consensusAddr, uint256 rate)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseCommissionRateUpdated(log types.Log) (*RoninValidatorSetCommissionRateUpdated, error) {
+	event := new(RoninValidatorSetCommissionRateUpdated)
+	if err := _RoninValidatorSet.contract.UnpackLog(event, "CommissionRateUpdated", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// RoninValidatorSetContractUpdatedIterator is returned from FilterContractUpdated and is used to iterate over the raw logs and unpacked data for ContractUpdated events raised by the RoninValidatorSet contract.
+type RoninValidatorSetContractUpdatedIterator struct {
+	Event *RoninValidatorSetContractUpdated // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *RoninValidatorSetContractUpdatedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(RoninValidatorSetContractUpdated)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(RoninValidatorSetContractUpdated)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *RoninValidatorSetContractUpdatedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *RoninValidatorSetContractUpdatedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// RoninValidatorSetContractUpdated represents a ContractUpdated event raised by the RoninValidatorSet contract.
+type RoninValidatorSetContractUpdated struct {
+	ContractType uint8
+	Addr         common.Address
+	Raw          types.Log // Blockchain specific contextual infos
+}
+
+// FilterContractUpdated is a free log retrieval operation binding the contract event 0x865d1c228a8ea13709cfe61f346f7ff67f1bbd4a18ff31ad3e7147350d317c59.
+//
+// Solidity: event ContractUpdated(uint8 indexed contractType, address indexed addr)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterContractUpdated(opts *bind.FilterOpts, contractType []uint8, addr []common.Address) (*RoninValidatorSetContractUpdatedIterator, error) {
+
+	var contractTypeRule []interface{}
+	for _, contractTypeItem := range contractType {
+		contractTypeRule = append(contractTypeRule, contractTypeItem)
+	}
+	var addrRule []interface{}
+	for _, addrItem := range addr {
+		addrRule = append(addrRule, addrItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "ContractUpdated", contractTypeRule, addrRule)
+	if err != nil {
+		return nil, err
+	}
+	return &RoninValidatorSetContractUpdatedIterator{contract: _RoninValidatorSet.contract, event: "ContractUpdated", logs: logs, sub: sub}, nil
+}
+
+// WatchContractUpdated is a free log subscription operation binding the contract event 0x865d1c228a8ea13709cfe61f346f7ff67f1bbd4a18ff31ad3e7147350d317c59.
+//
+// Solidity: event ContractUpdated(uint8 indexed contractType, address indexed addr)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchContractUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetContractUpdated, contractType []uint8, addr []common.Address) (event.Subscription, error) {
+
+	var contractTypeRule []interface{}
+	for _, contractTypeItem := range contractType {
+		contractTypeRule = append(contractTypeRule, contractTypeItem)
+	}
+	var addrRule []interface{}
+	for _, addrItem := range addr {
+		addrRule = append(addrRule, addrItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "ContractUpdated", contractTypeRule, addrRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(RoninValidatorSetContractUpdated)
+				if err := _RoninValidatorSet.contract.UnpackLog(event, "ContractUpdated", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseContractUpdated is a log parse operation binding the contract event 0x865d1c228a8ea13709cfe61f346f7ff67f1bbd4a18ff31ad3e7147350d317c59.
+//
+// Solidity: event ContractUpdated(uint8 indexed contractType, address indexed addr)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseContractUpdated(log types.Log) (*RoninValidatorSetContractUpdated, error) {
+	event := new(RoninValidatorSetContractUpdated)
+	if err := _RoninValidatorSet.contract.UnpackLog(event, "ContractUpdated", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// RoninValidatorSetDeprecatedRewardRecycleFailedIterator is returned from FilterDeprecatedRewardRecycleFailed and is used to iterate over the raw logs and unpacked data for DeprecatedRewardRecycleFailed events raised by the RoninValidatorSet contract.
+type RoninValidatorSetDeprecatedRewardRecycleFailedIterator struct {
+	Event *RoninValidatorSetDeprecatedRewardRecycleFailed // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *RoninValidatorSetDeprecatedRewardRecycleFailedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(RoninValidatorSetDeprecatedRewardRecycleFailed)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(RoninValidatorSetDeprecatedRewardRecycleFailed)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *RoninValidatorSetDeprecatedRewardRecycleFailedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *RoninValidatorSetDeprecatedRewardRecycleFailedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// RoninValidatorSetDeprecatedRewardRecycleFailed represents a DeprecatedRewardRecycleFailed event raised by the RoninValidatorSet contract.
+type RoninValidatorSetDeprecatedRewardRecycleFailed struct {
+	RecipientAddr common.Address
+	Amount        *big.Int
+	Balance       *big.Int
+	Raw           types.Log // Blockchain specific contextual infos
+}
+
+// FilterDeprecatedRewardRecycleFailed is a free log retrieval operation binding the contract event 0xa0561a59abed308fcd0556834574739d778cc6229018039a24ddda0f86aa0b73.
+//
+// Solidity: event DeprecatedRewardRecycleFailed(address indexed recipientAddr, uint256 amount, uint256 balance)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterDeprecatedRewardRecycleFailed(opts *bind.FilterOpts, recipientAddr []common.Address) (*RoninValidatorSetDeprecatedRewardRecycleFailedIterator, error) {
+
+	var recipientAddrRule []interface{}
+	for _, recipientAddrItem := range recipientAddr {
+		recipientAddrRule = append(recipientAddrRule, recipientAddrItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "DeprecatedRewardRecycleFailed", recipientAddrRule)
+	if err != nil {
+		return nil, err
+	}
+	return &RoninValidatorSetDeprecatedRewardRecycleFailedIterator{contract: _RoninValidatorSet.contract, event: "DeprecatedRewardRecycleFailed", logs: logs, sub: sub}, nil
+}
+
+// WatchDeprecatedRewardRecycleFailed is a free log subscription operation binding the contract event 0xa0561a59abed308fcd0556834574739d778cc6229018039a24ddda0f86aa0b73.
+//
+// Solidity: event DeprecatedRewardRecycleFailed(address indexed recipientAddr, uint256 amount, uint256 balance)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchDeprecatedRewardRecycleFailed(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetDeprecatedRewardRecycleFailed, recipientAddr []common.Address) (event.Subscription, error) {
+
+	var recipientAddrRule []interface{}
+	for _, recipientAddrItem := range recipientAddr {
+		recipientAddrRule = append(recipientAddrRule, recipientAddrItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "DeprecatedRewardRecycleFailed", recipientAddrRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(RoninValidatorSetDeprecatedRewardRecycleFailed)
+				if err := _RoninValidatorSet.contract.UnpackLog(event, "DeprecatedRewardRecycleFailed", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseDeprecatedRewardRecycleFailed is a log parse operation binding the contract event 0xa0561a59abed308fcd0556834574739d778cc6229018039a24ddda0f86aa0b73.
+//
+// Solidity: event DeprecatedRewardRecycleFailed(address indexed recipientAddr, uint256 amount, uint256 balance)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseDeprecatedRewardRecycleFailed(log types.Log) (*RoninValidatorSetDeprecatedRewardRecycleFailed, error) {
+	event := new(RoninValidatorSetDeprecatedRewardRecycleFailed)
+	if err := _RoninValidatorSet.contract.UnpackLog(event, "DeprecatedRewardRecycleFailed", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// RoninValidatorSetDeprecatedRewardRecycledIterator is returned from FilterDeprecatedRewardRecycled and is used to iterate over the raw logs and unpacked data for DeprecatedRewardRecycled events raised by the RoninValidatorSet contract.
+type RoninValidatorSetDeprecatedRewardRecycledIterator struct {
+	Event *RoninValidatorSetDeprecatedRewardRecycled // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *RoninValidatorSetDeprecatedRewardRecycledIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(RoninValidatorSetDeprecatedRewardRecycled)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(RoninValidatorSetDeprecatedRewardRecycled)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *RoninValidatorSetDeprecatedRewardRecycledIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *RoninValidatorSetDeprecatedRewardRecycledIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// RoninValidatorSetDeprecatedRewardRecycled represents a DeprecatedRewardRecycled event raised by the RoninValidatorSet contract.
+type RoninValidatorSetDeprecatedRewardRecycled struct {
+	RecipientAddr common.Address
+	Amount        *big.Int
+	Raw           types.Log // Blockchain specific contextual infos
+}
+
+// FilterDeprecatedRewardRecycled is a free log retrieval operation binding the contract event 0xc447c884574da5878be39c403db2245c22530c99b579ea7bcbb3720e1d110dc8.
+//
+// Solidity: event DeprecatedRewardRecycled(address indexed recipientAddr, uint256 amount)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterDeprecatedRewardRecycled(opts *bind.FilterOpts, recipientAddr []common.Address) (*RoninValidatorSetDeprecatedRewardRecycledIterator, error) {
+
+	var recipientAddrRule []interface{}
+	for _, recipientAddrItem := range recipientAddr {
+		recipientAddrRule = append(recipientAddrRule, recipientAddrItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "DeprecatedRewardRecycled", recipientAddrRule)
+	if err != nil {
+		return nil, err
+	}
+	return &RoninValidatorSetDeprecatedRewardRecycledIterator{contract: _RoninValidatorSet.contract, event: "DeprecatedRewardRecycled", logs: logs, sub: sub}, nil
+}
+
+// WatchDeprecatedRewardRecycled is a free log subscription operation binding the contract event 0xc447c884574da5878be39c403db2245c22530c99b579ea7bcbb3720e1d110dc8.
+//
+// Solidity: event DeprecatedRewardRecycled(address indexed recipientAddr, uint256 amount)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchDeprecatedRewardRecycled(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetDeprecatedRewardRecycled, recipientAddr []common.Address) (event.Subscription, error) {
+
+	var recipientAddrRule []interface{}
+	for _, recipientAddrItem := range recipientAddr {
+		recipientAddrRule = append(recipientAddrRule, recipientAddrItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "DeprecatedRewardRecycled", recipientAddrRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(RoninValidatorSetDeprecatedRewardRecycled)
+				if err := _RoninValidatorSet.contract.UnpackLog(event, "DeprecatedRewardRecycled", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseDeprecatedRewardRecycled is a log parse operation binding the contract event 0xc447c884574da5878be39c403db2245c22530c99b579ea7bcbb3720e1d110dc8.
+//
+// Solidity: event DeprecatedRewardRecycled(address indexed recipientAddr, uint256 amount)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseDeprecatedRewardRecycled(log types.Log) (*RoninValidatorSetDeprecatedRewardRecycled, error) {
+	event := new(RoninValidatorSetDeprecatedRewardRecycled)
+	if err := _RoninValidatorSet.contract.UnpackLog(event, "DeprecatedRewardRecycled", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// RoninValidatorSetEmergencyExitLockedAmountUpdatedIterator is returned from FilterEmergencyExitLockedAmountUpdated and is used to iterate over the raw logs and unpacked data for EmergencyExitLockedAmountUpdated events raised by the RoninValidatorSet contract.
+type RoninValidatorSetEmergencyExitLockedAmountUpdatedIterator struct {
+	Event *RoninValidatorSetEmergencyExitLockedAmountUpdated // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *RoninValidatorSetEmergencyExitLockedAmountUpdatedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(RoninValidatorSetEmergencyExitLockedAmountUpdated)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(RoninValidatorSetEmergencyExitLockedAmountUpdated)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *RoninValidatorSetEmergencyExitLockedAmountUpdatedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *RoninValidatorSetEmergencyExitLockedAmountUpdatedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// RoninValidatorSetEmergencyExitLockedAmountUpdated represents a EmergencyExitLockedAmountUpdated event raised by the RoninValidatorSet contract.
+type RoninValidatorSetEmergencyExitLockedAmountUpdated struct {
+	Amount *big.Int
+	Raw    types.Log // Blockchain specific contextual infos
+}
+
+// FilterEmergencyExitLockedAmountUpdated is a free log retrieval operation binding the contract event 0x17a6c3eb965cdd7439982da25abf85be88f0f772ca33198f548e2f99fee0289a.
+//
+// Solidity: event EmergencyExitLockedAmountUpdated(uint256 amount)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterEmergencyExitLockedAmountUpdated(opts *bind.FilterOpts) (*RoninValidatorSetEmergencyExitLockedAmountUpdatedIterator, error) {
+
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "EmergencyExitLockedAmountUpdated")
+	if err != nil {
+		return nil, err
+	}
+	return &RoninValidatorSetEmergencyExitLockedAmountUpdatedIterator{contract: _RoninValidatorSet.contract, event: "EmergencyExitLockedAmountUpdated", logs: logs, sub: sub}, nil
+}
+
+// WatchEmergencyExitLockedAmountUpdated is a free log subscription operation binding the contract event 0x17a6c3eb965cdd7439982da25abf85be88f0f772ca33198f548e2f99fee0289a.
+//
+// Solidity: event EmergencyExitLockedAmountUpdated(uint256 amount)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchEmergencyExitLockedAmountUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetEmergencyExitLockedAmountUpdated) (event.Subscription, error) {
+
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "EmergencyExitLockedAmountUpdated")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(RoninValidatorSetEmergencyExitLockedAmountUpdated)
+				if err := _RoninValidatorSet.contract.UnpackLog(event, "EmergencyExitLockedAmountUpdated", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseEmergencyExitLockedAmountUpdated is a log parse operation binding the contract event 0x17a6c3eb965cdd7439982da25abf85be88f0f772ca33198f548e2f99fee0289a.
+//
+// Solidity: event EmergencyExitLockedAmountUpdated(uint256 amount)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseEmergencyExitLockedAmountUpdated(log types.Log) (*RoninValidatorSetEmergencyExitLockedAmountUpdated, error) {
+	event := new(RoninValidatorSetEmergencyExitLockedAmountUpdated)
+	if err := _RoninValidatorSet.contract.UnpackLog(event, "EmergencyExitLockedAmountUpdated", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// RoninValidatorSetEmergencyExitLockedFundReleasedIterator is returned from FilterEmergencyExitLockedFundReleased and is used to iterate over the raw logs and unpacked data for EmergencyExitLockedFundReleased events raised by the RoninValidatorSet contract.
+type RoninValidatorSetEmergencyExitLockedFundReleasedIterator struct {
+	Event *RoninValidatorSetEmergencyExitLockedFundReleased // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *RoninValidatorSetEmergencyExitLockedFundReleasedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(RoninValidatorSetEmergencyExitLockedFundReleased)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(RoninValidatorSetEmergencyExitLockedFundReleased)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *RoninValidatorSetEmergencyExitLockedFundReleasedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *RoninValidatorSetEmergencyExitLockedFundReleasedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// RoninValidatorSetEmergencyExitLockedFundReleased represents a EmergencyExitLockedFundReleased event raised by the RoninValidatorSet contract.
+type RoninValidatorSetEmergencyExitLockedFundReleased struct {
+	ConsensusAddr  common.Address
+	Recipient      common.Address
+	UnlockedAmount *big.Int
+	Raw            types.Log // Blockchain specific contextual infos
+}
+
+// FilterEmergencyExitLockedFundReleased is a free log retrieval operation binding the contract event 0x7229136a18186c71a86246c012af3bb1df6460ef163934bbdccd6368abdd41e4.
+//
+// Solidity: event EmergencyExitLockedFundReleased(address indexed consensusAddr, address indexed recipient, uint256 unlockedAmount)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterEmergencyExitLockedFundReleased(opts *bind.FilterOpts, consensusAddr []common.Address, recipient []common.Address) (*RoninValidatorSetEmergencyExitLockedFundReleasedIterator, error) {
+
+	var consensusAddrRule []interface{}
+	for _, consensusAddrItem := range consensusAddr {
+		consensusAddrRule = append(consensusAddrRule, consensusAddrItem)
+	}
+	var recipientRule []interface{}
+	for _, recipientItem := range recipient {
+		recipientRule = append(recipientRule, recipientItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "EmergencyExitLockedFundReleased", consensusAddrRule, recipientRule)
+	if err != nil {
+		return nil, err
+	}
+	return &RoninValidatorSetEmergencyExitLockedFundReleasedIterator{contract: _RoninValidatorSet.contract, event: "EmergencyExitLockedFundReleased", logs: logs, sub: sub}, nil
+}
+
+// WatchEmergencyExitLockedFundReleased is a free log subscription operation binding the contract event 0x7229136a18186c71a86246c012af3bb1df6460ef163934bbdccd6368abdd41e4.
+//
+// Solidity: event EmergencyExitLockedFundReleased(address indexed consensusAddr, address indexed recipient, uint256 unlockedAmount)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchEmergencyExitLockedFundReleased(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetEmergencyExitLockedFundReleased, consensusAddr []common.Address, recipient []common.Address) (event.Subscription, error) {
+
+	var consensusAddrRule []interface{}
+	for _, consensusAddrItem := range consensusAddr {
+		consensusAddrRule = append(consensusAddrRule, consensusAddrItem)
+	}
+	var recipientRule []interface{}
+	for _, recipientItem := range recipient {
+		recipientRule = append(recipientRule, recipientItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "EmergencyExitLockedFundReleased", consensusAddrRule, recipientRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(RoninValidatorSetEmergencyExitLockedFundReleased)
+				if err := _RoninValidatorSet.contract.UnpackLog(event, "EmergencyExitLockedFundReleased", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseEmergencyExitLockedFundReleased is a log parse operation binding the contract event 0x7229136a18186c71a86246c012af3bb1df6460ef163934bbdccd6368abdd41e4.
+//
+// Solidity: event EmergencyExitLockedFundReleased(address indexed consensusAddr, address indexed recipient, uint256 unlockedAmount)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseEmergencyExitLockedFundReleased(log types.Log) (*RoninValidatorSetEmergencyExitLockedFundReleased, error) {
+	event := new(RoninValidatorSetEmergencyExitLockedFundReleased)
+	if err := _RoninValidatorSet.contract.UnpackLog(event, "EmergencyExitLockedFundReleased", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// RoninValidatorSetEmergencyExitLockedFundReleasingFailedIterator is returned from FilterEmergencyExitLockedFundReleasingFailed and is used to iterate over the raw logs and unpacked data for EmergencyExitLockedFundReleasingFailed events raised by the RoninValidatorSet contract.
+type RoninValidatorSetEmergencyExitLockedFundReleasingFailedIterator struct {
+	Event *RoninValidatorSetEmergencyExitLockedFundReleasingFailed // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *RoninValidatorSetEmergencyExitLockedFundReleasingFailedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(RoninValidatorSetEmergencyExitLockedFundReleasingFailed)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(RoninValidatorSetEmergencyExitLockedFundReleasingFailed)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *RoninValidatorSetEmergencyExitLockedFundReleasingFailedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *RoninValidatorSetEmergencyExitLockedFundReleasingFailedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// RoninValidatorSetEmergencyExitLockedFundReleasingFailed represents a EmergencyExitLockedFundReleasingFailed event raised by the RoninValidatorSet contract.
+type RoninValidatorSetEmergencyExitLockedFundReleasingFailed struct {
+	ConsensusAddr   common.Address
+	Recipient       common.Address
+	UnlockedAmount  *big.Int
+	ContractBalance *big.Int
+	Raw             types.Log // Blockchain specific contextual infos
+}
+
+// FilterEmergencyExitLockedFundReleasingFailed is a free log retrieval operation binding the contract event 0x3747d14eb72ad3e35cba9c3e00dab3b8d15b40cac6bdbd08402356e4f69f30a1.
+//
+// Solidity: event EmergencyExitLockedFundReleasingFailed(address indexed consensusAddr, address indexed recipient, uint256 unlockedAmount, uint256 contractBalance)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterEmergencyExitLockedFundReleasingFailed(opts *bind.FilterOpts, consensusAddr []common.Address, recipient []common.Address) (*RoninValidatorSetEmergencyExitLockedFundReleasingFailedIterator, error) {
+
+	var consensusAddrRule []interface{}
+	for _, consensusAddrItem := range consensusAddr {
+		consensusAddrRule = append(consensusAddrRule, consensusAddrItem)
+	}
+	var recipientRule []interface{}
+	for _, recipientItem := range recipient {
+		recipientRule = append(recipientRule, recipientItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "EmergencyExitLockedFundReleasingFailed", consensusAddrRule, recipientRule)
+	if err != nil {
+		return nil, err
+	}
+	return &RoninValidatorSetEmergencyExitLockedFundReleasingFailedIterator{contract: _RoninValidatorSet.contract, event: "EmergencyExitLockedFundReleasingFailed", logs: logs, sub: sub}, nil
+}
+
+// WatchEmergencyExitLockedFundReleasingFailed is a free log subscription operation binding the contract event 0x3747d14eb72ad3e35cba9c3e00dab3b8d15b40cac6bdbd08402356e4f69f30a1.
+//
+// Solidity: event EmergencyExitLockedFundReleasingFailed(address indexed consensusAddr, address indexed recipient, uint256 unlockedAmount, uint256 contractBalance)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchEmergencyExitLockedFundReleasingFailed(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetEmergencyExitLockedFundReleasingFailed, consensusAddr []common.Address, recipient []common.Address) (event.Subscription, error) {
+
+	var consensusAddrRule []interface{}
+	for _, consensusAddrItem := range consensusAddr {
+		consensusAddrRule = append(consensusAddrRule, consensusAddrItem)
+	}
+	var recipientRule []interface{}
+	for _, recipientItem := range recipient {
+		recipientRule = append(recipientRule, recipientItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "EmergencyExitLockedFundReleasingFailed", consensusAddrRule, recipientRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(RoninValidatorSetEmergencyExitLockedFundReleasingFailed)
+				if err := _RoninValidatorSet.contract.UnpackLog(event, "EmergencyExitLockedFundReleasingFailed", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseEmergencyExitLockedFundReleasingFailed is a log parse operation binding the contract event 0x3747d14eb72ad3e35cba9c3e00dab3b8d15b40cac6bdbd08402356e4f69f30a1.
+//
+// Solidity: event EmergencyExitLockedFundReleasingFailed(address indexed consensusAddr, address indexed recipient, uint256 unlockedAmount, uint256 contractBalance)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseEmergencyExitLockedFundReleasingFailed(log types.Log) (*RoninValidatorSetEmergencyExitLockedFundReleasingFailed, error) {
+	event := new(RoninValidatorSetEmergencyExitLockedFundReleasingFailed)
+	if err := _RoninValidatorSet.contract.UnpackLog(event, "EmergencyExitLockedFundReleasingFailed", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// RoninValidatorSetEmergencyExitRequestedIterator is returned from FilterEmergencyExitRequested and is used to iterate over the raw logs and unpacked data for EmergencyExitRequested events raised by the RoninValidatorSet contract.
+type RoninValidatorSetEmergencyExitRequestedIterator struct {
+	Event *RoninValidatorSetEmergencyExitRequested // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *RoninValidatorSetEmergencyExitRequestedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(RoninValidatorSetEmergencyExitRequested)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(RoninValidatorSetEmergencyExitRequested)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *RoninValidatorSetEmergencyExitRequestedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *RoninValidatorSetEmergencyExitRequestedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// RoninValidatorSetEmergencyExitRequested represents a EmergencyExitRequested event raised by the RoninValidatorSet contract.
+type RoninValidatorSetEmergencyExitRequested struct {
+	ConsensusAddr common.Address
+	LockedAmount  *big.Int
+	Raw           types.Log // Blockchain specific contextual infos
+}
+
+// FilterEmergencyExitRequested is a free log retrieval operation binding the contract event 0x77a1a819870c0f4d04c3ca4cc2881a0393136abc28bd651af50aedade94a27c4.
+//
+// Solidity: event EmergencyExitRequested(address indexed consensusAddr, uint256 lockedAmount)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterEmergencyExitRequested(opts *bind.FilterOpts, consensusAddr []common.Address) (*RoninValidatorSetEmergencyExitRequestedIterator, error) {
+
+	var consensusAddrRule []interface{}
+	for _, consensusAddrItem := range consensusAddr {
+		consensusAddrRule = append(consensusAddrRule, consensusAddrItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "EmergencyExitRequested", consensusAddrRule)
+	if err != nil {
+		return nil, err
+	}
+	return &RoninValidatorSetEmergencyExitRequestedIterator{contract: _RoninValidatorSet.contract, event: "EmergencyExitRequested", logs: logs, sub: sub}, nil
+}
+
+// WatchEmergencyExitRequested is a free log subscription operation binding the contract event 0x77a1a819870c0f4d04c3ca4cc2881a0393136abc28bd651af50aedade94a27c4.
+//
+// Solidity: event EmergencyExitRequested(address indexed consensusAddr, uint256 lockedAmount)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchEmergencyExitRequested(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetEmergencyExitRequested, consensusAddr []common.Address) (event.Subscription, error) {
+
+	var consensusAddrRule []interface{}
+	for _, consensusAddrItem := range consensusAddr {
+		consensusAddrRule = append(consensusAddrRule, consensusAddrItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "EmergencyExitRequested", consensusAddrRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(RoninValidatorSetEmergencyExitRequested)
+				if err := _RoninValidatorSet.contract.UnpackLog(event, "EmergencyExitRequested", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseEmergencyExitRequested is a log parse operation binding the contract event 0x77a1a819870c0f4d04c3ca4cc2881a0393136abc28bd651af50aedade94a27c4.
+//
+// Solidity: event EmergencyExitRequested(address indexed consensusAddr, uint256 lockedAmount)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseEmergencyExitRequested(log types.Log) (*RoninValidatorSetEmergencyExitRequested, error) {
+	event := new(RoninValidatorSetEmergencyExitRequested)
+	if err := _RoninValidatorSet.contract.UnpackLog(event, "EmergencyExitRequested", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// RoninValidatorSetEmergencyExpiryDurationUpdatedIterator is returned from FilterEmergencyExpiryDurationUpdated and is used to iterate over the raw logs and unpacked data for EmergencyExpiryDurationUpdated events raised by the RoninValidatorSet contract.
+type RoninValidatorSetEmergencyExpiryDurationUpdatedIterator struct {
+	Event *RoninValidatorSetEmergencyExpiryDurationUpdated // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *RoninValidatorSetEmergencyExpiryDurationUpdatedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(RoninValidatorSetEmergencyExpiryDurationUpdated)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(RoninValidatorSetEmergencyExpiryDurationUpdated)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *RoninValidatorSetEmergencyExpiryDurationUpdatedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *RoninValidatorSetEmergencyExpiryDurationUpdatedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// RoninValidatorSetEmergencyExpiryDurationUpdated represents a EmergencyExpiryDurationUpdated event raised by the RoninValidatorSet contract.
+type RoninValidatorSetEmergencyExpiryDurationUpdated struct {
+	Amount *big.Int
+	Raw    types.Log // Blockchain specific contextual infos
+}
+
+// FilterEmergencyExpiryDurationUpdated is a free log retrieval operation binding the contract event 0x0a50c66137118f386332efb949231ddd3946100dbf880003daca37ddd9e0662b.
+//
+// Solidity: event EmergencyExpiryDurationUpdated(uint256 amount)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterEmergencyExpiryDurationUpdated(opts *bind.FilterOpts) (*RoninValidatorSetEmergencyExpiryDurationUpdatedIterator, error) {
+
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "EmergencyExpiryDurationUpdated")
+	if err != nil {
+		return nil, err
+	}
+	return &RoninValidatorSetEmergencyExpiryDurationUpdatedIterator{contract: _RoninValidatorSet.contract, event: "EmergencyExpiryDurationUpdated", logs: logs, sub: sub}, nil
+}
+
+// WatchEmergencyExpiryDurationUpdated is a free log subscription operation binding the contract event 0x0a50c66137118f386332efb949231ddd3946100dbf880003daca37ddd9e0662b.
+//
+// Solidity: event EmergencyExpiryDurationUpdated(uint256 amount)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchEmergencyExpiryDurationUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetEmergencyExpiryDurationUpdated) (event.Subscription, error) {
+
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "EmergencyExpiryDurationUpdated")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(RoninValidatorSetEmergencyExpiryDurationUpdated)
+				if err := _RoninValidatorSet.contract.UnpackLog(event, "EmergencyExpiryDurationUpdated", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseEmergencyExpiryDurationUpdated is a log parse operation binding the contract event 0x0a50c66137118f386332efb949231ddd3946100dbf880003daca37ddd9e0662b.
+//
+// Solidity: event EmergencyExpiryDurationUpdated(uint256 amount)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseEmergencyExpiryDurationUpdated(log types.Log) (*RoninValidatorSetEmergencyExpiryDurationUpdated, error) {
+	event := new(RoninValidatorSetEmergencyExpiryDurationUpdated)
+	if err := _RoninValidatorSet.contract.UnpackLog(event, "EmergencyExpiryDurationUpdated", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// RoninValidatorSetFastFinalityRewardDistributedIterator is returned from FilterFastFinalityRewardDistributed and is used to iterate over the raw logs and unpacked data for FastFinalityRewardDistributed events raised by the RoninValidatorSet contract.
+type RoninValidatorSetFastFinalityRewardDistributedIterator struct {
+	Event *RoninValidatorSetFastFinalityRewardDistributed // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *RoninValidatorSetFastFinalityRewardDistributedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(RoninValidatorSetFastFinalityRewardDistributed)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(RoninValidatorSetFastFinalityRewardDistributed)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *RoninValidatorSetFastFinalityRewardDistributedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *RoninValidatorSetFastFinalityRewardDistributedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// RoninValidatorSetFastFinalityRewardDistributed represents a FastFinalityRewardDistributed event raised by the RoninValidatorSet contract.
+type RoninValidatorSetFastFinalityRewardDistributed struct {
+	ConsensusAddr common.Address
+	Recipient     common.Address
+	Amount        *big.Int
+	Raw           types.Log // Blockchain specific contextual infos
+}
+
+// FilterFastFinalityRewardDistributed is a free log retrieval operation binding the contract event 0x0c4d6a43fc8470dee97db74874b5685e412cc517d9bdecfde1623c5e835b18e4.
+//
+// Solidity: event FastFinalityRewardDistributed(address indexed consensusAddr, address indexed recipient, uint256 amount)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterFastFinalityRewardDistributed(opts *bind.FilterOpts, consensusAddr []common.Address, recipient []common.Address) (*RoninValidatorSetFastFinalityRewardDistributedIterator, error) {
+
+	var consensusAddrRule []interface{}
+	for _, consensusAddrItem := range consensusAddr {
+		consensusAddrRule = append(consensusAddrRule, consensusAddrItem)
+	}
+	var recipientRule []interface{}
+	for _, recipientItem := range recipient {
+		recipientRule = append(recipientRule, recipientItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "FastFinalityRewardDistributed", consensusAddrRule, recipientRule)
+	if err != nil {
+		return nil, err
+	}
+	return &RoninValidatorSetFastFinalityRewardDistributedIterator{contract: _RoninValidatorSet.contract, event: "FastFinalityRewardDistributed", logs: logs, sub: sub}, nil
+}
+
+// WatchFastFinalityRewardDistributed is a free log subscription operation binding the contract event 0x0c4d6a43fc8470dee97db74874b5685e412cc517d9bdecfde1623c5e835b18e4.
+//
+// Solidity: event FastFinalityRewardDistributed(address indexed consensusAddr, address indexed recipient, uint256 amount)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchFastFinalityRewardDistributed(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetFastFinalityRewardDistributed, consensusAddr []common.Address, recipient []common.Address) (event.Subscription, error) {
+
+	var consensusAddrRule []interface{}
+	for _, consensusAddrItem := range consensusAddr {
+		consensusAddrRule = append(consensusAddrRule, consensusAddrItem)
+	}
+	var recipientRule []interface{}
+	for _, recipientItem := range recipient {
+		recipientRule = append(recipientRule, recipientItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "FastFinalityRewardDistributed", consensusAddrRule, recipientRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(RoninValidatorSetFastFinalityRewardDistributed)
+				if err := _RoninValidatorSet.contract.UnpackLog(event, "FastFinalityRewardDistributed", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseFastFinalityRewardDistributed is a log parse operation binding the contract event 0x0c4d6a43fc8470dee97db74874b5685e412cc517d9bdecfde1623c5e835b18e4.
+//
+// Solidity: event FastFinalityRewardDistributed(address indexed consensusAddr, address indexed recipient, uint256 amount)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseFastFinalityRewardDistributed(log types.Log) (*RoninValidatorSetFastFinalityRewardDistributed, error) {
+	event := new(RoninValidatorSetFastFinalityRewardDistributed)
+	if err := _RoninValidatorSet.contract.UnpackLog(event, "FastFinalityRewardDistributed", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// RoninValidatorSetFastFinalityRewardDistributionFailedIterator is returned from FilterFastFinalityRewardDistributionFailed and is used to iterate over the raw logs and unpacked data for FastFinalityRewardDistributionFailed events raised by the RoninValidatorSet contract.
+type RoninValidatorSetFastFinalityRewardDistributionFailedIterator struct {
+	Event *RoninValidatorSetFastFinalityRewardDistributionFailed // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *RoninValidatorSetFastFinalityRewardDistributionFailedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(RoninValidatorSetFastFinalityRewardDistributionFailed)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(RoninValidatorSetFastFinalityRewardDistributionFailed)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *RoninValidatorSetFastFinalityRewardDistributionFailedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *RoninValidatorSetFastFinalityRewardDistributionFailedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// RoninValidatorSetFastFinalityRewardDistributionFailed represents a FastFinalityRewardDistributionFailed event raised by the RoninValidatorSet contract.
+type RoninValidatorSetFastFinalityRewardDistributionFailed struct {
+	ConsensusAddr   common.Address
+	Recipient       common.Address
+	Amount          *big.Int
+	ContractBalance *big.Int
+	Raw             types.Log // Blockchain specific contextual infos
+}
+
+// FilterFastFinalityRewardDistributionFailed is a free log retrieval operation binding the contract event 0x98697ee35f04a599a814432016fff3968c483d2d88dacb484926b9358f8e7cf9.
+//
+// Solidity: event FastFinalityRewardDistributionFailed(address indexed consensusAddr, address indexed recipient, uint256 amount, uint256 contractBalance)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterFastFinalityRewardDistributionFailed(opts *bind.FilterOpts, consensusAddr []common.Address, recipient []common.Address) (*RoninValidatorSetFastFinalityRewardDistributionFailedIterator, error) {
+
+	var consensusAddrRule []interface{}
+	for _, consensusAddrItem := range consensusAddr {
+		consensusAddrRule = append(consensusAddrRule, consensusAddrItem)
+	}
+	var recipientRule []interface{}
+	for _, recipientItem := range recipient {
+		recipientRule = append(recipientRule, recipientItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "FastFinalityRewardDistributionFailed", consensusAddrRule, recipientRule)
+	if err != nil {
+		return nil, err
+	}
+	return &RoninValidatorSetFastFinalityRewardDistributionFailedIterator{contract: _RoninValidatorSet.contract, event: "FastFinalityRewardDistributionFailed", logs: logs, sub: sub}, nil
+}
+
+// WatchFastFinalityRewardDistributionFailed is a free log subscription operation binding the contract event 0x98697ee35f04a599a814432016fff3968c483d2d88dacb484926b9358f8e7cf9.
+//
+// Solidity: event FastFinalityRewardDistributionFailed(address indexed consensusAddr, address indexed recipient, uint256 amount, uint256 contractBalance)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchFastFinalityRewardDistributionFailed(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetFastFinalityRewardDistributionFailed, consensusAddr []common.Address, recipient []common.Address) (event.Subscription, error) {
+
+	var consensusAddrRule []interface{}
+	for _, consensusAddrItem := range consensusAddr {
+		consensusAddrRule = append(consensusAddrRule, consensusAddrItem)
+	}
+	var recipientRule []interface{}
+	for _, recipientItem := range recipient {
+		recipientRule = append(recipientRule, recipientItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "FastFinalityRewardDistributionFailed", consensusAddrRule, recipientRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(RoninValidatorSetFastFinalityRewardDistributionFailed)
+				if err := _RoninValidatorSet.contract.UnpackLog(event, "FastFinalityRewardDistributionFailed", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseFastFinalityRewardDistributionFailed is a log parse operation binding the contract event 0x98697ee35f04a599a814432016fff3968c483d2d88dacb484926b9358f8e7cf9.
+//
+// Solidity: event FastFinalityRewardDistributionFailed(address indexed consensusAddr, address indexed recipient, uint256 amount, uint256 contractBalance)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseFastFinalityRewardDistributionFailed(log types.Log) (*RoninValidatorSetFastFinalityRewardDistributionFailed, error) {
+	event := new(RoninValidatorSetFastFinalityRewardDistributionFailed)
+	if err := _RoninValidatorSet.contract.UnpackLog(event, "FastFinalityRewardDistributionFailed", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
 // RoninValidatorSetInitializedIterator is returned from FilterInitialized and is used to iterate over the raw logs and unpacked data for Initialized events raised by the RoninValidatorSet contract.
 type RoninValidatorSetInitializedIterator struct {
 	Event *RoninValidatorSetInitialized // Event containing the contract specifics and raw log
@@ -3458,140 +5426,6 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchInitialized(opts *bind
 func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseInitialized(log types.Log) (*RoninValidatorSetInitialized, error) {
 	event := new(RoninValidatorSetInitialized)
 	if err := _RoninValidatorSet.contract.UnpackLog(event, "Initialized", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// RoninValidatorSetMaintenanceContractUpdatedIterator is returned from FilterMaintenanceContractUpdated and is used to iterate over the raw logs and unpacked data for MaintenanceContractUpdated events raised by the RoninValidatorSet contract.
-type RoninValidatorSetMaintenanceContractUpdatedIterator struct {
-	Event *RoninValidatorSetMaintenanceContractUpdated // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *RoninValidatorSetMaintenanceContractUpdatedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(RoninValidatorSetMaintenanceContractUpdated)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(RoninValidatorSetMaintenanceContractUpdated)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *RoninValidatorSetMaintenanceContractUpdatedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *RoninValidatorSetMaintenanceContractUpdatedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// RoninValidatorSetMaintenanceContractUpdated represents a MaintenanceContractUpdated event raised by the RoninValidatorSet contract.
-type RoninValidatorSetMaintenanceContractUpdated struct {
-	Arg0 common.Address
-	Raw  types.Log // Blockchain specific contextual infos
-}
-
-// FilterMaintenanceContractUpdated is a free log retrieval operation binding the contract event 0x31a33f126a5bae3c5bdf6cfc2cd6dcfffe2fe9634bdb09e21c44762993889e3b.
-//
-// Solidity: event MaintenanceContractUpdated(address arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterMaintenanceContractUpdated(opts *bind.FilterOpts) (*RoninValidatorSetMaintenanceContractUpdatedIterator, error) {
-
-	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "MaintenanceContractUpdated")
-	if err != nil {
-		return nil, err
-	}
-	return &RoninValidatorSetMaintenanceContractUpdatedIterator{contract: _RoninValidatorSet.contract, event: "MaintenanceContractUpdated", logs: logs, sub: sub}, nil
-}
-
-// WatchMaintenanceContractUpdated is a free log subscription operation binding the contract event 0x31a33f126a5bae3c5bdf6cfc2cd6dcfffe2fe9634bdb09e21c44762993889e3b.
-//
-// Solidity: event MaintenanceContractUpdated(address arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchMaintenanceContractUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetMaintenanceContractUpdated) (event.Subscription, error) {
-
-	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "MaintenanceContractUpdated")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(RoninValidatorSetMaintenanceContractUpdated)
-				if err := _RoninValidatorSet.contract.UnpackLog(event, "MaintenanceContractUpdated", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseMaintenanceContractUpdated is a log parse operation binding the contract event 0x31a33f126a5bae3c5bdf6cfc2cd6dcfffe2fe9634bdb09e21c44762993889e3b.
-//
-// Solidity: event MaintenanceContractUpdated(address arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseMaintenanceContractUpdated(log types.Log) (*RoninValidatorSetMaintenanceContractUpdated, error) {
-	event := new(RoninValidatorSetMaintenanceContractUpdated)
-	if err := _RoninValidatorSet.contract.UnpackLog(event, "MaintenanceContractUpdated", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
@@ -4000,6 +5834,140 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseMaxValidatorNumberUpda
 	return event, nil
 }
 
+// RoninValidatorSetMinEffectiveDaysOnwardsUpdatedIterator is returned from FilterMinEffectiveDaysOnwardsUpdated and is used to iterate over the raw logs and unpacked data for MinEffectiveDaysOnwardsUpdated events raised by the RoninValidatorSet contract.
+type RoninValidatorSetMinEffectiveDaysOnwardsUpdatedIterator struct {
+	Event *RoninValidatorSetMinEffectiveDaysOnwardsUpdated // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *RoninValidatorSetMinEffectiveDaysOnwardsUpdatedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(RoninValidatorSetMinEffectiveDaysOnwardsUpdated)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(RoninValidatorSetMinEffectiveDaysOnwardsUpdated)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *RoninValidatorSetMinEffectiveDaysOnwardsUpdatedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *RoninValidatorSetMinEffectiveDaysOnwardsUpdatedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// RoninValidatorSetMinEffectiveDaysOnwardsUpdated represents a MinEffectiveDaysOnwardsUpdated event raised by the RoninValidatorSet contract.
+type RoninValidatorSetMinEffectiveDaysOnwardsUpdated struct {
+	NumOfDays *big.Int
+	Raw       types.Log // Blockchain specific contextual infos
+}
+
+// FilterMinEffectiveDaysOnwardsUpdated is a free log retrieval operation binding the contract event 0x266d432ffe659e3565750d26ec685b822a58041eee724b67a5afec3168a25267.
+//
+// Solidity: event MinEffectiveDaysOnwardsUpdated(uint256 numOfDays)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterMinEffectiveDaysOnwardsUpdated(opts *bind.FilterOpts) (*RoninValidatorSetMinEffectiveDaysOnwardsUpdatedIterator, error) {
+
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "MinEffectiveDaysOnwardsUpdated")
+	if err != nil {
+		return nil, err
+	}
+	return &RoninValidatorSetMinEffectiveDaysOnwardsUpdatedIterator{contract: _RoninValidatorSet.contract, event: "MinEffectiveDaysOnwardsUpdated", logs: logs, sub: sub}, nil
+}
+
+// WatchMinEffectiveDaysOnwardsUpdated is a free log subscription operation binding the contract event 0x266d432ffe659e3565750d26ec685b822a58041eee724b67a5afec3168a25267.
+//
+// Solidity: event MinEffectiveDaysOnwardsUpdated(uint256 numOfDays)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchMinEffectiveDaysOnwardsUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetMinEffectiveDaysOnwardsUpdated) (event.Subscription, error) {
+
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "MinEffectiveDaysOnwardsUpdated")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(RoninValidatorSetMinEffectiveDaysOnwardsUpdated)
+				if err := _RoninValidatorSet.contract.UnpackLog(event, "MinEffectiveDaysOnwardsUpdated", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseMinEffectiveDaysOnwardsUpdated is a log parse operation binding the contract event 0x266d432ffe659e3565750d26ec685b822a58041eee724b67a5afec3168a25267.
+//
+// Solidity: event MinEffectiveDaysOnwardsUpdated(uint256 numOfDays)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseMinEffectiveDaysOnwardsUpdated(log types.Log) (*RoninValidatorSetMinEffectiveDaysOnwardsUpdated, error) {
+	event := new(RoninValidatorSetMinEffectiveDaysOnwardsUpdated)
+	if err := _RoninValidatorSet.contract.UnpackLog(event, "MinEffectiveDaysOnwardsUpdated", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
 // RoninValidatorSetMiningRewardDistributedIterator is returned from FilterMiningRewardDistributed and is used to iterate over the raw logs and unpacked data for MiningRewardDistributed events raised by the RoninValidatorSet contract.
 type RoninValidatorSetMiningRewardDistributedIterator struct {
 	Event *RoninValidatorSetMiningRewardDistributed // Event containing the contract specifics and raw log
@@ -4309,542 +6277,6 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseMiningRewardDistributi
 	return event, nil
 }
 
-// RoninValidatorSetNumberOfBlocksInEpochUpdatedIterator is returned from FilterNumberOfBlocksInEpochUpdated and is used to iterate over the raw logs and unpacked data for NumberOfBlocksInEpochUpdated events raised by the RoninValidatorSet contract.
-type RoninValidatorSetNumberOfBlocksInEpochUpdatedIterator struct {
-	Event *RoninValidatorSetNumberOfBlocksInEpochUpdated // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *RoninValidatorSetNumberOfBlocksInEpochUpdatedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(RoninValidatorSetNumberOfBlocksInEpochUpdated)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(RoninValidatorSetNumberOfBlocksInEpochUpdated)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *RoninValidatorSetNumberOfBlocksInEpochUpdatedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *RoninValidatorSetNumberOfBlocksInEpochUpdatedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// RoninValidatorSetNumberOfBlocksInEpochUpdated represents a NumberOfBlocksInEpochUpdated event raised by the RoninValidatorSet contract.
-type RoninValidatorSetNumberOfBlocksInEpochUpdated struct {
-	Arg0 *big.Int
-	Raw  types.Log // Blockchain specific contextual infos
-}
-
-// FilterNumberOfBlocksInEpochUpdated is a free log retrieval operation binding the contract event 0xbfd285a38b782d8a00e424fb824320ff3d1a698534358d02da611468d59b7808.
-//
-// Solidity: event NumberOfBlocksInEpochUpdated(uint256 arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterNumberOfBlocksInEpochUpdated(opts *bind.FilterOpts) (*RoninValidatorSetNumberOfBlocksInEpochUpdatedIterator, error) {
-
-	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "NumberOfBlocksInEpochUpdated")
-	if err != nil {
-		return nil, err
-	}
-	return &RoninValidatorSetNumberOfBlocksInEpochUpdatedIterator{contract: _RoninValidatorSet.contract, event: "NumberOfBlocksInEpochUpdated", logs: logs, sub: sub}, nil
-}
-
-// WatchNumberOfBlocksInEpochUpdated is a free log subscription operation binding the contract event 0xbfd285a38b782d8a00e424fb824320ff3d1a698534358d02da611468d59b7808.
-//
-// Solidity: event NumberOfBlocksInEpochUpdated(uint256 arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchNumberOfBlocksInEpochUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetNumberOfBlocksInEpochUpdated) (event.Subscription, error) {
-
-	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "NumberOfBlocksInEpochUpdated")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(RoninValidatorSetNumberOfBlocksInEpochUpdated)
-				if err := _RoninValidatorSet.contract.UnpackLog(event, "NumberOfBlocksInEpochUpdated", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseNumberOfBlocksInEpochUpdated is a log parse operation binding the contract event 0xbfd285a38b782d8a00e424fb824320ff3d1a698534358d02da611468d59b7808.
-//
-// Solidity: event NumberOfBlocksInEpochUpdated(uint256 arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseNumberOfBlocksInEpochUpdated(log types.Log) (*RoninValidatorSetNumberOfBlocksInEpochUpdated, error) {
-	event := new(RoninValidatorSetNumberOfBlocksInEpochUpdated)
-	if err := _RoninValidatorSet.contract.UnpackLog(event, "NumberOfBlocksInEpochUpdated", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// RoninValidatorSetRoninTrustedOrganizationContractUpdatedIterator is returned from FilterRoninTrustedOrganizationContractUpdated and is used to iterate over the raw logs and unpacked data for RoninTrustedOrganizationContractUpdated events raised by the RoninValidatorSet contract.
-type RoninValidatorSetRoninTrustedOrganizationContractUpdatedIterator struct {
-	Event *RoninValidatorSetRoninTrustedOrganizationContractUpdated // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *RoninValidatorSetRoninTrustedOrganizationContractUpdatedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(RoninValidatorSetRoninTrustedOrganizationContractUpdated)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(RoninValidatorSetRoninTrustedOrganizationContractUpdated)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *RoninValidatorSetRoninTrustedOrganizationContractUpdatedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *RoninValidatorSetRoninTrustedOrganizationContractUpdatedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// RoninValidatorSetRoninTrustedOrganizationContractUpdated represents a RoninTrustedOrganizationContractUpdated event raised by the RoninValidatorSet contract.
-type RoninValidatorSetRoninTrustedOrganizationContractUpdated struct {
-	Arg0 common.Address
-	Raw  types.Log // Blockchain specific contextual infos
-}
-
-// FilterRoninTrustedOrganizationContractUpdated is a free log retrieval operation binding the contract event 0xfd6f5f93d69a07c593a09be0b208bff13ab4ffd6017df3b33433d63bdc59b4d7.
-//
-// Solidity: event RoninTrustedOrganizationContractUpdated(address arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterRoninTrustedOrganizationContractUpdated(opts *bind.FilterOpts) (*RoninValidatorSetRoninTrustedOrganizationContractUpdatedIterator, error) {
-
-	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "RoninTrustedOrganizationContractUpdated")
-	if err != nil {
-		return nil, err
-	}
-	return &RoninValidatorSetRoninTrustedOrganizationContractUpdatedIterator{contract: _RoninValidatorSet.contract, event: "RoninTrustedOrganizationContractUpdated", logs: logs, sub: sub}, nil
-}
-
-// WatchRoninTrustedOrganizationContractUpdated is a free log subscription operation binding the contract event 0xfd6f5f93d69a07c593a09be0b208bff13ab4ffd6017df3b33433d63bdc59b4d7.
-//
-// Solidity: event RoninTrustedOrganizationContractUpdated(address arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchRoninTrustedOrganizationContractUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetRoninTrustedOrganizationContractUpdated) (event.Subscription, error) {
-
-	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "RoninTrustedOrganizationContractUpdated")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(RoninValidatorSetRoninTrustedOrganizationContractUpdated)
-				if err := _RoninValidatorSet.contract.UnpackLog(event, "RoninTrustedOrganizationContractUpdated", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseRoninTrustedOrganizationContractUpdated is a log parse operation binding the contract event 0xfd6f5f93d69a07c593a09be0b208bff13ab4ffd6017df3b33433d63bdc59b4d7.
-//
-// Solidity: event RoninTrustedOrganizationContractUpdated(address arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseRoninTrustedOrganizationContractUpdated(log types.Log) (*RoninValidatorSetRoninTrustedOrganizationContractUpdated, error) {
-	event := new(RoninValidatorSetRoninTrustedOrganizationContractUpdated)
-	if err := _RoninValidatorSet.contract.UnpackLog(event, "RoninTrustedOrganizationContractUpdated", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// RoninValidatorSetSlashIndicatorContractUpdatedIterator is returned from FilterSlashIndicatorContractUpdated and is used to iterate over the raw logs and unpacked data for SlashIndicatorContractUpdated events raised by the RoninValidatorSet contract.
-type RoninValidatorSetSlashIndicatorContractUpdatedIterator struct {
-	Event *RoninValidatorSetSlashIndicatorContractUpdated // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *RoninValidatorSetSlashIndicatorContractUpdatedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(RoninValidatorSetSlashIndicatorContractUpdated)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(RoninValidatorSetSlashIndicatorContractUpdated)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *RoninValidatorSetSlashIndicatorContractUpdatedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *RoninValidatorSetSlashIndicatorContractUpdatedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// RoninValidatorSetSlashIndicatorContractUpdated represents a SlashIndicatorContractUpdated event raised by the RoninValidatorSet contract.
-type RoninValidatorSetSlashIndicatorContractUpdated struct {
-	Arg0 common.Address
-	Raw  types.Log // Blockchain specific contextual infos
-}
-
-// FilterSlashIndicatorContractUpdated is a free log retrieval operation binding the contract event 0xaa5b07dd43aa44c69b70a6a2b9c3fcfed12b6e5f6323596ba7ac91035ab80a4f.
-//
-// Solidity: event SlashIndicatorContractUpdated(address arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterSlashIndicatorContractUpdated(opts *bind.FilterOpts) (*RoninValidatorSetSlashIndicatorContractUpdatedIterator, error) {
-
-	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "SlashIndicatorContractUpdated")
-	if err != nil {
-		return nil, err
-	}
-	return &RoninValidatorSetSlashIndicatorContractUpdatedIterator{contract: _RoninValidatorSet.contract, event: "SlashIndicatorContractUpdated", logs: logs, sub: sub}, nil
-}
-
-// WatchSlashIndicatorContractUpdated is a free log subscription operation binding the contract event 0xaa5b07dd43aa44c69b70a6a2b9c3fcfed12b6e5f6323596ba7ac91035ab80a4f.
-//
-// Solidity: event SlashIndicatorContractUpdated(address arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchSlashIndicatorContractUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetSlashIndicatorContractUpdated) (event.Subscription, error) {
-
-	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "SlashIndicatorContractUpdated")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(RoninValidatorSetSlashIndicatorContractUpdated)
-				if err := _RoninValidatorSet.contract.UnpackLog(event, "SlashIndicatorContractUpdated", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseSlashIndicatorContractUpdated is a log parse operation binding the contract event 0xaa5b07dd43aa44c69b70a6a2b9c3fcfed12b6e5f6323596ba7ac91035ab80a4f.
-//
-// Solidity: event SlashIndicatorContractUpdated(address arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseSlashIndicatorContractUpdated(log types.Log) (*RoninValidatorSetSlashIndicatorContractUpdated, error) {
-	event := new(RoninValidatorSetSlashIndicatorContractUpdated)
-	if err := _RoninValidatorSet.contract.UnpackLog(event, "SlashIndicatorContractUpdated", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// RoninValidatorSetStakingContractUpdatedIterator is returned from FilterStakingContractUpdated and is used to iterate over the raw logs and unpacked data for StakingContractUpdated events raised by the RoninValidatorSet contract.
-type RoninValidatorSetStakingContractUpdatedIterator struct {
-	Event *RoninValidatorSetStakingContractUpdated // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *RoninValidatorSetStakingContractUpdatedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(RoninValidatorSetStakingContractUpdated)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(RoninValidatorSetStakingContractUpdated)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *RoninValidatorSetStakingContractUpdatedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *RoninValidatorSetStakingContractUpdatedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// RoninValidatorSetStakingContractUpdated represents a StakingContractUpdated event raised by the RoninValidatorSet contract.
-type RoninValidatorSetStakingContractUpdated struct {
-	Arg0 common.Address
-	Raw  types.Log // Blockchain specific contextual infos
-}
-
-// FilterStakingContractUpdated is a free log retrieval operation binding the contract event 0x6397f5b135542bb3f477cb346cfab5abdec1251d08dc8f8d4efb4ffe122ea0bf.
-//
-// Solidity: event StakingContractUpdated(address arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterStakingContractUpdated(opts *bind.FilterOpts) (*RoninValidatorSetStakingContractUpdatedIterator, error) {
-
-	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "StakingContractUpdated")
-	if err != nil {
-		return nil, err
-	}
-	return &RoninValidatorSetStakingContractUpdatedIterator{contract: _RoninValidatorSet.contract, event: "StakingContractUpdated", logs: logs, sub: sub}, nil
-}
-
-// WatchStakingContractUpdated is a free log subscription operation binding the contract event 0x6397f5b135542bb3f477cb346cfab5abdec1251d08dc8f8d4efb4ffe122ea0bf.
-//
-// Solidity: event StakingContractUpdated(address arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchStakingContractUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetStakingContractUpdated) (event.Subscription, error) {
-
-	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "StakingContractUpdated")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(RoninValidatorSetStakingContractUpdated)
-				if err := _RoninValidatorSet.contract.UnpackLog(event, "StakingContractUpdated", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseStakingContractUpdated is a log parse operation binding the contract event 0x6397f5b135542bb3f477cb346cfab5abdec1251d08dc8f8d4efb4ffe122ea0bf.
-//
-// Solidity: event StakingContractUpdated(address arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseStakingContractUpdated(log types.Log) (*RoninValidatorSetStakingContractUpdated, error) {
-	event := new(RoninValidatorSetStakingContractUpdated)
-	if err := _RoninValidatorSet.contract.UnpackLog(event, "StakingContractUpdated", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
 // RoninValidatorSetStakingRewardDistributedIterator is returned from FilterStakingRewardDistributed and is used to iterate over the raw logs and unpacked data for StakingRewardDistributed events raised by the RoninValidatorSet contract.
 type RoninValidatorSetStakingRewardDistributedIterator struct {
 	Event *RoninValidatorSetStakingRewardDistributed // Event containing the contract specifics and raw log
@@ -4914,13 +6346,15 @@ func (it *RoninValidatorSetStakingRewardDistributedIterator) Close() error {
 
 // RoninValidatorSetStakingRewardDistributed represents a StakingRewardDistributed event raised by the RoninValidatorSet contract.
 type RoninValidatorSetStakingRewardDistributed struct {
-	Amount *big.Int
-	Raw    types.Log // Blockchain specific contextual infos
+	TotalAmount    *big.Int
+	ConsensusAddrs []common.Address
+	Amounts        []*big.Int
+	Raw            types.Log // Blockchain specific contextual infos
 }
 
-// FilterStakingRewardDistributed is a free log retrieval operation binding the contract event 0xeb09b8cc1cefa77cd4ec30003e6364cf60afcedd20be8c09f26e717788baf139.
+// FilterStakingRewardDistributed is a free log retrieval operation binding the contract event 0x9e242ca1ef9dde96eb71ef8d19a3f0f6a619b63e4c0d3998771387103656d087.
 //
-// Solidity: event StakingRewardDistributed(uint256 amount)
+// Solidity: event StakingRewardDistributed(uint256 totalAmount, address[] consensusAddrs, uint256[] amounts)
 func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterStakingRewardDistributed(opts *bind.FilterOpts) (*RoninValidatorSetStakingRewardDistributedIterator, error) {
 
 	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "StakingRewardDistributed")
@@ -4930,9 +6364,9 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterStakingRewardDistribu
 	return &RoninValidatorSetStakingRewardDistributedIterator{contract: _RoninValidatorSet.contract, event: "StakingRewardDistributed", logs: logs, sub: sub}, nil
 }
 
-// WatchStakingRewardDistributed is a free log subscription operation binding the contract event 0xeb09b8cc1cefa77cd4ec30003e6364cf60afcedd20be8c09f26e717788baf139.
+// WatchStakingRewardDistributed is a free log subscription operation binding the contract event 0x9e242ca1ef9dde96eb71ef8d19a3f0f6a619b63e4c0d3998771387103656d087.
 //
-// Solidity: event StakingRewardDistributed(uint256 amount)
+// Solidity: event StakingRewardDistributed(uint256 totalAmount, address[] consensusAddrs, uint256[] amounts)
 func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchStakingRewardDistributed(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetStakingRewardDistributed) (event.Subscription, error) {
 
 	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "StakingRewardDistributed")
@@ -4967,9 +6401,9 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchStakingRewardDistribut
 	}), nil
 }
 
-// ParseStakingRewardDistributed is a log parse operation binding the contract event 0xeb09b8cc1cefa77cd4ec30003e6364cf60afcedd20be8c09f26e717788baf139.
+// ParseStakingRewardDistributed is a log parse operation binding the contract event 0x9e242ca1ef9dde96eb71ef8d19a3f0f6a619b63e4c0d3998771387103656d087.
 //
-// Solidity: event StakingRewardDistributed(uint256 amount)
+// Solidity: event StakingRewardDistributed(uint256 totalAmount, address[] consensusAddrs, uint256[] amounts)
 func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseStakingRewardDistributed(log types.Log) (*RoninValidatorSetStakingRewardDistributed, error) {
 	event := new(RoninValidatorSetStakingRewardDistributed)
 	if err := _RoninValidatorSet.contract.UnpackLog(event, "StakingRewardDistributed", log); err != nil {
@@ -5048,14 +6482,16 @@ func (it *RoninValidatorSetStakingRewardDistributionFailedIterator) Close() erro
 
 // RoninValidatorSetStakingRewardDistributionFailed represents a StakingRewardDistributionFailed event raised by the RoninValidatorSet contract.
 type RoninValidatorSetStakingRewardDistributionFailed struct {
-	Amount          *big.Int
+	TotalAmount     *big.Int
+	ConsensusAddrs  []common.Address
+	Amounts         []*big.Int
 	ContractBalance *big.Int
 	Raw             types.Log // Blockchain specific contextual infos
 }
 
-// FilterStakingRewardDistributionFailed is a free log retrieval operation binding the contract event 0x0752cb1e4b6fb7b2beb1cf423d908acaec7acfb7782e67a88d158351b1c0c4a5.
+// FilterStakingRewardDistributionFailed is a free log retrieval operation binding the contract event 0xe5668ec1bb2b6bb144a50f810e388da4b1d7d3fc05fcb9d588a1aac59d248f89.
 //
-// Solidity: event StakingRewardDistributionFailed(uint256 amount, uint256 contractBalance)
+// Solidity: event StakingRewardDistributionFailed(uint256 totalAmount, address[] consensusAddrs, uint256[] amounts, uint256 contractBalance)
 func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterStakingRewardDistributionFailed(opts *bind.FilterOpts) (*RoninValidatorSetStakingRewardDistributionFailedIterator, error) {
 
 	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "StakingRewardDistributionFailed")
@@ -5065,9 +6501,9 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterStakingRewardDistribu
 	return &RoninValidatorSetStakingRewardDistributionFailedIterator{contract: _RoninValidatorSet.contract, event: "StakingRewardDistributionFailed", logs: logs, sub: sub}, nil
 }
 
-// WatchStakingRewardDistributionFailed is a free log subscription operation binding the contract event 0x0752cb1e4b6fb7b2beb1cf423d908acaec7acfb7782e67a88d158351b1c0c4a5.
+// WatchStakingRewardDistributionFailed is a free log subscription operation binding the contract event 0xe5668ec1bb2b6bb144a50f810e388da4b1d7d3fc05fcb9d588a1aac59d248f89.
 //
-// Solidity: event StakingRewardDistributionFailed(uint256 amount, uint256 contractBalance)
+// Solidity: event StakingRewardDistributionFailed(uint256 totalAmount, address[] consensusAddrs, uint256[] amounts, uint256 contractBalance)
 func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchStakingRewardDistributionFailed(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetStakingRewardDistributionFailed) (event.Subscription, error) {
 
 	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "StakingRewardDistributionFailed")
@@ -5102,290 +6538,12 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchStakingRewardDistribut
 	}), nil
 }
 
-// ParseStakingRewardDistributionFailed is a log parse operation binding the contract event 0x0752cb1e4b6fb7b2beb1cf423d908acaec7acfb7782e67a88d158351b1c0c4a5.
+// ParseStakingRewardDistributionFailed is a log parse operation binding the contract event 0xe5668ec1bb2b6bb144a50f810e388da4b1d7d3fc05fcb9d588a1aac59d248f89.
 //
-// Solidity: event StakingRewardDistributionFailed(uint256 amount, uint256 contractBalance)
+// Solidity: event StakingRewardDistributionFailed(uint256 totalAmount, address[] consensusAddrs, uint256[] amounts, uint256 contractBalance)
 func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseStakingRewardDistributionFailed(log types.Log) (*RoninValidatorSetStakingRewardDistributionFailed, error) {
 	event := new(RoninValidatorSetStakingRewardDistributionFailed)
 	if err := _RoninValidatorSet.contract.UnpackLog(event, "StakingRewardDistributionFailed", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// RoninValidatorSetStakingVestingContractUpdatedIterator is returned from FilterStakingVestingContractUpdated and is used to iterate over the raw logs and unpacked data for StakingVestingContractUpdated events raised by the RoninValidatorSet contract.
-type RoninValidatorSetStakingVestingContractUpdatedIterator struct {
-	Event *RoninValidatorSetStakingVestingContractUpdated // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *RoninValidatorSetStakingVestingContractUpdatedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(RoninValidatorSetStakingVestingContractUpdated)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(RoninValidatorSetStakingVestingContractUpdated)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *RoninValidatorSetStakingVestingContractUpdatedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *RoninValidatorSetStakingVestingContractUpdatedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// RoninValidatorSetStakingVestingContractUpdated represents a StakingVestingContractUpdated event raised by the RoninValidatorSet contract.
-type RoninValidatorSetStakingVestingContractUpdated struct {
-	Arg0 common.Address
-	Raw  types.Log // Blockchain specific contextual infos
-}
-
-// FilterStakingVestingContractUpdated is a free log retrieval operation binding the contract event 0xc328090a37d855191ab58469296f98f87a851ca57d5cdfd1e9ac3c83e9e7096d.
-//
-// Solidity: event StakingVestingContractUpdated(address arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterStakingVestingContractUpdated(opts *bind.FilterOpts) (*RoninValidatorSetStakingVestingContractUpdatedIterator, error) {
-
-	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "StakingVestingContractUpdated")
-	if err != nil {
-		return nil, err
-	}
-	return &RoninValidatorSetStakingVestingContractUpdatedIterator{contract: _RoninValidatorSet.contract, event: "StakingVestingContractUpdated", logs: logs, sub: sub}, nil
-}
-
-// WatchStakingVestingContractUpdated is a free log subscription operation binding the contract event 0xc328090a37d855191ab58469296f98f87a851ca57d5cdfd1e9ac3c83e9e7096d.
-//
-// Solidity: event StakingVestingContractUpdated(address arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchStakingVestingContractUpdated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetStakingVestingContractUpdated) (event.Subscription, error) {
-
-	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "StakingVestingContractUpdated")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(RoninValidatorSetStakingVestingContractUpdated)
-				if err := _RoninValidatorSet.contract.UnpackLog(event, "StakingVestingContractUpdated", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseStakingVestingContractUpdated is a log parse operation binding the contract event 0xc328090a37d855191ab58469296f98f87a851ca57d5cdfd1e9ac3c83e9e7096d.
-//
-// Solidity: event StakingVestingContractUpdated(address arg0)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseStakingVestingContractUpdated(log types.Log) (*RoninValidatorSetStakingVestingContractUpdated, error) {
-	event := new(RoninValidatorSetStakingVestingContractUpdated)
-	if err := _RoninValidatorSet.contract.UnpackLog(event, "StakingVestingContractUpdated", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// RoninValidatorSetValidatorLiberatedIterator is returned from FilterValidatorLiberated and is used to iterate over the raw logs and unpacked data for ValidatorLiberated events raised by the RoninValidatorSet contract.
-type RoninValidatorSetValidatorLiberatedIterator struct {
-	Event *RoninValidatorSetValidatorLiberated // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *RoninValidatorSetValidatorLiberatedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(RoninValidatorSetValidatorLiberated)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(RoninValidatorSetValidatorLiberated)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *RoninValidatorSetValidatorLiberatedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *RoninValidatorSetValidatorLiberatedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// RoninValidatorSetValidatorLiberated represents a ValidatorLiberated event raised by the RoninValidatorSet contract.
-type RoninValidatorSetValidatorLiberated struct {
-	Validator common.Address
-	Raw       types.Log // Blockchain specific contextual infos
-}
-
-// FilterValidatorLiberated is a free log retrieval operation binding the contract event 0x028097aa2663c9c46d17e72793860e66036c00b17374e44ae5410327322f396e.
-//
-// Solidity: event ValidatorLiberated(address indexed validator)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterValidatorLiberated(opts *bind.FilterOpts, validator []common.Address) (*RoninValidatorSetValidatorLiberatedIterator, error) {
-
-	var validatorRule []interface{}
-	for _, validatorItem := range validator {
-		validatorRule = append(validatorRule, validatorItem)
-	}
-
-	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "ValidatorLiberated", validatorRule)
-	if err != nil {
-		return nil, err
-	}
-	return &RoninValidatorSetValidatorLiberatedIterator{contract: _RoninValidatorSet.contract, event: "ValidatorLiberated", logs: logs, sub: sub}, nil
-}
-
-// WatchValidatorLiberated is a free log subscription operation binding the contract event 0x028097aa2663c9c46d17e72793860e66036c00b17374e44ae5410327322f396e.
-//
-// Solidity: event ValidatorLiberated(address indexed validator)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchValidatorLiberated(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetValidatorLiberated, validator []common.Address) (event.Subscription, error) {
-
-	var validatorRule []interface{}
-	for _, validatorItem := range validator {
-		validatorRule = append(validatorRule, validatorItem)
-	}
-
-	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "ValidatorLiberated", validatorRule)
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(RoninValidatorSetValidatorLiberated)
-				if err := _RoninValidatorSet.contract.UnpackLog(event, "ValidatorLiberated", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseValidatorLiberated is a log parse operation binding the contract event 0x028097aa2663c9c46d17e72793860e66036c00b17374e44ae5410327322f396e.
-//
-// Solidity: event ValidatorLiberated(address indexed validator)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseValidatorLiberated(log types.Log) (*RoninValidatorSetValidatorLiberated, error) {
-	event := new(RoninValidatorSetValidatorLiberated)
-	if err := _RoninValidatorSet.contract.UnpackLog(event, "ValidatorLiberated", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
@@ -5461,7 +6619,7 @@ func (it *RoninValidatorSetValidatorPunishedIterator) Close() error {
 
 // RoninValidatorSetValidatorPunished represents a ValidatorPunished event raised by the RoninValidatorSet contract.
 type RoninValidatorSetValidatorPunished struct {
-	ConsensusAddr                  common.Address
+	Cid                            common.Address
 	Period                         *big.Int
 	JailedUntil                    *big.Int
 	DeductedStakingAmount          *big.Int
@@ -5472,19 +6630,19 @@ type RoninValidatorSetValidatorPunished struct {
 
 // FilterValidatorPunished is a free log retrieval operation binding the contract event 0x54ce99c5ce1fc9f61656d4a0fb2697974d0c973ac32eecaefe06fcf18b8ef68a.
 //
-// Solidity: event ValidatorPunished(address indexed consensusAddr, uint256 indexed period, uint256 jailedUntil, uint256 deductedStakingAmount, bool blockProducerRewardDeprecated, bool bridgeOperatorRewardDeprecated)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterValidatorPunished(opts *bind.FilterOpts, consensusAddr []common.Address, period []*big.Int) (*RoninValidatorSetValidatorPunishedIterator, error) {
+// Solidity: event ValidatorPunished(address indexed cid, uint256 indexed period, uint256 jailedUntil, uint256 deductedStakingAmount, bool blockProducerRewardDeprecated, bool bridgeOperatorRewardDeprecated)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterValidatorPunished(opts *bind.FilterOpts, cid []common.Address, period []*big.Int) (*RoninValidatorSetValidatorPunishedIterator, error) {
 
-	var consensusAddrRule []interface{}
-	for _, consensusAddrItem := range consensusAddr {
-		consensusAddrRule = append(consensusAddrRule, consensusAddrItem)
+	var cidRule []interface{}
+	for _, cidItem := range cid {
+		cidRule = append(cidRule, cidItem)
 	}
 	var periodRule []interface{}
 	for _, periodItem := range period {
 		periodRule = append(periodRule, periodItem)
 	}
 
-	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "ValidatorPunished", consensusAddrRule, periodRule)
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "ValidatorPunished", cidRule, periodRule)
 	if err != nil {
 		return nil, err
 	}
@@ -5493,19 +6651,19 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterValidatorPunished(opt
 
 // WatchValidatorPunished is a free log subscription operation binding the contract event 0x54ce99c5ce1fc9f61656d4a0fb2697974d0c973ac32eecaefe06fcf18b8ef68a.
 //
-// Solidity: event ValidatorPunished(address indexed consensusAddr, uint256 indexed period, uint256 jailedUntil, uint256 deductedStakingAmount, bool blockProducerRewardDeprecated, bool bridgeOperatorRewardDeprecated)
-func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchValidatorPunished(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetValidatorPunished, consensusAddr []common.Address, period []*big.Int) (event.Subscription, error) {
+// Solidity: event ValidatorPunished(address indexed cid, uint256 indexed period, uint256 jailedUntil, uint256 deductedStakingAmount, bool blockProducerRewardDeprecated, bool bridgeOperatorRewardDeprecated)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchValidatorPunished(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetValidatorPunished, cid []common.Address, period []*big.Int) (event.Subscription, error) {
 
-	var consensusAddrRule []interface{}
-	for _, consensusAddrItem := range consensusAddr {
-		consensusAddrRule = append(consensusAddrRule, consensusAddrItem)
+	var cidRule []interface{}
+	for _, cidItem := range cid {
+		cidRule = append(cidRule, cidItem)
 	}
 	var periodRule []interface{}
 	for _, periodItem := range period {
 		periodRule = append(periodRule, periodItem)
 	}
 
-	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "ValidatorPunished", consensusAddrRule, periodRule)
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "ValidatorPunished", cidRule, periodRule)
 	if err != nil {
 		return nil, err
 	}
@@ -5539,7 +6697,7 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchValidatorPunished(opts
 
 // ParseValidatorPunished is a log parse operation binding the contract event 0x54ce99c5ce1fc9f61656d4a0fb2697974d0c973ac32eecaefe06fcf18b8ef68a.
 //
-// Solidity: event ValidatorPunished(address indexed consensusAddr, uint256 indexed period, uint256 jailedUntil, uint256 deductedStakingAmount, bool blockProducerRewardDeprecated, bool bridgeOperatorRewardDeprecated)
+// Solidity: event ValidatorPunished(address indexed cid, uint256 indexed period, uint256 jailedUntil, uint256 deductedStakingAmount, bool blockProducerRewardDeprecated, bool bridgeOperatorRewardDeprecated)
 func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseValidatorPunished(log types.Log) (*RoninValidatorSetValidatorPunished, error) {
 	event := new(RoninValidatorSetValidatorPunished)
 	if err := _RoninValidatorSet.contract.UnpackLog(event, "ValidatorPunished", log); err != nil {
@@ -5688,6 +6846,151 @@ func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchValidatorSetUpdated(op
 func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseValidatorSetUpdated(log types.Log) (*RoninValidatorSetValidatorSetUpdated, error) {
 	event := new(RoninValidatorSetValidatorSetUpdated)
 	if err := _RoninValidatorSet.contract.UnpackLog(event, "ValidatorSetUpdated", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// RoninValidatorSetValidatorUnjailedIterator is returned from FilterValidatorUnjailed and is used to iterate over the raw logs and unpacked data for ValidatorUnjailed events raised by the RoninValidatorSet contract.
+type RoninValidatorSetValidatorUnjailedIterator struct {
+	Event *RoninValidatorSetValidatorUnjailed // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *RoninValidatorSetValidatorUnjailedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(RoninValidatorSetValidatorUnjailed)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(RoninValidatorSetValidatorUnjailed)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *RoninValidatorSetValidatorUnjailedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *RoninValidatorSetValidatorUnjailedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// RoninValidatorSetValidatorUnjailed represents a ValidatorUnjailed event raised by the RoninValidatorSet contract.
+type RoninValidatorSetValidatorUnjailed struct {
+	Cid    common.Address
+	Period *big.Int
+	Raw    types.Log // Blockchain specific contextual infos
+}
+
+// FilterValidatorUnjailed is a free log retrieval operation binding the contract event 0x6bb2436cb6b6eb65d5a52fac2ae0373a77ade6661e523ef3004ee2d5524e6c6e.
+//
+// Solidity: event ValidatorUnjailed(address indexed cid, uint256 period)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) FilterValidatorUnjailed(opts *bind.FilterOpts, cid []common.Address) (*RoninValidatorSetValidatorUnjailedIterator, error) {
+
+	var cidRule []interface{}
+	for _, cidItem := range cid {
+		cidRule = append(cidRule, cidItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.FilterLogs(opts, "ValidatorUnjailed", cidRule)
+	if err != nil {
+		return nil, err
+	}
+	return &RoninValidatorSetValidatorUnjailedIterator{contract: _RoninValidatorSet.contract, event: "ValidatorUnjailed", logs: logs, sub: sub}, nil
+}
+
+// WatchValidatorUnjailed is a free log subscription operation binding the contract event 0x6bb2436cb6b6eb65d5a52fac2ae0373a77ade6661e523ef3004ee2d5524e6c6e.
+//
+// Solidity: event ValidatorUnjailed(address indexed cid, uint256 period)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) WatchValidatorUnjailed(opts *bind.WatchOpts, sink chan<- *RoninValidatorSetValidatorUnjailed, cid []common.Address) (event.Subscription, error) {
+
+	var cidRule []interface{}
+	for _, cidItem := range cid {
+		cidRule = append(cidRule, cidItem)
+	}
+
+	logs, sub, err := _RoninValidatorSet.contract.WatchLogs(opts, "ValidatorUnjailed", cidRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(RoninValidatorSetValidatorUnjailed)
+				if err := _RoninValidatorSet.contract.UnpackLog(event, "ValidatorUnjailed", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseValidatorUnjailed is a log parse operation binding the contract event 0x6bb2436cb6b6eb65d5a52fac2ae0373a77ade6661e523ef3004ee2d5524e6c6e.
+//
+// Solidity: event ValidatorUnjailed(address indexed cid, uint256 period)
+func (_RoninValidatorSet *RoninValidatorSetFilterer) ParseValidatorUnjailed(log types.Log) (*RoninValidatorSetValidatorUnjailed, error) {
+	event := new(RoninValidatorSetValidatorUnjailed)
+	if err := _RoninValidatorSet.contract.UnpackLog(event, "ValidatorUnjailed", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log

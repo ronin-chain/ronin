@@ -19,6 +19,7 @@ import (
 	finalityTracking "github.com/ethereum/go-ethereum/consensus/consortium/generated_contracts/finality_tracking"
 	legacyProfile "github.com/ethereum/go-ethereum/consensus/consortium/generated_contracts/legacy_profile"
 	"github.com/ethereum/go-ethereum/consensus/consortium/generated_contracts/profile"
+	roninTrustedOrg "github.com/ethereum/go-ethereum/consensus/consortium/generated_contracts/ronin_trusted_org"
 	roninValidatorSet "github.com/ethereum/go-ethereum/consensus/consortium/generated_contracts/ronin_validator_set"
 	slashIndicator "github.com/ethereum/go-ethereum/consensus/consortium/generated_contracts/slash_indicator"
 	"github.com/ethereum/go-ethereum/consensus/consortium/generated_contracts/staking"
@@ -79,6 +80,7 @@ type ContractIntegrator struct {
 	chainConfig         *chainParams.ChainConfig
 	signer              types.Signer
 	roninValidatorSetSC *roninValidatorSet.RoninValidatorSet
+	roninTrustedOrgSC   *roninTrustedOrg.RoninTrustedOrg
 	slashIndicatorSC    *slashIndicator.SlashIndicator
 	finalityTrackingSC  *finalityTracking.FinalityTracking
 
@@ -136,10 +138,16 @@ func NewContractIntegrator(
 	if err != nil {
 		return nil, err
 	}
+	// Create Ronin Trusted Org contract
+	roninTrustedOrg, err := roninTrustedOrg.NewRoninTrustedOrg(config.RoninTrustedOrgUpgrade.ProxyAddress, backend)
+	if err != nil {
+		return nil, err
+	}
 
 	return &ContractIntegrator{
 		chainConfig:         config,
 		roninValidatorSetSC: roninValidatorSetSC,
+		roninTrustedOrgSC:   roninTrustedOrg,
 		slashIndicatorSC:    slashIndicatorSC,
 		finalityTrackingSC:  finalityTrackingSC,
 
@@ -705,4 +713,37 @@ func (b *ConsortiumBackend) FilterLogs(ctx context.Context, query ethereum.Filte
 // NOTE(linh): This method is never called, implement for interface purposes
 func (b *ConsortiumBackend) SubscribeFilterLogs(ctx context.Context, query ethereum.FilterQuery, ch chan<- types.Log) (ethereum.Subscription, error) {
 	return nil, errMethodUnimplemented
+}
+
+func (c *ContractIntegrator) GetCandidateConsensusAddr(blockNumber *big.Int) ([]common.Address, error) {
+	callOpts := bind.CallOpts{
+		BlockNumber: blockNumber,
+	}
+	candidateInfos, err := c.roninValidatorSetSC.GetCandidateInfos(&callOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	var consensusAddr []common.Address
+	for _, info := range candidateInfos {
+		consensusAddr = append(consensusAddr, info.ShadowedConsensus)
+	}
+
+	return consensusAddr, nil
+}
+
+func (c *ContractIntegrator) GetCandidateGovernorAddr(blockNumber *big.Int) ([]common.Address, error) {
+	callOpts := bind.CallOpts{
+		BlockNumber: blockNumber,
+	}
+	trustedOrgs, err := c.roninTrustedOrgSC.GetAllTrustedOrganizations(&callOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	var governorAddr []common.Address
+	for _, org := range trustedOrgs {
+		governorAddr = append(governorAddr, org.Governor)
+	}
+	return governorAddr, nil
 }

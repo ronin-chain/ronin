@@ -30,10 +30,12 @@ ENV BLS_PASSWORD=''
 ENV BLS_AUTO_GENERATE='false'
 ENV BLS_SHOW_PRIVATE_KEY='false'
 ENV GENERATE_BLS_PROOF='false'
+ENV SHADOW_FORK_CONFIG_PATH ''
 
 COPY --from=builder /opt/build/bin/ronin /usr/local/bin/ronin
 COPY --from=builder /opt/genesis/ ./
 COPY --from=builder /opt/docker/chainnode/entrypoint.sh ./
+COPY --from=builder /opt/core/state/shadow_switch/config/ ./
 
 EXPOSE 7000 6060 8545 8546 30303 30303/udp
 

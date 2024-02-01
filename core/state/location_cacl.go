@@ -38,3 +38,8 @@ func GetLocFixedArrAtElement(slot uint64, index uint64, elementSize uint64) comm
 	arrBig := slotBig.Add(slotBig, new(big.Int).SetUint64(index*elementSize))
 	return common.BigToHash(arrBig)
 }
+
+func GetLocStructElement(slot common.Hash, offset uint64) common.Hash {
+	structElementBig := new(big.Int).Add(slot.Big(), new(big.Int).SetUint64(offset))
+	return common.BigToHash(structElementBig)
+}
