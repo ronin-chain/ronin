@@ -1125,7 +1125,12 @@ func doCall(
 	// Make sure the context is cancelled when the call has completed
 	// this makes sure resources are cleaned up.
 	defer cancel()
-	gp := new(core.GasPool).AddGas(math.MaxUint64)
+	gp := new(core.GasPool)
+	if globalGasCap == 0 {
+		gp.AddGas(math.MaxUint64)
+	} else {
+		gp.AddGas(globalGasCap)
+	}
 
 	return applyMessage(
 		ctx,
