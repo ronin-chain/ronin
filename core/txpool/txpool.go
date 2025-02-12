@@ -290,15 +290,16 @@ func (p *TxPool) Get(hash common.Hash) *types.Transaction {
 	return nil
 }
 
-// GetRLP returns a RLP-encoded transaction if it is contained in the pool.
-func (p *TxPool) GetRLP(hash common.Hash) []byte {
+// GetRLP returns a RLP-encoded transaction and broadcast status if it is
+// contained in the pool.
+func (p *TxPool) GetRLP(hash common.Hash) ([]byte, bool) {
 	for _, subpool := range p.subpools {
-		encoded := subpool.GetRLP(hash)
+		encoded, canBroadcast := subpool.GetRLP(hash)
 		if len(encoded) != 0 {
-			return encoded
+			return encoded, canBroadcast
 		}
 	}
-	return nil
+	return nil, false
 }
 
 // GetBlobs returns a number of blobs are proofs for the given versioned hashes.

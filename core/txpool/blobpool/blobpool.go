@@ -109,23 +109,26 @@ type blobTxMeta struct {
 	evictionExecTip      *uint256.Int // Worst gas tip across all previous nonces
 	evictionExecFeeJumps float64      // Worst base fee (converted to fee jumps) across all previous nonces
 	evictionBlobFeeJumps float64      // Worse blob fee (converted to fee jumps) across all previous nonces
+
+	canBroadcast bool
 }
 
 // newBlobTxMeta retrieves the indexed metadata fields from a blob transaction
 // and assembles a helper struct to track in memory.
 func newBlobTxMeta(id uint64, size uint32, tx *types.Transaction) *blobTxMeta {
 	meta := &blobTxMeta{
-		hash:       tx.Hash(),
-		vhashes:    tx.BlobHashes(),
-		id:         id,
-		size:       size,
-		nonce:      tx.Nonce(),
-		costCap:    uint256.MustFromBig(tx.Cost()),
-		execTipCap: uint256.MustFromBig(tx.GasTipCap()),
-		execFeeCap: uint256.MustFromBig(tx.GasFeeCap()),
-		blobFeeCap: uint256.MustFromBig(tx.BlobGasFeeCap()),
-		execGas:    tx.Gas(),
-		blobGas:    tx.BlobGas(),
+		hash:         tx.Hash(),
+		vhashes:      tx.BlobHashes(),
+		id:           id,
+		size:         size,
+		nonce:        tx.Nonce(),
+		costCap:      uint256.MustFromBig(tx.Cost()),
+		execTipCap:   uint256.MustFromBig(tx.GasTipCap()),
+		execFeeCap:   uint256.MustFromBig(tx.GasFeeCap()),
+		blobFeeCap:   uint256.MustFromBig(tx.BlobGasFeeCap()),
+		execGas:      tx.Gas(),
+		blobGas:      tx.BlobGas(),
+		canBroadcast: !tx.IsNoBroadcast(),
 	}
 	meta.basefeeJumps = dynamicFeeJumps(meta.execFeeCap)
 	meta.blobfeeJumps = dynamicFeeJumps(meta.blobFeeCap)
@@ -1220,9 +1223,15 @@ func (p *BlobPool) Get(hash common.Hash) *types.Transaction {
 	return item
 }
 
-// GetRLP returns a RLP-encoded transaction if it is contained in the pool.
-func (p *BlobPool) GetRLP(hash common.Hash) []byte {
-	return p.getRLP(hash)
+// GetRLP returns a RLP-encoded transaction and broadcast status if it is
+// contained in the pool.
+func (p *BlobPool) GetRLP(hash common.Hash) ([]byte, bool) {
+	encoded := p.getRLP(hash)
+	if len(encoded) != 0 {
+		canBroadcast, _ := p.lookup.broadcastStatusOfTx(hash)
+		return encoded, canBroadcast
+	}
+	return nil, false
 }
 
 // GetBlobs returns a number of blobs are proofs for the given versioned hashes.

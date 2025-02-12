@@ -105,9 +105,9 @@ type TxPool interface {
 	// Get retrieves the transaction from the local txpool with the given hash.
 	Get(hash common.Hash) *types.Transaction
 
-	// GetRLP retrieves the RLP-encoded transaction from the local txpool with
-	// the given hash.
-	GetRLP(hash common.Hash) []byte
+	// GetRLP retrieves the RLP-encoded transaction and broadcast status from the
+	// local txpool with the given hash.
+	GetRLP(hash common.Hash) ([]byte, bool)
 }
 
 // MakeProtocols constructs the P2P protocol definitions for `eth`.

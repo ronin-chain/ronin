@@ -20,18 +20,23 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
+type txMetadata struct {
+	id           uint64 // the billy id of transction
+	canBroadcast bool
+}
+
 // lookup maps blob versioned hashes to transaction hashes that include them,
 // and transaction hashes to billy entries that include them.
 type lookup struct {
 	blobIndex map[common.Hash]map[common.Hash]struct{}
-	txIndex   map[common.Hash]uint64
+	txIndex   map[common.Hash]*txMetadata
 }
 
 // newLookup creates a new index for tracking blob to tx; and tx to billy mappings.
 func newLookup() *lookup {
 	return &lookup{
 		blobIndex: make(map[common.Hash]map[common.Hash]struct{}),
-		txIndex:   make(map[common.Hash]uint64),
+		txIndex:   make(map[common.Hash]*txMetadata),
 	}
 }
 
@@ -43,8 +48,22 @@ func (l *lookup) exists(txhash common.Hash) bool {
 
 // storeidOfTx returns the datastore storage item id of a transaction.
 func (l *lookup) storeidOfTx(txhash common.Hash) (uint64, bool) {
-	id, ok := l.txIndex[txhash]
-	return id, ok
+	meta, ok := l.txIndex[txhash]
+	if !ok {
+		return 0, false
+	}
+	return meta.id, ok
+}
+
+// broadcastStatusOfTx's first returned bool is true if the transaction
+// can be broadcasted, the second returned bool is true when the transaction
+// is available in the lookup
+func (l *lookup) broadcastStatusOfTx(txhash common.Hash) (bool, bool) {
+	meta, ok := l.txIndex[txhash]
+	if !ok {
+		return false, false
+	}
+	return meta.canBroadcast, ok
 }
 
 // storeidOfBlob returns the datastore storage item id of a blob.
@@ -72,7 +91,10 @@ func (l *lookup) track(tx *blobTxMeta) {
 		l.blobIndex[vhash][tx.hash] = struct{}{} // may be double mapped if a tx contains the same blob twice
 	}
 	// Map the transaction hash to the datastore id
-	l.txIndex[tx.hash] = tx.id
+	l.txIndex[tx.hash] = &txMetadata{
+		id:           tx.id,
+		canBroadcast: tx.canBroadcast,
+	}
 }
 
 // untrack removes a set of mappings from blob versioned hashes to transaction

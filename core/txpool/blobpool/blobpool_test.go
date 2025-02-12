@@ -240,9 +240,9 @@ func verifyPoolInternals(t *testing.T, pool *BlobPool) {
 			seen[tx.hash] = struct{}{}
 		}
 	}
-	for hash, id := range pool.lookup.txIndex {
+	for hash, meta := range pool.lookup.txIndex {
 		if _, ok := seen[hash]; !ok {
-			t.Errorf("tx lookup entry missing from transaction index: hash #%x, id %d", hash, id)
+			t.Errorf("tx lookup entry missing from transaction index: hash #%x, id %d", hash, meta.id)
 		}
 		delete(seen, hash)
 	}

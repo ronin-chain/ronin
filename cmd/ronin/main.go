@@ -154,6 +154,7 @@ var (
 		utils.NodeKeyHexFlag,
 		utils.DNSDiscoveryFlag,
 		utils.TrustedNodesOnlyFlag,
+		utils.DisableTxBroadcastFromFlag,
 		utils.MainnetFlag,
 		utils.DeveloperFlag,
 		utils.DeveloperPeriodFlag,

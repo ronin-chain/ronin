@@ -249,17 +249,18 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 		checkpoint = params.TrustedCheckpoints[genesisHash]
 	}
 	if eth.handler, err = newHandler(&handlerConfig{
-		NodeID:               eth.p2pServer.Self().ID(),
-		Database:             chainDb,
-		Chain:                eth.blockchain,
-		TxPool:               eth.txPool,
-		Network:              config.NetworkId,
-		Sync:                 config.SyncMode,
-		BloomCache:           uint64(cacheLimit),
-		EventMux:             eth.eventMux,
-		Checkpoint:           checkpoint,
-		Whitelist:            config.Whitelist,
-		DisableRoninProtocol: config.DisableRoninProtocol,
+		NodeID:                 eth.p2pServer.Self().ID(),
+		Database:               chainDb,
+		Chain:                  eth.blockchain,
+		TxPool:                 eth.txPool,
+		Network:                config.NetworkId,
+		Sync:                   config.SyncMode,
+		BloomCache:             uint64(cacheLimit),
+		EventMux:               eth.eventMux,
+		Checkpoint:             checkpoint,
+		Whitelist:              config.Whitelist,
+		DisableRoninProtocol:   config.DisableRoninProtocol,
+		DisableTxBroadcastFrom: config.DisableTxBroadcastFrom,
 	}); err != nil {
 		return nil, err
 	}

@@ -1054,18 +1054,19 @@ func (pool *LegacyPool) Get(hash common.Hash) *types.Transaction {
 	return pool.all.Get(hash)
 }
 
-// GetRLP returns a RLP-encoded transaction if it is contained in the pool.
-func (pool *LegacyPool) GetRLP(hash common.Hash) []byte {
+// GetRLP returns a RLP-encoded transaction and broadcast status if it is contained
+// in the pool.
+func (pool *LegacyPool) GetRLP(hash common.Hash) ([]byte, bool) {
 	tx := pool.all.Get(hash)
 	if tx == nil {
-		return nil
+		return nil, false
 	}
 	encoded, err := rlp.EncodeToBytes(tx)
 	if err != nil {
 		log.Error("Failed to encoded transaction in legacy pool", "hash", hash, "err", err)
-		return nil
+		return nil, false
 	}
-	return encoded
+	return encoded, !tx.IsNoBroadcast()
 }
 
 // GetBlobs is not supported by the legacy transaction pool, it is just here to

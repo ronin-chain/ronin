@@ -85,18 +85,18 @@ func (p *testTxPool) Get(hash common.Hash) *types.Transaction {
 	return p.pool[hash]
 }
 
-// Get retrieves the transaction from local txpool with given
-// tx hash.
-func (p *testTxPool) GetRLP(hash common.Hash) []byte {
+// Get retrieves the transaction and broadcast status from
+// local txpool with given tx hash.
+func (p *testTxPool) GetRLP(hash common.Hash) ([]byte, bool) {
 	p.lock.Lock()
 	defer p.lock.Unlock()
 
 	tx := p.pool[hash]
 	if tx != nil {
 		blob, _ := rlp.EncodeToBytes(tx)
-		return blob
+		return blob, !tx.IsNoBroadcast()
 	}
-	return nil
+	return nil, false
 }
 
 // AddRemotes appends a batch of transactions to the pool, and notifies any
