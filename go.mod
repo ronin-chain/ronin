@@ -79,7 +79,7 @@ require (
 	github.com/holiman/billy v0.0.0-20240322075458-72a4e81ec6da
 	github.com/klauspost/compress v1.17.8
 	github.com/pkg/errors v0.9.1
-	github.com/supranational/blst v0.3.11
+	github.com/supranational/blst v0.3.14
 	github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4 v1.3.1
 	golang.org/x/exp v0.0.0-20240103183307-be819d1f06fc
 	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d
