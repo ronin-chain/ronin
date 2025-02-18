@@ -3,7 +3,7 @@ name: EVM benchmark
 on:
   pull_request:
     branches:
-      - master
+      - main
     paths:
       - core/vm/**
   workflow_dispatch:
@@ -45,7 +45,7 @@ jobs:
           cd core/vm
           if [[ ${{ github.event_name }} = "pull_request" ]]; then
             ../../script/benchstat.sh -f "-test.v -test.run=^$ -test.bench=BenchmarkEvm" \
-              -o $(git rev-parse --short origin/master) -n ${{ github.sha }} -c 10 -i
+              -o $(git rev-parse --short origin/main) -n ${{ github.sha }} -c 10 -i
           else
             ../../script/benchstat.sh -f "-test.v -test.run=^$ -test.bench=BenchmarkEvm" \
               -o "$OLD_COMMIT" -n "$NEW_COMMIT" -c 10 -i
