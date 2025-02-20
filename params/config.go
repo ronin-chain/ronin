@@ -307,7 +307,7 @@ var (
 	RoninTestnetProfileContractAddress             = common.HexToAddress("0x3b67c8D22a91572a6AB18acC9F70787Af04A4043")
 	RoninTestnetFinalityTrackingAddress            = common.HexToAddress("0x41aCDFe786171824a037f2Cd6224c5916A58969a")
 	RoninTestnetWhiteListDeployerContractV2Address = common.HexToAddress("0x50a7e07Aa75eB9C04281713224f50403cA79851F")
-
+	RoninTestnetTreasuryAddress                   = common.HexToAddress("0x5cfca565c09cc32bb7ba7222a648f1b014d6c30b")
 	RoninTestnetChainConfig = &ChainConfig{
 		ChainID:                            big.NewInt(2021),
 		HomesteadBlock:                     big.NewInt(0),
@@ -354,7 +354,7 @@ var (
 		ShanghaiBlock:        big.NewInt(35554400),
 		CancunBlock:          big.NewInt(35554400),
 		VenokiBlock:          big.NewInt(35554400),
-		RoninTreasuryAddress: nil,
+		RoninTreasuryAddress: &RoninTestnetTreasuryAddress,
 	}
 
 	// GoerliTrustedCheckpoint contains the light client trusted checkpoint for the Görli test network.
