@@ -334,7 +334,7 @@ func (st *StateTransition) preCheck() error {
 			}
 			// This will panic if baseFee is nil, but basefee presence is verified
 			// as part of header validation.
-			if st.gasFeeCap.Cmp(st.evm.Context.BaseFee) < 0 {
+			if !st.evm.Config.IsSystemTransaction && st.gasFeeCap.Cmp(st.evm.Context.BaseFee) < 0 {
 				return fmt.Errorf("%w: address %v, maxFeePerGas: %s baseFee: %s", ErrFeeCapTooLow,
 					msg.From().Hex(), st.gasFeeCap, st.evm.Context.BaseFee)
 			}
@@ -420,10 +420,8 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	// 6. caller has enough balance to cover asset transfer for **topmost** call
 
 	// Check clauses 1-3, buy gas if everything is correct
-	if !st.evm.Config.IsSystemTransaction {
-		if err := st.preCheck(); err != nil {
-			return nil, err
-		}
+	if err := st.preCheck(); err != nil {
+		return nil, err
 	}
 
 	if tracer := st.evm.Config.Tracer; tracer != nil {
