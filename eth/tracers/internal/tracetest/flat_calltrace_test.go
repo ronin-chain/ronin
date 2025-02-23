@@ -70,7 +70,7 @@ type flatCallTracerTest struct {
 	Result       []flatCallTrace `json:"result"`
 }
 
-func flatCallTracerTestRunner(tracerName string, filename string, dirPath string, t testing.TB) error {
+func flatCallTracerTestRunner(tracerName string, filename string, dirPath string, scheme string, t testing.TB) error {
 	// Call tracer test found, read if from disk
 	blob, err := os.ReadFile(filepath.Join("testdata", dirPath, filename))
 	if err != nil {
@@ -100,7 +100,7 @@ func flatCallTracerTestRunner(tracerName string, filename string, dirPath string
 		Difficulty:  (*big.Int)(test.Context.Difficulty),
 		GasLimit:    uint64(test.Context.GasLimit),
 	}
-	triedb, _, statedb := tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false, rawdb.HashScheme)
+	triedb, _, statedb := tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false, scheme)
 	defer triedb.Close()
 
 	// Create the tracer, the EVM environment and run it
@@ -152,10 +152,11 @@ func flatCallTracerTestRunner(tracerName string, filename string, dirPath string
 // Iterates over all the input-output datasets in the tracer parity test harness and
 // runs the Native tracer against them.
 func TestFlatCallTracerNative(t *testing.T) {
-	testFlatCallTracer("flatCallTracer", "call_tracer_flat", t)
+	testFlatCallTracer("flatCallTracer", "call_tracer_flat", rawdb.HashScheme, t)
+	testFlatCallTracer("flatCallTracer", "call_tracer_flat", rawdb.PathScheme, t)
 }
 
-func testFlatCallTracer(tracerName string, dirPath string, t *testing.T) {
+func testFlatCallTracer(tracerName string, dirPath string, scheme string, t *testing.T) {
 	files, err := os.ReadDir(filepath.Join("testdata", dirPath))
 	if err != nil {
 		t.Fatalf("failed to retrieve tracer test suite: %v", err)
@@ -167,7 +168,7 @@ func testFlatCallTracer(tracerName string, dirPath string, t *testing.T) {
 		file := file // capture range variable
 		t.Run(camel(strings.TrimSuffix(file.Name(), ".json")), func(t *testing.T) {
 			t.Parallel()
-			err := flatCallTracerTestRunner(tracerName, file.Name(), dirPath, t)
+			err := flatCallTracerTestRunner(tracerName, file.Name(), dirPath, scheme, t)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -203,7 +204,8 @@ func BenchmarkFlatCallTracer(b *testing.B) {
 		filename := strings.TrimPrefix(file, "testdata/call_tracer_flat/")
 		b.Run(camel(strings.TrimSuffix(filename, ".json")), func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
-				err := flatCallTracerTestRunner("flatCallTracer", filename, "call_tracer_flat", b)
+				// Should replace based on Hash/Path Scheme
+				err := flatCallTracerTestRunner("flatCallTracer", filename, "call_tracer_flat", rawdb.HashScheme, b)
 				if err != nil {
 					b.Fatal(err)
 				}

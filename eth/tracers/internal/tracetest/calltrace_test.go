@@ -81,18 +81,21 @@ type callTracerTest struct {
 // Iterates over all the input-output datasets in the tracer test harness and
 // runs the JavaScript tracers against them.
 func TestCallTracerLegacy(t *testing.T) {
-	testCallTracer("callTracerLegacy", "call_tracer_legacy", t)
+	testCallTracer("callTracerLegacy", "call_tracer_legacy", rawdb.HashScheme, t)
+	testCallTracer("callTracerLegacy", "call_tracer_legacy", rawdb.PathScheme, t)
 }
 
 func TestCallTracerNative(t *testing.T) {
-	testCallTracer("callTracer", "call_tracer", t)
+	testCallTracer("callTracer", "call_tracer", rawdb.HashScheme, t)
+	testCallTracer("callTracer", "call_tracer", rawdb.PathScheme, t)
 }
 
 func TestCallTracerNativeWithLog(t *testing.T) {
-	testCallTracer("callTracer", "call_tracer_withLog", t)
+	testCallTracer("callTracer", "call_tracer_withLog", rawdb.HashScheme, t)
+	testCallTracer("callTracer", "call_tracer_withLog", rawdb.PathScheme, t)
 }
 
-func testCallTracer(tracerName string, dirPath string, t *testing.T) {
+func testCallTracer(tracerName string, dirPath string, scheme string, t *testing.T) {
 	isLegacy := strings.HasSuffix(dirPath, "_legacy")
 	files, err := os.ReadDir(filepath.Join("testdata", dirPath))
 	if err != nil {
@@ -137,7 +140,7 @@ func testCallTracer(tracerName string, dirPath string, t *testing.T) {
 					GasLimit:    uint64(test.Context.GasLimit),
 					BaseFee:     test.Genesis.BaseFee,
 				}
-				triedb, _, statedb = tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false, rawdb.HashScheme)
+				triedb, _, statedb = tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false, scheme)
 			)
 			triedb.Close()
 			tracer, err := tracers.DefaultDirectory.New(tracerName, new(tracers.Context), test.TracerConfig)

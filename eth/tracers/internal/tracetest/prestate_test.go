@@ -53,18 +53,21 @@ type testcase struct {
 }
 
 func TestPrestateTracerLegacy(t *testing.T) {
-	testPrestateDiffTracer("prestateTracerLegacy", "prestate_tracer_legacy", t)
+	testPrestateDiffTracer("prestateTracerLegacy", "prestate_tracer_legacy", rawdb.HashScheme, t)
+	testPrestateDiffTracer("prestateTracerLegacy", "prestate_tracer_legacy", rawdb.PathScheme, t)
 }
 
 func TestPrestateTracer(t *testing.T) {
-	testPrestateDiffTracer("prestateTracer", "prestate_tracer", t)
+	testPrestateDiffTracer("prestateTracer", "prestate_tracer", rawdb.HashScheme, t)
+	testPrestateDiffTracer("prestateTracer", "prestate_tracer", rawdb.PathScheme, t)
 }
 
 func TestPrestateWithDiffModeTracer(t *testing.T) {
-	testPrestateDiffTracer("prestateTracer", "prestate_tracer_with_diff_mode", t)
+	testPrestateDiffTracer("prestateTracer", "prestate_tracer_with_diff_mode", rawdb.HashScheme, t)
+	testPrestateDiffTracer("prestateTracer", "prestate_tracer_with_diff_mode", rawdb.PathScheme, t)
 }
 
-func testPrestateDiffTracer(tracerName string, dirPath string, t *testing.T) {
+func testPrestateDiffTracer(tracerName string, dirPath string, scheme string, t *testing.T) {
 	files, err := os.ReadDir(filepath.Join("testdata", dirPath))
 	if err != nil {
 		t.Fatalf("failed to retrieve tracer test suite: %v", err)
@@ -108,7 +111,7 @@ func testPrestateDiffTracer(tracerName string, dirPath string, t *testing.T) {
 					GasLimit:    uint64(test.Context.GasLimit),
 					BaseFee:     test.Genesis.BaseFee,
 				}
-				triedb, _, statedb = tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false, rawdb.HashScheme)
+				triedb, _, statedb = tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false, scheme)
 			)
 			defer triedb.Close()
 			tracer, err := tracers.DefaultDirectory.New(tracerName, new(tracers.Context), test.TracerConfig)

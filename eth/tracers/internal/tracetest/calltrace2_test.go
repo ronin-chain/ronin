@@ -116,10 +116,11 @@ type callTracer2Test struct {
 }
 
 func TestCallTracer2Native(t *testing.T) {
-	testCallTracer2("callTracer2", "call_tracer2", t)
+	testCallTracer2("callTracer2", "call_tracer2", rawdb.HashScheme, t)
+	testCallTracer2("callTracer2", "call_tracer2", rawdb.PathScheme, t)
 }
 
-func testCallTracer2(tracerName string, dirPath string, t *testing.T) {
+func testCallTracer2(tracerName string, dirPath string, scheme string, t *testing.T) {
 	files, err := ioutil.ReadDir(filepath.Join("testdata", dirPath))
 	if err != nil {
 		t.Fatalf("failed to retrieve tracer test suite: %v", err)
@@ -162,7 +163,7 @@ func testCallTracer2(tracerName string, dirPath string, t *testing.T) {
 					Difficulty:  (*big.Int)(test.Context.Difficulty),
 					GasLimit:    uint64(test.Context.GasLimit),
 				}
-				triedb, _, statedb = tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false, rawdb.HashScheme)
+				triedb, _, statedb = tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false, scheme)
 			)
 			defer triedb.Close()
 			tracer, err := tracers.DefaultDirectory.New(tracerName, new(tracers.Context), test.TracerConfig)
