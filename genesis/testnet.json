@@ -37,9 +37,9 @@
     "trippBlock": 27580600,
     "trippPeriod": 19866,
     "aaronBlock": 28231200,
-    "shanghaiBlock": 35554400,
-    "cancunBlock": 35554400, 
-    "venokiBlock": 35554400,
+    "shanghaiBlock": 35574800,
+    "cancunBlock": 35574800,
+    "venokiBlock": 35574800,
     "whiteListDeployerContractV2Address": "0x50a7e07Aa75eB9C04281713224f50403cA79851F",
     "roninTreasuryAddress": "0x5cfca565c09cc32bb7ba7222a648f1b014d6c30b",
     "roninTrustedOrgUpgrade": {
