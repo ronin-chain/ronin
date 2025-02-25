@@ -494,8 +494,14 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	}
 
 	effectiveTip := st.gasPrice
-	if rules.IsLondon {
-		effectiveTip = cmath.BigMin(st.gasTipCap, new(big.Int).Sub(st.gasFeeCap, st.evm.Context.BaseFee))
+	if st.evm.Config.IsSystemTransaction {
+		// System transaction is not affected by basefee rule
+		// and tip is always 0.
+		effectiveTip = common.Big0
+	} else {
+		if rules.IsLondon {
+			effectiveTip = cmath.BigMin(st.gasTipCap, new(big.Int).Sub(st.gasFeeCap, st.evm.Context.BaseFee))
+		}
 	}
 
 	// if currentBlock is ConsortiumV2 then add balance to system address
