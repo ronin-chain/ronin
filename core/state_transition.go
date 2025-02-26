@@ -489,33 +489,27 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 			// After EIP-3529: refunds are capped to gasUsed / 5
 			gasRefund = st.refundGas(params.RefundQuotientEIP3529)
 		}
-	}
 
-	effectiveTip := st.gasPrice
-	if st.evm.Config.IsSystemTransaction {
-		// System transaction is not affected by basefee rule
-		// and tip is always 0.
-		effectiveTip = common.Big0
-	} else {
+		effectiveTip := st.gasPrice
 		if rules.IsLondon {
 			effectiveTip = cmath.BigMin(st.gasTipCap, new(big.Int).Sub(st.gasFeeCap, st.evm.Context.BaseFee))
 		}
-	}
 
-	// if currentBlock is ConsortiumV2 then add balance to system address
-	newEffectiveTip := new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), effectiveTip)
-	if st.evm.ChainConfig().IsConsortiumV2(st.evm.Context.BlockNumber) {
-		st.state.AddBalance(consensus.SystemAddress, newEffectiveTip)
-	} else {
-		st.state.AddBalance(st.evm.Context.Coinbase, newEffectiveTip)
-	}
+		// if currentBlock is ConsortiumV2 then add balance to system address
+		newEffectiveTip := new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), effectiveTip)
+		if st.evm.ChainConfig().IsConsortiumV2(st.evm.Context.BlockNumber) {
+			st.state.AddBalance(consensus.SystemAddress, newEffectiveTip)
+		} else {
+			st.state.AddBalance(st.evm.Context.Coinbase, newEffectiveTip)
+		}
 
-	// After Venoki the base fee is non-zero and the fee is transferred to treasury
-	if rules.IsVenoki {
-		treasuryAddress := st.evm.ChainConfig().RoninTreasuryAddress
-		if treasuryAddress != nil {
-			fee := new(big.Int).Mul(big.NewInt(int64(st.gasUsed())), st.evm.Context.BaseFee)
-			st.state.AddBalance(*treasuryAddress, fee)
+		// After Venoki the base fee is non-zero and the fee is transferred to treasury
+		if rules.IsVenoki {
+			treasuryAddress := st.evm.ChainConfig().RoninTreasuryAddress
+			if treasuryAddress != nil {
+				fee := new(big.Int).Mul(big.NewInt(int64(st.gasUsed())), st.evm.Context.BaseFee)
+				st.state.AddBalance(*treasuryAddress, fee)
+			}
 		}
 	}
 
