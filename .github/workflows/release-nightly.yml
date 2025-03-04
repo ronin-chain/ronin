@@ -1,8 +1,8 @@
-name: master release
+name: main release
 on:
   push:
     branches:
-      - master
+      - main
 
 env:
   REGISTRY: ghcr.io
