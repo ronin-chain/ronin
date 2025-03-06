@@ -249,6 +249,7 @@ var (
 	RoninMainnetProfileContractAddress             = common.HexToAddress("0x840EBf1CA767CB690029E91856A357a43B85d035")
 	RoninMainnetFinalityTrackingAddress            = common.HexToAddress("0xA30B2932CD8b8A89E34551Cdfa13810af38dA576")
 	RoninMainnetWhiteListDeployerContractV2Address = common.HexToAddress("0xc1876d5C4BFAF0eE325E4226B2bdf216D9896AE1")
+	RoninMainnetTreasuryAddress                    = common.HexToAddress("0xb903E3936d3ca90b69b29F1df2810083a2DC0d71")
 
 	RoninMainnetChainConfig = &ChainConfig{
 		ChainID:                            big.NewInt(2020),
@@ -296,7 +297,7 @@ var (
 		ShanghaiBlock:        big.NewInt(43447600),
 		CancunBlock:          big.NewInt(43447600),
 		VenokiBlock:          big.NewInt(43447600),
-		RoninTreasuryAddress: nil,
+		RoninTreasuryAddress: &RoninMainnetTreasuryAddress,
 	}
 
 	RoninTestnetBlacklistContract                  = common.HexToAddress("0xF53EED5210c9cF308abFe66bA7CF14884c95A8aC")
