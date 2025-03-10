@@ -266,6 +266,10 @@ func (s cancunSigner) Sender(tx *Transaction) (common.Address, error) {
 	return recoverPlain(s.Hash(tx), R, S, V, true)
 }
 
+func (s cancunSigner) Payer(tx *Transaction) (common.Address, error) {
+	return payerInternal(s, tx)
+}
+
 func (s cancunSigner) Equal(s2 Signer) bool {
 	x, ok := s2.(cancunSigner)
 	return ok && x.chainId.Cmp(s.chainId) == 0
