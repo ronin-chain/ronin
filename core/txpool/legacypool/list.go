@@ -280,6 +280,12 @@ func newList(strict bool, signer types.Signer, txpoolPayerCost map[common.Addres
 	}
 }
 
+// Contains returns whether the  list contains a transaction
+// with the provided nonce.
+func (l *list) Contains(nonce uint64) bool {
+	return l.txs.Get(nonce) != nil
+}
+
 // Signer returns the signer of txlist
 func (l *list) Signer() types.Signer {
 	return l.signer

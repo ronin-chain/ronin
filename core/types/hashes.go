@@ -18,7 +18,13 @@ package types
 
 import (
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
+)
+
+var (
+	// EmptyCodeHash is the known hash of the empty EVM bytecode.
+	EmptyCodeHash = crypto.Keccak256Hash(nil) // c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470
 )
 
 // TrieRootHash returns the hash itself if it's non-empty or the predefined

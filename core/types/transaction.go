@@ -38,6 +38,9 @@ var (
 	ErrGasFeeCapTooLow            = errors.New("fee cap less than base fee")
 	ErrSamePayerSenderSponsoredTx = errors.New("payer = sender in sponsored transaction")
 	errEmptyTypedTx               = errors.New("empty typed transaction bytes")
+	errInvalidYParity             = errors.New("'yParity' field must be 0 or 1")
+	errVYParityMismatch           = errors.New("'v' and 'yParity' fields do not match")
+	errVYParityMissing            = errors.New("missing 'yParity' or 'v' field in transaction")
 )
 
 // Transaction types.
@@ -46,6 +49,7 @@ const (
 	AccessListTxType
 	DynamicFeeTxType
 	BlobTxType
+	SetCodeTxType
 
 	SponsoredTxType = 100
 )
@@ -198,6 +202,8 @@ func (tx *Transaction) decodeTyped(b []byte) (TxData, error) {
 		inner = new(SponsoredTx)
 	case BlobTxType:
 		inner = new(BlobTx)
+	case SetCodeTxType:
+		inner = new(SetCodeTx)
 	default:
 		return nil, ErrTxTypeNotSupported
 	}
@@ -458,6 +464,38 @@ func (tx *Transaction) WithBlobTxSidecar(sideCar *BlobTxSidecar) *Transaction {
 	return cpy
 }
 
+// SetCodeAuthorizations returns the authorizations list of the transaction.
+func (tx *Transaction) SetCodeAuthorizations() []SetCodeAuthorization {
+	setcodetx, ok := tx.inner.(*SetCodeTx)
+	if !ok {
+		return nil
+	}
+	return setcodetx.AuthList
+}
+
+// SetCodeAuthorities returns a list of unique authorities from the
+// authorization list.
+func (tx *Transaction) SetCodeAuthorities() []common.Address {
+	setcodetx, ok := tx.inner.(*SetCodeTx)
+	if !ok {
+		return nil
+	}
+	var (
+		marks = make(map[common.Address]bool)
+		auths = make([]common.Address, 0, len(setcodetx.AuthList))
+	)
+	for _, auth := range setcodetx.AuthList {
+		if addr, err := auth.Authority(); err == nil {
+			if marks[addr] {
+				continue
+			}
+			marks[addr] = true
+			auths = append(auths, addr)
+		}
+	}
+	return auths
+}
+
 // BlobGasFeeCapCmp compares the blob fee cap of two transactions.
 func (tx *Transaction) BlobGasFeeCapCmp(other *Transaction) int {
 	return tx.BlobGasFeeCap().Cmp(other.BlobGasFeeCap())
@@ -606,6 +644,7 @@ type Message struct {
 	expiredTime   uint64
 	blobGasFeeCap *big.Int
 	blobHashes    []common.Hash
+	authList      []SetCodeAuthorization
 }
 
 // Create a new message with payer is the same as from, expired time = 0
@@ -621,6 +660,7 @@ func NewMessage(
 	isFake bool,
 	blobFeeCap *big.Int,
 	blobHashes []common.Hash,
+	authList []SetCodeAuthorization,
 ) Message {
 	return Message{
 		from:          from,
@@ -638,6 +678,7 @@ func NewMessage(
 		expiredTime:   0,
 		blobGasFeeCap: blobFeeCap,
 		blobHashes:    blobHashes,
+		authList:      authList,
 	}
 }
 
@@ -657,6 +698,7 @@ func (tx *Transaction) AsMessage(s Signer, baseFee *big.Int) (Message, error) {
 		expiredTime:   tx.ExpiredTime(),
 		blobGasFeeCap: tx.BlobGasFeeCap(),
 		blobHashes:    tx.BlobHashes(),
+		authList:      tx.SetCodeAuthorizations(),
 	}
 	// If baseFee provided, set gasPrice to effectiveGasPrice.
 	if baseFee != nil {
@@ -699,8 +741,9 @@ func (m Message) IsFake() bool           { return m.isFake }
 func (m Message) Payer() common.Address  { return m.payer }
 func (m Message) ExpiredTime() uint64    { return m.expiredTime }
 
-func (m Message) BlobHashes() []common.Hash { return m.blobHashes }
-func (m Message) BlobGasFeeCap() *big.Int   { return m.blobGasFeeCap }
+func (m Message) BlobHashes() []common.Hash                     { return m.blobHashes }
+func (m Message) BlobGasFeeCap() *big.Int                       { return m.blobGasFeeCap }
+func (m Message) SetCodeAuthorizations() []SetCodeAuthorization { return m.authList }
 
 // copyAddressPtr copies an address.
 func copyAddressPtr(a *common.Address) *common.Address {
