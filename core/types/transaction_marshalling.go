@@ -179,10 +179,10 @@ func (t *Transaction) UnmarshalJSON(input []byte) error {
 		return errors.New("missing required field 'input' in transaction")
 	}
 	data := *dec.Data
-	if dec.V == nil {
-		return errors.New("missing required field 'v' in transaction")
+	v, err := dec.yParityValue()
+	if err != nil {
+		return err
 	}
-	v := (*big.Int)(dec.V)
 	if dec.R == nil {
 		return errors.New("missing required field 'r' in transaction")
 	}
@@ -360,24 +360,21 @@ func (t *Transaction) UnmarshalJSON(input []byte) error {
 			itx.AccessList = *dec.AccessList
 		}
 	case SetCodeTxType:
-		var itx SetCodeTx
+		itx := SetCodeTx{
+			Nonce: nonce,
+			Gas:   gas,
+			Value: uint256.MustFromBig(value),
+			Data:  data,
+		}
 		inner = &itx
 		if dec.ChainID == nil {
 			return errors.New("missing required field 'chainId' in transaction")
 		}
 		itx.ChainID = dec.ChainID.ToInt().Uint64()
-		if dec.Nonce == nil {
-			return errors.New("missing required field 'nonce' in transaction")
-		}
-		itx.Nonce = uint64(*dec.Nonce)
 		if dec.To == nil {
 			return errors.New("missing required field 'to' in transaction")
 		}
 		itx.To = *dec.To
-		if dec.Gas == nil {
-			return errors.New("missing required field 'gas' for txdata")
-		}
-		itx.Gas = uint64(*dec.Gas)
 		if dec.MaxPriorityFeePerGas == nil {
 			return errors.New("missing required field 'maxPriorityFeePerGas' for txdata")
 		}
@@ -386,17 +383,9 @@ func (t *Transaction) UnmarshalJSON(input []byte) error {
 			return errors.New("missing required field 'maxFeePerGas' for txdata")
 		}
 		itx.GasFeeCap = uint256.MustFromBig((*big.Int)(dec.MaxFeePerGas))
-		if dec.Value == nil {
-			return errors.New("missing required field 'value' in transaction")
-		}
-		itx.Value = uint256.MustFromBig((*big.Int)(dec.Value))
 		if dec.AccessList != nil {
 			itx.AccessList = *dec.AccessList
 		}
-		if dec.Data == nil {
-			return errors.New("missing required field 'input' in transaction")
-		}
-		itx.Data = *dec.Data
 		if dec.AuthorizationList == nil {
 			return errors.New("missing required field 'authorizationList' in transaction")
 		}
@@ -404,32 +393,21 @@ func (t *Transaction) UnmarshalJSON(input []byte) error {
 
 		// signature R
 		var overflow bool
-		if dec.R == nil {
-			return errors.New("missing required field 'r' in transaction")
-		}
-		itx.R, overflow = uint256.FromBig((*big.Int)(dec.R))
+		itx.R, overflow = uint256.FromBig(r)
 		if overflow {
 			return errors.New("'r' value overflows uint256")
 		}
 		// signature S
-		if dec.S == nil {
-			return errors.New("missing required field 's' in transaction")
-		}
-		itx.S, overflow = uint256.FromBig((*big.Int)(dec.S))
+		itx.S, overflow = uint256.FromBig(s)
 		if overflow {
 			return errors.New("'s' value overflows uint256")
 		}
-		// signature V
-		vbig, err := dec.yParityValue()
-		if err != nil {
-			return err
-		}
-		itx.V, overflow = uint256.FromBig(vbig)
+		itx.V, overflow = uint256.FromBig(v)
 		if overflow {
 			return errors.New("'v' value overflows uint256")
 		}
 		if itx.V.Sign() != 0 || itx.R.Sign() != 0 || itx.S.Sign() != 0 {
-			if err := sanityCheckSignature(vbig, itx.R.ToBig(), itx.S.ToBig(), false); err != nil {
+			if err := sanityCheckSignature(v, itx.R.ToBig(), itx.S.ToBig(), false); err != nil {
 				return err
 			}
 		}
