@@ -46,6 +46,7 @@ const (
 	AccessListTxType
 	DynamicFeeTxType
 	BlobTxType
+	SetCodeTxType
 
 	SponsoredTxType = 100
 )
