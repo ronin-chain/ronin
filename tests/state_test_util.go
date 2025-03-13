@@ -368,8 +368,10 @@ func (tx *stTransaction) toMessage(ps stPostState, baseFee *big.Int) (core.Messa
 		return nil, fmt.Errorf("no gas price provided")
 	}
 
+	// TODO: pass authList as go-ethereum did, leave it to "tests" update tasks
+	// https://github.com/ethereum/go-ethereum/blob/aaaf01d71232d1b7da5ab2ae9258f7fb9f22b1bf/tests/state_test_util.go#L479
 	msg := types.NewMessage(from, to, tx.Nonce, value, gasLimit, gasPrice,
-		tx.MaxFeePerGas, tx.MaxPriorityFeePerGas, data, accessList, false, nil, nil)
+		tx.MaxFeePerGas, tx.MaxPriorityFeePerGas, data, accessList, false, nil, nil, nil)
 	return msg, nil
 }
 
