@@ -325,9 +325,6 @@ func (t *Transaction) UnmarshalJSON(input []byte) error {
 			Gas:   gas,
 			Value: uint256.MustFromBig(value),
 			Data:  data,
-			V:     uint256.MustFromBig(v),
-			R:     uint256.MustFromBig(r),
-			S:     uint256.MustFromBig(s),
 		}
 		inner = &itx
 		if dec.ChainID == nil {
@@ -357,6 +354,21 @@ func (t *Transaction) UnmarshalJSON(input []byte) error {
 		itx.BlobHashes = dec.BlobVersionedHashes
 		if dec.AccessList != nil {
 			itx.AccessList = *dec.AccessList
+		}
+		// signature R
+		var overflow bool
+		itx.R, overflow = uint256.FromBig(r)
+		if overflow {
+			return errors.New("'r' value overflows uint256")
+		}
+		// signature S
+		itx.S, overflow = uint256.FromBig(s)
+		if overflow {
+			return errors.New("'s' value overflows uint256")
+		}
+		itx.V, overflow = uint256.FromBig(v)
+		if overflow {
+			return errors.New("'v' value overflows uint256")
 		}
 	case SetCodeTxType:
 		itx := SetCodeTx{
