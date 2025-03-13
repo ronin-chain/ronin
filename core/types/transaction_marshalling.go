@@ -141,7 +141,6 @@ func (t *Transaction) MarshalJSON() ([]byte, error) {
 		}
 	case *SetCodeTx:
 		enc.ChainID = (*hexutil.Big)(new(big.Int).SetUint64(tx.ChainID))
-		enc.Nonce = (*hexutil.Uint64)(&tx.Nonce)
 		enc.MaxFeePerGas = (*hexutil.Big)(tx.GasFeeCap.ToBig())
 		enc.MaxPriorityFeePerGas = (*hexutil.Big)(tx.GasTipCap.ToBig())
 		enc.AccessList = &tx.AccessList
