@@ -48,6 +48,10 @@ var (
 		Name:  "log.json",
 		Usage: "Format logs with JSON",
 	}
+	logstdoutFlag = cli.BoolFlag{
+		Name:  "log.stdout",
+		Usage: "Write log messages to stdout instead of stderr",
+	}
 	backtraceAtFlag = cli.StringFlag{
 		Name:  "log.backtrace",
 		Usage: "Request a stack trace at a specific logging statement (e.g. \"block.go:271\")",
@@ -95,6 +99,7 @@ var Flags = []cli.Flag{
 	&verbosityFlag,
 	&vmoduleFlag,
 	&logjsonFlag,
+	&logstdoutFlag,
 	&backtraceAtFlag,
 	&debugFlag,
 	&pprofFlag,
@@ -119,6 +124,9 @@ func init() {
 func Setup(ctx *cli.Context) error {
 	var ostream log.Handler
 	output := io.Writer(os.Stderr)
+	if ctx.Bool(logstdoutFlag.Name) {
+		output = io.Writer(os.Stdout)
+	}
 	if ctx.Bool(logjsonFlag.Name) {
 		ostream = log.StreamHandler(output, log.JSONFormat())
 	} else {
