@@ -566,7 +566,7 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 		evm.StateDB.AddAddressToAccessList(address)
 	}
 	// Ensure there's no existing contract already at the designated address
-	contractHash := evm.resolveCodeHash(address)
+	contractHash := evm.StateDB.GetCodeHash(address)
 	if evm.StateDB.GetNonce(address) != 0 || (contractHash != (common.Hash{}) && contractHash != emptyCodeHash) {
 		captureTraceEarly(ErrContractAddressCollision)
 		return nil, common.Address{}, 0, ErrContractAddressCollision
@@ -700,12 +700,12 @@ func (evm *EVM) ChainConfig() *params.ChainConfig { return evm.chainConfig }
 
 // PublishEvent executes Publish function from OpEvent if OpCode is found in Context.PublishEvents
 func (evm *EVM) PublishEvent(
-	opCode OpCode,
-	counter uint64,
-	from, to common.Address,
-	value *big.Int,
-	input, output []byte,
-	err error,
+		opCode OpCode,
+		counter uint64,
+		from, to common.Address,
+		value *big.Int,
+		input, output []byte,
+		err error,
 ) {
 	context := evm.Context
 	if context.CurrentTransaction == nil {
