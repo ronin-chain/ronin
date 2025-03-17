@@ -669,13 +669,12 @@ func (c *Consortium) snapshotAtConsortiumFork(
 func (c *Consortium) snapshot(chain consensus.ChainHeaderReader, number uint64, hash common.Hash, parents []*types.Header) (*Snapshot, error) {
 	// Search for a snapshot in memory or on disk for checkpoints
 	var (
-		headers    []*types.Header
-		snap       *Snapshot
-		cpyParents = make([]*types.Header, len(parents))
+		headers []*types.Header
+		snap    *Snapshot
 	)
-	// NOTE(linh): We must copy parents before going to the loop because parents are modified.
-	// 	If not, the FindAncientHeader function can not find its block ancestor
-	copy(cpyParents, parents)
+	// Only the parents slice's length is modified so we only need to shallow copy
+	// the slice here to make FindAncientHeader find its block ancestor
+	cpyParents := parents
 
 	for snap == nil {
 		// If an in-memory snapshot was found, use that
