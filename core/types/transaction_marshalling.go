@@ -206,6 +206,10 @@ func (t *Transaction) UnmarshalJSON(input []byte) error {
 	var inner TxData
 	switch dec.Type {
 	case LegacyTxType:
+		if dec.V == nil {
+			return errors.New("missing required field 'v' in transaction")
+		}
+
 		itx := LegacyTx{
 			Nonce: nonce,
 			Gas:   gas,
