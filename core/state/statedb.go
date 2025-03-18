@@ -435,7 +435,7 @@ func (s *StateDB) SetNonce(addr common.Address, nonce uint64) {
 	}
 }
 
-func (s *StateDB) SetCode(addr common.Address, code []byte) (prev []byte) {
+func (s *StateDB) SetCode(addr common.Address, code []byte) []byte {
 	stateObject := s.GetOrNewStateObject(addr)
 	if stateObject != nil {
 		return stateObject.SetCode(crypto.Keccak256Hash(code), code)

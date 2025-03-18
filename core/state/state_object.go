@@ -569,7 +569,7 @@ func (s *stateObject) CodeSize(db Database) int {
 	return size
 }
 
-func (s *stateObject) SetCode(codeHash common.Hash, code []byte) (prev []byte) {
+func (s *stateObject) SetCode(codeHash common.Hash, code []byte) []byte {
 	prevcode := s.Code()
 	s.db.journal.append(codeChange{
 		account:  &s.address,
