@@ -108,7 +108,7 @@ func testVotePool(t *testing.T, isValidRules bool) {
 	mockEngine := &mockPOSA{}
 
 	// Create vote pool
-	votePool := NewVotePool(chain, mockEngine, 22)
+	votePool := NewVotePool(chain, mockEngine, 22, nil)
 
 	// Create vote manager
 	// Create a temporary file for the votes journal
@@ -407,7 +407,7 @@ func TestVotePoolDosProtection(t *testing.T) {
 	mockEngine := &mockPOSA{}
 
 	// Create vote pool
-	votePool := NewVotePool(chain, mockEngine, 22)
+	votePool := NewVotePool(chain, mockEngine, 22, nil)
 
 	for i := 0; i < maxFutureVotePerPeer; i++ {
 		vote := generateVote(1, common.BigToHash(big.NewInt(int64(i+1))), secretKey)
@@ -506,7 +506,7 @@ func testVotePoolPruneFutureVoteCounter(t *testing.T, scheme string) {
 
 	// Create vote pool
 	voteNum := lowerLimitOfVoteBlockNumber
-	votePool := NewVotePool(chain, mockEngine, voteNum)
+	votePool := NewVotePool(chain, mockEngine, voteNum, nil)
 	secretKey, err := bls.RandKey()
 	if err != nil {
 		t.Fatalf("Failed to create secret key, err %s", err)
@@ -606,7 +606,7 @@ func TestVotePoolWrongTargetNumber(t *testing.T) {
 	mockEngine := &mockPOSAv2{}
 
 	// Create vote pool
-	votePool := NewVotePool(chain, mockEngine, 22)
+	votePool := NewVotePool(chain, mockEngine, 22, nil)
 
 	// bs[0] is the block 1 so the target block number must be 1.
 	// Here we provide wrong target number 0

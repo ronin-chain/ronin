@@ -248,6 +248,21 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 	if checkpoint == nil {
 		checkpoint = params.TrustedCheckpoints[genesisHash]
 	}
+	if eth.handler, err = newHandler(&handlerConfig{
+		NodeID:               eth.p2pServer.Self().ID(),
+		Database:             chainDb,
+		Chain:                eth.blockchain,
+		TxPool:               eth.txPool,
+		Network:              config.NetworkId,
+		Sync:                 config.SyncMode,
+		BloomCache:           uint64(cacheLimit),
+		EventMux:             eth.eventMux,
+		Checkpoint:           checkpoint,
+		Whitelist:            config.Whitelist,
+		DisableRoninProtocol: config.DisableRoninProtocol,
+	}); err != nil {
+		return nil, err
+	}
 	var votePool *vote.VotePool
 	nodeConfig := stack.Config()
 	if nodeConfig.EnableFastFinality {
@@ -259,7 +274,12 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 		if !ok {
 			return nil, errors.New("consensus engine does not support fast finality")
 		}
-		votePool = vote.NewVotePool(eth.blockchain, finalityEngine, nodeConfig.MaxCurVoteAmountPerBlock)
+		votePool = vote.NewVotePool(
+			eth.blockchain,
+			finalityEngine,
+			nodeConfig.MaxCurVoteAmountPerBlock,
+			eth.handler.removePeer,
+		)
 
 		if _, err := vote.NewVoteManager(
 			eth,
@@ -276,22 +296,7 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 			return nil, err
 		}
 	}
-	if eth.handler, err = newHandler(&handlerConfig{
-		NodeID:               eth.p2pServer.Self().ID(),
-		Database:             chainDb,
-		Chain:                eth.blockchain,
-		TxPool:               eth.txPool,
-		Network:              config.NetworkId,
-		Sync:                 config.SyncMode,
-		BloomCache:           uint64(cacheLimit),
-		EventMux:             eth.eventMux,
-		Checkpoint:           checkpoint,
-		Whitelist:            config.Whitelist,
-		DisableRoninProtocol: config.DisableRoninProtocol,
-		VotePool:             votePool,
-	}); err != nil {
-		return nil, err
-	}
+	eth.handler.votePool = votePool
 
 	// set SCValidators function before initiating new miner to prevent miner starts without SCValidators
 	if chainConfig.Consortium != nil {

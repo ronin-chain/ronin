@@ -34,8 +34,10 @@ var (
 
 type VoteBox struct {
 	blockNumber  uint64
-	voteMessages []*types.VoteEnvelope
+	voteMessages []*voteWithPeer
 }
+
+type peerDropFn func(id string)
 
 // voteWithPeer is a wrapper around VoteEnvelop to include peer information
 type voteWithPeer struct {
@@ -68,6 +70,8 @@ type VotePool struct {
 	lastFutureVoteBlock  map[string]uint64      // last block that peer has future vote
 	originatedFrom       map[common.Hash]string // mapping from vote hash to the sender
 	justifiedBlockNumber uint64
+
+	dropPeer peerDropFn
 }
 
 type votesPriorityQueue []*types.VoteData
@@ -76,6 +80,7 @@ func NewVotePool(
 	chain *core.BlockChain,
 	engine consensus.FastFinalityPoSA,
 	maxCurVoteAmountPerBlock int,
+	dropPeer peerDropFn,
 ) *VotePool {
 	votePool := &VotePool{
 		chain:                    chain,
@@ -120,7 +125,10 @@ func (pool *VotePool) loop() {
 
 		// Handle votes channel and put the vote into vote pool.
 		case vote := <-pool.votesCh:
-			pool.putIntoVotePool(vote)
+			if !pool.putIntoVotePool(vote) && pool.dropPeer != nil {
+				log.Debug("Invalid finality vote, drop peer", "peer", vote.peer)
+				pool.dropPeer(vote.peer)
+			}
 		}
 	}
 }
@@ -129,6 +137,8 @@ func (pool *VotePool) PutVote(peer string, vote *types.VoteEnvelope) {
 	pool.votesCh <- &voteWithPeer{vote: vote, peer: peer}
 }
 
+// putIntoVotePool returns false when the vote fails critical verification
+// that we need to drop the peer broadcasts the vote
 func (pool *VotePool) putIntoVotePool(voteWithPeerInfo *voteWithPeer) bool {
 	vote := voteWithPeerInfo.vote
 	peer := voteWithPeerInfo.peer
@@ -141,7 +151,8 @@ func (pool *VotePool) putIntoVotePool(voteWithPeerInfo *voteWithPeer) bool {
 	// Make sure in the range (currentHeight-lowerLimitOfVoteBlockNumber, currentHeight+upperLimitOfVoteBlockNumber].
 	if targetNumber+lowerLimitOfVoteBlockNumber-1 < headNumber || targetNumber > headNumber+upperLimitOfVoteBlockNumber {
 		log.Debug("BlockNumber of vote is outside the range of header-256~header+11, will be discarded")
-		return false
+		// The node may be slow to catch up, keep peer connection
+		return true
 	}
 
 	pool.mu.Lock()
@@ -149,14 +160,17 @@ func (pool *VotePool) putIntoVotePool(voteWithPeerInfo *voteWithPeer) bool {
 
 	if targetNumber <= pool.justifiedBlockNumber {
 		log.Debug("BlockNumber of vote is older than justified block number")
-		return false
+		// The node may be slow to catch up, keep peer connection
+		return true
 	}
 
 	voteHash := vote.Hash()
 	isFutureVote := false
 	if _, ok := pool.originatedFrom[voteHash]; ok {
 		log.Debug("Vote pool already contained the same vote", "voteHash", voteHash)
-		return false
+		// We have received the vote from other node,
+		// so just keep connection for this peer
+		return true
 	}
 
 	voteData := &types.VoteData{
@@ -205,7 +219,7 @@ func (pool *VotePool) putIntoVotePool(voteWithPeerInfo *voteWithPeer) bool {
 		pool.votesFeed.Send(voteEv)
 	}
 
-	pool.putVote(votes, votesPq, vote, voteData, voteHash, isFutureVote)
+	pool.putVote(votes, votesPq, voteWithPeerInfo, voteData, voteHash, isFutureVote)
 	pool.originatedFrom[voteHash] = peer
 	// Update the peer feature vote counter, and its last block for pruning
 	if isFutureVote {
@@ -223,9 +237,16 @@ func (pool *VotePool) SubscribeNewVoteEvent(ch chan<- core.NewVoteEvent) event.S
 }
 
 // The vote pool's mutex must already be acquired when calling this function
-func (pool *VotePool) putVote(m map[common.Hash]*VoteBox, votesPq *votesPriorityQueue, vote *types.VoteEnvelope, voteData *types.VoteData, voteHash common.Hash, isFutureVote bool) {
-	targetHash := vote.Data.TargetHash
-	targetNumber := vote.Data.TargetNumber
+func (pool *VotePool) putVote(
+	m map[common.Hash]*VoteBox,
+	votesPq *votesPriorityQueue,
+	vote *voteWithPeer,
+	voteData *types.VoteData,
+	voteHash common.Hash,
+	isFutureVote bool,
+) {
+	targetHash := vote.vote.Data.TargetHash
+	targetNumber := vote.vote.Data.TargetNumber
 
 	log.Debug("The vote info to put is:", "voteBlockNumber", targetNumber, "voteBlockHash", targetHash)
 
@@ -235,7 +256,7 @@ func (pool *VotePool) putVote(m map[common.Hash]*VoteBox, votesPq *votesPriority
 		heap.Push(votesPq, voteData)
 		voteBox := &VoteBox{
 			blockNumber:  targetNumber,
-			voteMessages: make([]*types.VoteEnvelope, 0, maxFutureVoteAmountPerBlock),
+			voteMessages: make([]*voteWithPeer, 0, maxFutureVoteAmountPerBlock),
 		}
 		m[targetHash] = voteBox
 
@@ -293,15 +314,18 @@ func (pool *VotePool) transfer(blockHash common.Hash) {
 		return
 	}
 
-	validVotes := make([]*types.VoteEnvelope, 0, len(voteBox.voteMessages))
+	validVotes := make([]*voteWithPeer, 0, len(voteBox.voteMessages))
 	for _, vote := range voteBox.voteMessages {
 		// Verify if the vote comes from valid validators based on voteAddress (BLSPublicKey).
-		if pool.engine.VerifyVote(pool.chain, vote) != nil {
+		if pool.engine.VerifyVote(pool.chain, vote.vote) != nil {
+			if pool.dropPeer != nil {
+				pool.dropPeer(vote.peer)
+			}
 			continue
 		}
 
 		// In the process of transfer, send valid vote to votes channel for handler usage
-		voteEv := core.NewVoteEvent{Vote: vote}
+		voteEv := core.NewVoteEvent{Vote: vote.vote}
 		pool.votesFeed.Send(voteEv)
 		validVotes = append(validVotes, vote)
 	}
@@ -316,9 +340,9 @@ func (pool *VotePool) transfer(blockHash common.Hash) {
 	}
 
 	for _, vote := range futureVotes[blockHash].voteMessages {
-		peer, ok := pool.originatedFrom[vote.Hash()]
+		peer, ok := pool.originatedFrom[vote.vote.Hash()]
 		if !ok {
-			log.Debug("Cannot find the sender of vote", "voteHash", vote.Hash())
+			log.Debug("Cannot find the sender of vote", "voteHash", vote.vote.Hash())
 			continue
 		}
 		pool.numFutureVotePerPeer[peer]--
@@ -347,7 +371,7 @@ func (pool *VotePool) pruneVote(
 			if voteBox, ok := voteMap[blockHash]; ok {
 				voteMessages := voteBox.voteMessages
 				for _, voteMessage := range voteMessages {
-					voteHash := voteMessage.Hash()
+					voteHash := voteMessage.vote.Hash()
 					if peer := pool.originatedFrom[voteHash]; peer != "" && isFuture {
 						pool.numFutureVotePerPeer[peer]--
 					}
@@ -390,7 +414,9 @@ func (pool *VotePool) GetVotes() []*types.VoteEnvelope {
 	votesRes := make([]*types.VoteEnvelope, 0)
 	curVotes := pool.curVotes
 	for _, voteBox := range curVotes {
-		votesRes = append(votesRes, voteBox.voteMessages...)
+		for _, vote := range voteBox.voteMessages {
+			votesRes = append(votesRes, vote.vote)
+		}
 	}
 	return votesRes
 }
@@ -419,8 +445,13 @@ func (pool *VotePool) FetchVoteByBlockHash(blockHash common.Hash) []*types.VoteE
 	// We successfully acquire the read lock, read
 	// the vote and remember to release the lock
 	defer pool.mu.RUnlock()
-	if _, ok := pool.curVotes[blockHash]; ok {
-		return pool.curVotes[blockHash].voteMessages
+	if voteBox, ok := pool.curVotes[blockHash]; ok {
+		votes := make([]*types.VoteEnvelope, 0, len(voteBox.voteMessages))
+		for _, vote := range voteBox.voteMessages {
+			votes = append(votes, vote.vote)
+		}
+
+		return votes
 	} else {
 		return nil
 	}
