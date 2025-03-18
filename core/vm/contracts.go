@@ -146,13 +146,13 @@ func init() {
 	PrecompiledContractsCancun[common.BytesToAddress([]byte{10})] = &kzgPointEvaluation{}
 
 	PrecompiledContractsPrague = copyPrecompiledContract(PrecompiledContractsCancun)
-	PrecompiledContractsPrague[common.BytesToAddress([]byte{0x11})] = &bls12381G1Add{}
-	PrecompiledContractsPrague[common.BytesToAddress([]byte{0x12})] = &bls12381G1MultiExp{}
-	PrecompiledContractsPrague[common.BytesToAddress([]byte{0x13})] = &bls12381G2Add{}
-	PrecompiledContractsPrague[common.BytesToAddress([]byte{0x14})] = &bls12381G2MultiExp{}
-	PrecompiledContractsPrague[common.BytesToAddress([]byte{0x15})] = &bls12381Pairing{}
-	PrecompiledContractsPrague[common.BytesToAddress([]byte{0x16})] = &bls12381MapG1{}
-	PrecompiledContractsPrague[common.BytesToAddress([]byte{0x17})] = &bls12381MapG2{}
+	PrecompiledContractsPrague[common.BytesToAddress([]byte{11})] = &bls12381G1Add{}
+	PrecompiledContractsPrague[common.BytesToAddress([]byte{12})] = &bls12381G1MultiExp{}
+	PrecompiledContractsPrague[common.BytesToAddress([]byte{13})] = &bls12381G2Add{}
+	PrecompiledContractsPrague[common.BytesToAddress([]byte{14})] = &bls12381G2MultiExp{}
+	PrecompiledContractsPrague[common.BytesToAddress([]byte{15})] = &bls12381Pairing{}
+	PrecompiledContractsPrague[common.BytesToAddress([]byte{16})] = &bls12381MapG1{}
+	PrecompiledContractsPrague[common.BytesToAddress([]byte{17})] = &bls12381MapG2{}
 
 	// Remove consortiumLog precompiled contract after Cancun
 	delete(PrecompiledContractsCancun, common.BytesToAddress([]byte{101}))
