@@ -469,6 +469,7 @@ var (
 		BerlinBlock:                   big.NewInt(0),
 		LondonBlock:                   big.NewInt(0),
 		CancunBlock:                   big.NewInt(0),
+		PragueBlock:                   big.NewInt(0),
 		ArrowGlacierBlock:             nil,
 		OdysseusBlock:                 nil,
 		FenixBlock:                    nil,
@@ -613,6 +614,7 @@ type ChainConfig struct {
 	ShanghaiBlock *big.Int `json:"shanghaiBlock,omitempty"` // Shanghai switch block (nil = no fork, 0 = already on activated)
 	CancunBlock   *big.Int `json:"cancunBlock,omitempty"`   // Cancun switch block (nil = no fork, 0 = already on activated)
 	VenokiBlock   *big.Int `json:"venokiBlock,omitempty"`   // Venoki switch block (nil = no fork, 0 = already on activated)
+	PragueBlock   *big.Int `json:"pragueBlock,omitempty"`   // Prague switch block (nil = no fork, 0 = already on activated)
 
 	BlacklistContractAddress           *common.Address `json:"blacklistContractAddress,omitempty"`           // Address of Blacklist Contract (nil = no blacklist)
 	FenixValidatorContractAddress      *common.Address `json:"fenixValidatorContractAddress,omitempty"`      // Address of Ronin Contract in the Fenix hardfork (nil = no blacklist)
@@ -746,7 +748,7 @@ func (c *ChainConfig) String() string {
 	chainConfigFmt += "Engine: %v, Blacklist Contract: %v, Fenix Validator Contract: %v, ConsortiumV2: %v, ConsortiumV2.RoninValidatorSet: %v, "
 	chainConfigFmt += "ConsortiumV2.SlashIndicator: %v, ConsortiumV2.StakingContract: %v, Puffy: %v, Buba: %v, Olek: %v, Shillin: %v, Antenna: %v, "
 	chainConfigFmt += "ConsortiumV2.ProfileContract: %v, ConsortiumV2.FinalityTracking: %v, whiteListDeployerContractV2Address: %v, roninTreasuryAddress: %v, "
-	chainConfigFmt += "Miko: %v, Tripp: %v, TrippPeriod: %v, Aaron: %v, Shanghai: %v, Cancun: %v, Venoki: %v}"
+	chainConfigFmt += "Miko: %v, Tripp: %v, TrippPeriod: %v, Aaron: %v, Shanghai: %v, Cancun: %v, Venoki: %v, Prague: %v}"
 
 	return fmt.Sprintf(chainConfigFmt,
 		c.ChainID,
@@ -789,6 +791,7 @@ func (c *ChainConfig) String() string {
 		c.ShanghaiBlock,
 		c.CancunBlock,
 		c.VenokiBlock,
+		c.PragueBlock,
 	)
 }
 
@@ -951,6 +954,11 @@ func (c *ChainConfig) IsVenoki(num *big.Int) bool {
 	return isForked(c.VenokiBlock, num)
 }
 
+// IsPrague returns whether the num is equals to or larger than the prague fork block.
+func (c *ChainConfig) IsPrague(num *big.Int) bool {
+	return isForked(c.PragueBlock, num)
+}
+
 // CheckCompatible checks whether scheduled fork transitions have been imported
 // with a mismatching chain configuration.
 func (c *ChainConfig) CheckCompatible(newcfg *ChainConfig, height uint64) *ConfigCompatError {
@@ -1106,6 +1114,9 @@ func (c *ChainConfig) checkCompatible(newcfg *ChainConfig, head *big.Int) *Confi
 	if isForkIncompatible(c.VenokiBlock, newcfg.VenokiBlock, head) {
 		return newCompatError("Venoki fork block", c.VenokiBlock, newcfg.VenokiBlock)
 	}
+	if isForkIncompatible(c.PragueBlock, newcfg.PragueBlock, head) {
+		return newCompatError("Prague fork block", c.PragueBlock, newcfg.PragueBlock)
+	}
 	return nil
 }
 
@@ -1176,7 +1187,7 @@ type Rules struct {
 	IsBerlin, IsLondon, IsOdysseusFork                      bool
 	IsFenix, IsShillin, IsConsortiumV2, IsAntenna           bool
 	IsMiko, IsTripp, IsAaron, IsShanghai, IsCancun          bool
-	IsVenoki, IsLastConsortiumV1Block                       bool
+	IsVenoki, IsLastConsortiumV1Block, IsPrague             bool
 }
 
 // Rules ensures c's ChainID is not nil.
@@ -1209,5 +1220,6 @@ func (c *ChainConfig) Rules(num *big.Int) Rules {
 		IsShanghai:              c.IsShanghai(num),
 		IsCancun:                c.IsCancun(num),
 		IsVenoki:                c.IsVenoki(num),
+		IsPrague:                c.IsPrague(num),
 	}
 }
