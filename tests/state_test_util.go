@@ -408,8 +408,6 @@ func (tx *stTransaction) toMessage(ps stPostState, baseFee *big.Int) (core.Messa
 		}
 	}
 
-	// TODO: pass authList as go-ethereum did, leave it to "tests" update tasks
-	// https://github.com/ethereum/go-ethereum/blob/aaaf01d71232d1b7da5ab2ae9258f7fb9f22b1bf/tests/state_test_util.go#L479
 	msg := types.NewMessage(from, to, tx.Nonce, value, gasLimit, gasPrice,
 		tx.MaxFeePerGas, tx.MaxPriorityFeePerGas, data, accessList, false, nil, nil, authList)
 	return msg, nil
