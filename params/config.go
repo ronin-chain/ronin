@@ -469,7 +469,6 @@ var (
 		BerlinBlock:                   big.NewInt(0),
 		LondonBlock:                   big.NewInt(0),
 		CancunBlock:                   big.NewInt(0),
-		PragueBlock:                   big.NewInt(0),
 		ArrowGlacierBlock:             nil,
 		OdysseusBlock:                 nil,
 		FenixBlock:                    nil,
