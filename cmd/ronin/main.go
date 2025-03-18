@@ -153,6 +153,7 @@ var (
 		utils.NodeKeyFileFlag,
 		utils.NodeKeyHexFlag,
 		utils.DNSDiscoveryFlag,
+		utils.TrustedNodesOnlyFlag,
 		utils.MainnetFlag,
 		utils.DeveloperFlag,
 		utils.DeveloperPeriodFlag,

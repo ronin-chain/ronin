@@ -168,6 +168,9 @@ type Config struct {
 	Logger log.Logger `toml:",omitempty"`
 
 	clock mclock.Clock
+
+	// Only accept connection from a trusted node.
+	TrustedNodesOnly bool
 }
 
 // Server manages all peer connections.
@@ -870,6 +873,8 @@ running:
 
 func (srv *Server) postHandshakeChecks(peers map[enode.ID]*Peer, inboundCount int, c *conn) error {
 	switch {
+	case !c.is(trustedConn) && srv.Config.TrustedNodesOnly:
+		return DiscUselessPeer
 	case !c.is(trustedConn) && len(peers) >= srv.MaxPeers:
 		return DiscTooManyPeers
 	case !c.is(trustedConn) && c.is(inboundConn) && inboundCount >= srv.maxInboundConns():

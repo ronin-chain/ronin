@@ -880,6 +880,11 @@ var (
 		Usage:    "Sets DNS discovery entry points (use \"\" to disable DNS)",
 		Category: flags.NetworkingCategory,
 	}
+	TrustedNodesOnlyFlag = &cli.BoolFlag{
+		Name:     "trusted-node-only",
+		Usage:    "Only accept p2p connection from a trusted node",
+		Category: flags.NetworkingCategory,
+	}
 
 	// ATM the url is left to the user and deployment to
 	JSpathFlag = &flags.DirectoryFlag{
@@ -1551,6 +1556,8 @@ func SetP2PConfig(ctx *cli.Context, cfg *p2p.Config) {
 		cfg.NoDiscovery = true
 		cfg.DiscoveryV5 = false
 	}
+
+	cfg.TrustedNodesOnly = ctx.Bool(TrustedNodesOnlyFlag.Name)
 }
 
 // SetNodeConfig applies node-related command line flags to the config.
