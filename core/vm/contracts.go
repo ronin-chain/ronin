@@ -59,6 +59,7 @@ var PrecompiledContractsBLS = map[common.Address]PrecompiledContract{
 }
 
 var (
+	PrecompiledAddressesPrague     []common.Address
 	PrecompiledAddressesCancun     []common.Address
 	PrecompiledAddressesBerlin     []common.Address
 	PrecompiledAddressesMiko       []common.Address
@@ -94,6 +95,10 @@ var (
 	// PrecompiledContractsCancun contains the default set of pre-compiled Ethereum
 	// contracts used in the Cancun release.
 	PrecompiledContractsCancun map[common.Address]PrecompiledContract
+
+	// PrecompiledContractsPrague contains the default set of pre-compiled Ethereum
+	// contracts used in the Prague release.
+	PrecompiledContractsPrague map[common.Address]PrecompiledContract
 )
 
 func copyPrecompiledContract(contracts map[common.Address]PrecompiledContract) map[common.Address]PrecompiledContract {
@@ -141,6 +146,16 @@ func init() {
 
 	PrecompiledContractsCancun = copyPrecompiledContract(PrecompiledContractsBerlin)
 	PrecompiledContractsCancun[common.BytesToAddress([]byte{10})] = &kzgPointEvaluation{}
+
+	PrecompiledContractsPrague = copyPrecompiledContract(PrecompiledContractsCancun)
+	PrecompiledContractsPrague[common.BytesToAddress([]byte{0x11})] = &bls12381G1Add{}
+	PrecompiledContractsPrague[common.BytesToAddress([]byte{0x12})] = &bls12381G1MultiExp{}
+	PrecompiledContractsPrague[common.BytesToAddress([]byte{0x13})] = &bls12381G2Add{}
+	PrecompiledContractsPrague[common.BytesToAddress([]byte{0x14})] = &bls12381G2MultiExp{}
+	PrecompiledContractsPrague[common.BytesToAddress([]byte{0x15})] = &bls12381Pairing{}
+	PrecompiledContractsPrague[common.BytesToAddress([]byte{0x16})] = &bls12381MapG1{}
+	PrecompiledContractsPrague[common.BytesToAddress([]byte{0x17})] = &bls12381MapG2{}
+
 	// Remove consortiumLog precompiled contract after Cancun
 	delete(PrecompiledContractsCancun, common.BytesToAddress([]byte{101}))
 
@@ -179,11 +194,16 @@ func init() {
 	for k := range PrecompiledContractsCancun {
 		PrecompiledAddressesCancun = append(PrecompiledAddressesCancun, k)
 	}
+	for k := range PrecompiledContractsPrague {
+		PrecompiledAddressesPrague = append(PrecompiledAddressesPrague, k)
+	}
 }
 
 // ActivePrecompiles returns the precompiles enabled with the current configuration.
 func ActivePrecompiles(rules params.Rules) []common.Address {
 	switch {
+	case rules.IsPrague:
+		return PrecompiledAddressesPrague
 	case rules.IsCancun:
 		return PrecompiledAddressesCancun
 	case rules.IsBerlin:

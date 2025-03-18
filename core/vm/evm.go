@@ -72,6 +72,8 @@ func (evm *EVM) precompile(caller ContractRef, addr common.Address) (Precompiled
 
 	var precompiles map[common.Address]PrecompiledContract
 	switch {
+	case evm.chainRules.IsPrague:
+		precompiles = PrecompiledContractsPrague
 	case evm.chainRules.IsCancun:
 		precompiles = PrecompiledContractsCancun
 	case evm.chainRules.IsBerlin:
