@@ -2894,6 +2894,7 @@ func testDeleteRecreateSlots(t *testing.T, scheme string) {
 
 	chainConfig := *params.TestChainConfig
 	chainConfig.CancunBlock = nil
+	chainConfig.PragueBlock = nil
 	gspec := &Genesis{
 		Config: &chainConfig,
 		Alloc: GenesisAlloc{
@@ -2987,6 +2988,7 @@ func testDeleteRecreateAccount(t *testing.T, scheme string) {
 
 	chainConfig := *params.TestChainConfig
 	chainConfig.CancunBlock = nil
+	chainConfig.PragueBlock = nil
 	gspec := &Genesis{
 		Config: &chainConfig,
 		Alloc: GenesisAlloc{
@@ -3114,6 +3116,7 @@ func testDeleteRecreateSlotsAcrossManyBlocks(t *testing.T, scheme string) {
 	t.Logf("Destination address: %x\n", aa)
 	chainConfig := *params.TestChainConfig
 	chainConfig.CancunBlock = nil
+	chainConfig.PragueBlock = nil
 	gspec := &Genesis{
 		Config: &chainConfig,
 		Alloc: GenesisAlloc{
@@ -3452,7 +3455,7 @@ func testEIP2718Transition(t *testing.T, scheme string) {
 
 	// Expected gas is intrinsic + 2 * pc + hot load + cold load, since only one load is in the access list
 	expected := params.TxGas + params.TxAccessListAddressGas + params.TxAccessListStorageKeyGas +
-		vm.GasQuickStep*2 + params.WarmStorageReadCostEIP2929 + params.ColdSloadCostEIP2929
+			vm.GasQuickStep*2 + params.WarmStorageReadCostEIP2929 + params.ColdSloadCostEIP2929
 	if block.GasUsed() != expected {
 		t.Fatalf("incorrect amount of gas spent: expected %d, got %d", expected, block.GasUsed())
 	}
@@ -3554,7 +3557,7 @@ func testEIP1559Transition(t *testing.T, scheme string) {
 
 	// 1+2: Ensure EIP-1559 access lists are accounted for via gas usage.
 	expectedGas := params.TxGas + params.TxAccessListAddressGas + params.TxAccessListStorageKeyGas +
-		vm.GasQuickStep*2 + params.WarmStorageReadCostEIP2929 + params.ColdSloadCostEIP2929
+			vm.GasQuickStep*2 + params.WarmStorageReadCostEIP2929 + params.ColdSloadCostEIP2929
 	if block.GasUsed() != expectedGas {
 		t.Fatalf("incorrect amount of gas spent: expected %d, got %d", expectedGas, block.GasUsed())
 	}
