@@ -801,6 +801,11 @@ func (c *bls12381G1MultiExp) Run(input []byte) ([]byte, error) {
 		if points[i], err = g.DecodePoint(input[t0:t1]); err != nil {
 			return nil, err
 		}
+		// 'point is on curve' check already done,
+		// Here we need to apply subgroup checks.
+		if !g.InCorrectSubgroup(points[i]) {
+			return nil, errBLS12381G1PointSubgroup
+		}
 		// Decode scalar value
 		scalars[i] = new(big.Int).SetBytes(input[t1:t2])
 	}
@@ -895,6 +900,11 @@ func (c *bls12381G2MultiExp) Run(input []byte) ([]byte, error) {
 		// Decode G1 point
 		if points[i], err = g.DecodePoint(input[t0:t1]); err != nil {
 			return nil, err
+		}
+		// 'point is on curve' check already done,
+		// Here we need to apply subgroup checks.
+		if !g.InCorrectSubgroup(points[i]) {
+			return nil, errBLS12381G2PointSubgroup
 		}
 		// Decode scalar value
 		scalars[i] = new(big.Int).SetBytes(input[t1:t2])
