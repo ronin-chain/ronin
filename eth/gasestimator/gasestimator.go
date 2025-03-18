@@ -211,7 +211,7 @@ func execute(ctx context.Context, call core.Message, opts *Options, gasLimit uin
 		true,
 		call.BlobGasFeeCap(),
 		call.BlobHashes(),
-		nil,
+		call.AuthList(),
 	)
 
 	// Execute the call and separate execution faults caused by a lack of gas or

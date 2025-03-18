@@ -99,6 +99,7 @@ const (
 	TxAccessListStorageKeyGas uint64 = 1900 // Per storage key specified in EIP 2930 access list
 	TxTokenPerNonZeroByte     uint64 = 4    // Token cost per non-zero byte as specified by EIP-7623.
 	TxCostFloorPerToken       uint64 = 10   // Cost floor per byte of data as specified by EIP-7623.
+	TxAuthTupleGas            uint64 = 12500 // Per auth tuple code specified in EIP-7702
 
 	// These have been changed during the course of the chain
 	CallGasFrontier              uint64 = 40  // Once per CALL operation & message call transaction.
