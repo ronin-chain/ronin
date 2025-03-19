@@ -289,6 +289,17 @@ func (p *TxPool) Get(hash common.Hash) *types.Transaction {
 	return nil
 }
 
+// GetRLP returns a RLP-encoded transaction if it is contained in the pool.
+func (p *TxPool) GetRLP(hash common.Hash) []byte {
+	for _, subpool := range p.subpools {
+		encoded := subpool.GetRLP(hash)
+		if len(encoded) != 0 {
+			return encoded
+		}
+	}
+	return nil
+}
+
 // Add enqueues a batch of transactions into the pool if they are valid. Due
 // to the large transaction churn, add may postpone fully integrating the tx
 // to a later point to batch multiple ones together.

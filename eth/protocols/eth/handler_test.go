@@ -17,9 +17,11 @@
 package eth
 
 import (
+	"crypto/sha256"
 	"math"
 	"math/big"
 	"math/rand"
+	"os"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -28,15 +30,18 @@ import (
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/txpool"
+	"github.com/ethereum/go-ethereum/core/txpool/blobpool"
 	"github.com/ethereum/go-ethereum/core/txpool/legacypool"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/crypto/kzg4844"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/trie"
+	"github.com/holiman/uint256"
 )
 
 var (
@@ -81,8 +86,13 @@ func newTestBackendWithGenerator(blocks int, generator func(int, *core.BlockGen)
 	txconfig := legacypool.DefaultConfig
 	txconfig.Journal = "" // Don't litter the disk with test journals
 
+	storage, _ := os.MkdirTemp("", "blobpool-")
+	defer os.RemoveAll(storage)
+
+	blobPool := blobpool.New(blobpool.Config{Datadir: storage}, params.TestChainConfig, chain)
+
 	legacyPool := legacypool.New(txconfig, params.TestChainConfig, chain)
-	txPool, err := txpool.New(txconfig.PriceLimit, chain, []txpool.SubPool{legacyPool})
+	txPool, err := txpool.New(txconfig.PriceLimit, chain, []txpool.SubPool{legacyPool, blobPool})
 	if err != nil {
 		panic(err)
 	}
@@ -594,5 +604,82 @@ func testGetBlockReceipts(t *testing.T, protocol uint) {
 		ReceiptsPacket: receipts,
 	}); err != nil {
 		t.Errorf("receipts mismatch: %v", err)
+	}
+}
+
+func TestGetPooledTransaction(t *testing.T) {
+	t.Run("blobTx", func(t *testing.T) {
+		testGetPooledTransaction(t, true)
+	})
+	t.Run("legacyTx", func(t *testing.T) {
+		testGetPooledTransaction(t, false)
+	})
+}
+
+func testGetPooledTransaction(t *testing.T, blobTx bool) {
+	var (
+		emptyBlob          = kzg4844.Blob{}
+		emptyBlobs         = []kzg4844.Blob{emptyBlob}
+		emptyBlobCommit, _ = kzg4844.BlobToCommitment(&emptyBlob)
+		emptyBlobProof, _  = kzg4844.ComputeBlobProof(&emptyBlob, emptyBlobCommit)
+		emptyBlobHash      = kzg4844.CalcBlobHashV1(sha256.New(), &emptyBlobCommit)
+	)
+	backend := newTestBackendWithGenerator(0, nil)
+	defer backend.close()
+
+	peer, _ := newTestPeer("peer", ETH66, backend)
+	defer peer.close()
+
+	var (
+		tx     *types.Transaction
+		err    error
+		signer = types.NewCancunSigner(params.TestChainConfig.ChainID)
+	)
+	if blobTx {
+		tx, err = types.SignNewTx(testKey, signer, &types.BlobTx{
+			ChainID:    uint256.MustFromBig(params.TestChainConfig.ChainID),
+			Nonce:      0,
+			GasTipCap:  uint256.NewInt(20_000_000_000),
+			GasFeeCap:  uint256.NewInt(21_000_000_000),
+			Gas:        21000,
+			To:         testAddr,
+			BlobHashes: []common.Hash{emptyBlobHash},
+			BlobFeeCap: uint256.MustFromBig(common.Big1),
+			Sidecar: &types.BlobTxSidecar{
+				Blobs:       emptyBlobs,
+				Commitments: []kzg4844.Commitment{emptyBlobCommit},
+				Proofs:      []kzg4844.Proof{emptyBlobProof},
+			},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+	} else {
+		tx, err = types.SignTx(
+			types.NewTransaction(0, testAddr, big.NewInt(10_000), params.TxGas, big.NewInt(1_000_000_000), nil),
+			signer,
+			testKey,
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	errs := backend.txpool.Add([]*types.Transaction{tx}, true, true)
+	for _, err := range errs {
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// Send the hash request and verify the response
+	p2p.Send(peer.app, GetPooledTransactionsMsg, GetPooledTransactionsPacket66{
+		RequestId:                   123,
+		GetPooledTransactionsPacket: []common.Hash{tx.Hash()},
+	})
+	if err := p2p.ExpectMsg(peer.app, PooledTransactionsMsg, PooledTransactionsPacket66{
+		RequestId:                123,
+		PooledTransactionsPacket: []*types.Transaction{tx},
+	}); err != nil {
+		t.Errorf("pooled transaction mismatch: %v", err)
 	}
 }
