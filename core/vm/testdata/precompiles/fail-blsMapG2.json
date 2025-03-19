@@ -21,7 +21,7 @@
   },
   {
     "Input": "0000000000000000000000000000000021366f100476ce8d3be6cfc90d59fe13349e388ed12b6dd6dc31ccd267ff000e2c993a063ca66beced06f804d4b8e5af0000000000000000000000000000000002829ce3c021339ccb5caf3e187f6370e1e2a311dec9b75363117063ab2015603ff52c3d3b98f19c2f65575e99e8b78c",
-    "ExpectedError": "must be less than modulus",
+    "ExpectedError": "invalid fp.Element encoding",
     "Name": "bls_mapg2_invalid_fq_element"
   }
 ]

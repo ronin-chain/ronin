@@ -21,7 +21,7 @@
   },
   {
     "Input": "000000000000000000000000000000002f6d9c5465982c0421b61e74579709b3b5b91e57bdd4f6015742b4ff301abb7ef895b9cce00c33c7d48f8e5fa4ac09ae",
-    "ExpectedError": "must be less than modulus",
+    "ExpectedError": "invalid fp.Element encoding",
     "Name": "bls_invalid_fq_element"
   }
 ]
