@@ -82,7 +82,7 @@ type Message interface {
 	IsFake() bool
 	Data() []byte
 	AccessList() types.AccessList
-	AuthList() []types.SetCodeAuthorization
+	SetCodeAuthorizations() []types.SetCodeAuthorization
 
 	// In legacy transaction, this is the same as From.
 	// In sponsored transaction, this is the payer's
@@ -397,11 +397,11 @@ func (st *StateTransition) preCheck() error {
 	}
 
 	// Check that EIP-7702 authorization list signatures are well formed.
-	if msg.AuthList() != nil {
+	if msg.SetCodeAuthorizations() != nil {
 		if msg.To() == nil {
 			return fmt.Errorf("%w (sender %v)", ErrSetCodeTxCreate, msg.From())
 		}
-		if len(msg.AuthList()) == 0 {
+		if len(msg.SetCodeAuthorizations()) == 0 {
 			return fmt.Errorf("%w (sender %v)", ErrEmptyAuthList, msg.From())
 		}
 	}
@@ -458,7 +458,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 
 	// Check clauses 4-5, subtract intrinsic gas if everything is correct
 	if !st.evm.Config.IsSystemTransaction {
-		gas, err := IntrinsicGas(st.data, st.msg.AccessList(), st.msg.AuthList(), contractCreation, rules.IsHomestead, rules.IsIstanbul, rules.IsShanghai)
+		gas, err := IntrinsicGas(st.data, st.msg.AccessList(), st.msg.SetCodeAuthorizations(), contractCreation, rules.IsHomestead, rules.IsIstanbul, rules.IsShanghai)
 		if err != nil {
 			return nil, err
 		}
@@ -494,8 +494,8 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		st.state.SetNonce(msg.From(), st.state.GetNonce(msg.From())+1)
 
 		// Apply EIP-7702 authorizations.
-		if msg.AuthList() != nil {
-			for _, auth := range msg.AuthList() {
+		if msg.SetCodeAuthorizations() != nil {
+			for _, auth := range msg.SetCodeAuthorizations() {
 				// Note errors are ignored, we simply skip invalid authorizations here.
 				st.applyAuthorization(&auth)
 			}
