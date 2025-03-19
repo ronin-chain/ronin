@@ -463,7 +463,7 @@ func (tx *Transaction) WithBlobTxSidecar(sideCar *BlobTxSidecar) *Transaction {
 }
 
 // AuthList returns the authorizations list of the transaction.
-func (tx *Transaction) AuthList() []Authorization {
+func (tx *Transaction) AuthList() []SetCodeAuthorization {
 	setcodetx, ok := tx.inner.(*SetCodeTx)
 	if !ok {
 		return nil
@@ -611,7 +611,7 @@ type Message struct {
 	expiredTime   uint64
 	blobGasFeeCap *big.Int
 	blobHashes    []common.Hash
-	authList      []Authorization
+	authList      []SetCodeAuthorization
 }
 
 // Create a new message with payer is the same as from, expired time = 0
@@ -627,7 +627,7 @@ func NewMessage(
 	isFake bool,
 	blobFeeCap *big.Int,
 	blobHashes []common.Hash,
-	authList []Authorization,
+	authList []SetCodeAuthorization,
 ) Message {
 	return Message{
 		from:          from,
@@ -708,9 +708,9 @@ func (m Message) IsFake() bool           { return m.isFake }
 func (m Message) Payer() common.Address  { return m.payer }
 func (m Message) ExpiredTime() uint64    { return m.expiredTime }
 
-func (m Message) BlobHashes() []common.Hash { return m.blobHashes }
-func (m Message) BlobGasFeeCap() *big.Int   { return m.blobGasFeeCap }
-func (m Message) AuthList() []Authorization { return m.authList }
+func (m Message) BlobHashes() []common.Hash        { return m.blobHashes }
+func (m Message) BlobGasFeeCap() *big.Int          { return m.blobGasFeeCap }
+func (m Message) AuthList() []SetCodeAuthorization { return m.authList }
 
 // copyAddressPtr copies an address.
 func copyAddressPtr(a *common.Address) *common.Address {

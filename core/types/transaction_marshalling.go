@@ -32,20 +32,20 @@ type txJSON struct {
 	Type hexutil.Uint64 `json:"type"`
 
 	// Common transaction fields:
-	Nonce                *hexutil.Uint64 `json:"nonce"`
-	GasPrice             *hexutil.Big    `json:"gasPrice"`
-	MaxPriorityFeePerGas *hexutil.Big    `json:"maxPriorityFeePerGas"`
-	MaxFeePerGas         *hexutil.Big    `json:"maxFeePerGas"`
-	MaxFeePerBlobGas     *hexutil.Big    `json:"maxFeePerBlobGas,omitempty"`
-	Gas                  *hexutil.Uint64 `json:"gas"`
-	Value                *hexutil.Big    `json:"value"`
-	Data                 *hexutil.Bytes  `json:"input"`
-	V                    *hexutil.Big    `json:"v"`
-	R                    *hexutil.Big    `json:"r"`
-	S                    *hexutil.Big    `json:"s"`
-	To                   *common.Address `json:"to"`
-	AuthorizationList    []Authorization `json:"authorizationList,omitempty"`
-	YParity              *hexutil.Uint64 `json:"yParity,omitempty"`
+	Nonce                *hexutil.Uint64        `json:"nonce"`
+	GasPrice             *hexutil.Big           `json:"gasPrice"`
+	MaxPriorityFeePerGas *hexutil.Big           `json:"maxPriorityFeePerGas"`
+	MaxFeePerGas         *hexutil.Big           `json:"maxFeePerGas"`
+	MaxFeePerBlobGas     *hexutil.Big           `json:"maxFeePerBlobGas,omitempty"`
+	Gas                  *hexutil.Uint64        `json:"gas"`
+	Value                *hexutil.Big           `json:"value"`
+	Data                 *hexutil.Bytes         `json:"input"`
+	V                    *hexutil.Big           `json:"v"`
+	R                    *hexutil.Big           `json:"r"`
+	S                    *hexutil.Big           `json:"s"`
+	To                   *common.Address        `json:"to"`
+	AuthorizationList    []SetCodeAuthorization `json:"authorizationList,omitempty"`
+	YParity              *hexutil.Uint64        `json:"yParity,omitempty"`
 
 	// Access list transaction fields:
 	ChainID    *hexutil.Big `json:"chainId,omitempty"`

@@ -393,11 +393,11 @@ func (tx *stTransaction) toMessage(ps stPostState, baseFee *big.Int) (core.Messa
 	if gasPrice == nil {
 		return nil, fmt.Errorf("no gas price provided")
 	}
-	var authList []types.Authorization
+	var authList []types.SetCodeAuthorization
 	if tx.AuthorizationList != nil {
-		authList = make([]types.Authorization, len(tx.AuthorizationList))
+		authList = make([]types.SetCodeAuthorization, len(tx.AuthorizationList))
 		for i, auth := range tx.AuthorizationList {
-			authList[i] = types.Authorization{
+			authList[i] = types.SetCodeAuthorization{
 				ChainID: auth.ChainID.Uint64(),
 				Address: auth.Address,
 				Nonce:   auth.Nonce,
