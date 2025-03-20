@@ -17,10 +17,6 @@ var (
 	// configured for the transaction pool.
 	ErrUnderpriced = errors.New("transaction underpriced")
 
-	// ErrTxPoolOverflow is returned if the transaction pool is full and can't accpet
-	// another remote transaction.
-	ErrTxPoolOverflow = errors.New("txpool is full")
-
 	// ErrReplaceUnderpriced is returned if a transaction is attempted to be replaced
 	// with a different one without the required price bump.
 	ErrReplaceUnderpriced = errors.New("replacement transaction underpriced")
@@ -47,18 +43,10 @@ var (
 
 	// ErrAddressBlacklisted is returned if a transaction is sent to blacklisted address
 	ErrAddressBlacklisted = errors.New("address is blacklisted")
-	// ErrFutureReplacePending is returned if a future transaction replaces a pending
-	// transaction. Future transactions should only be able to replace other future transactions.
-	ErrFutureReplacePending = errors.New("future transaction tries to replace pending")
 
 	// ErrAlreadyReserved is returned if the sender address has a pending transaction
 	// in a different subpool. For example, this error is returned in response to any
 	// input transaction of non-blob type when a blob transaction from this sender
 	// remains pending (and vice-versa).
 	ErrAlreadyReserved = errors.New("address already reserved")
-
-	// ErrAuthorityReserved is returned if a transaction has an authorization
-	// signed by an address which already has in-flight transactions known to the
-	// pool.
-	ErrAuthorityReserved = errors.New("authority already reserved")
 )
