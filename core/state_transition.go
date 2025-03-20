@@ -505,7 +505,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	var gasRefund uint64
 	if !st.evm.Config.IsSystemTransaction {
 		// Compute refund counter, capped to a refund quotient.
-		gasRefund := st.calcRefund()
+		gasRefund = st.calcRefund()
 		st.gas += gasRefund
 		if rules.IsPrague {
 			// After EIP-7623: Data-heavy transactions pay the floor gas.
