@@ -88,20 +88,24 @@ func ValidateTransaction(tx *types.Transaction, head *types.Header, signer types
 		return fmt.Errorf("%w: transaction size %v, limit %v", ErrOversizedData, tx.Size(), opts.MaxSize)
 	}
 	// Ensure only transactions that have been enabled are accepted
-	if !opts.Config.IsBerlin(head.Number) && tx.Type() == types.AccessListTxType {
+	rules := opts.Config.Rules(head.Number)
+	if !rules.IsBerlin && tx.Type() == types.AccessListTxType {
 		return fmt.Errorf("%w: type %d rejected, pool not yet in Berlin", core.ErrTxTypeNotSupported, tx.Type())
 	}
-	if !opts.Config.IsLondon(head.Number) && tx.Type() == types.DynamicFeeTxType {
+	if !rules.IsLondon && tx.Type() == types.DynamicFeeTxType {
 		return fmt.Errorf("%w: type %d rejected, pool not yet in London", core.ErrTxTypeNotSupported, tx.Type())
 	}
-	if !opts.Config.IsMiko(head.Number) && tx.Type() == types.SponsoredTxType {
+	if !rules.IsMiko && tx.Type() == types.SponsoredTxType {
 		return fmt.Errorf("%w: type %d rejected, pool not yet in Miko", core.ErrTxTypeNotSupported, tx.Type())
 	}
-	if !opts.Config.IsCancun(head.Number) && tx.Type() == types.BlobTxType {
+	if !rules.IsCancun && tx.Type() == types.BlobTxType {
 		return fmt.Errorf("%w: type %d rejected, pool not yet in Cancun", core.ErrTxTypeNotSupported, tx.Type())
 	}
+	if !rules.IsPrague && tx.Type() == types.SetCodeTxType {
+		return fmt.Errorf("%w: type %d rejected, pool not yet in Prague", core.ErrTxTypeNotSupported, tx.Type())
+	}
 	// Check whether the init code size has been exceeded
-	if opts.Config.IsShanghai(head.Number) && tx.To() == nil && len(tx.Data()) > params.MaxInitCodeSize {
+	if rules.IsShanghai && tx.To() == nil && len(tx.Data()) > params.MaxInitCodeSize {
 		return fmt.Errorf("%w: code size %v, limit %v", core.ErrMaxInitCodeSizeExceeded, len(tx.Data()), params.MaxInitCodeSize)
 	}
 	// Transactions can't be negative. This may never happen using RLP decoded
@@ -131,7 +135,7 @@ func ValidateTransaction(tx *types.Transaction, head *types.Header, signer types
 	}
 	// Ensure the transaction has more gas than the bare minimum needed to cover
 	// the transaction metadata
-	intrGas, err := core.IntrinsicGas(tx.Data(), tx.AccessList(), tx.SetCodeAuthorizations(), tx.To() == nil, true, opts.Config.IsIstanbul(head.Number), opts.Config.IsShanghai(head.Number))
+	intrGas, err := core.IntrinsicGas(tx.Data(), tx.AccessList(), tx.SetCodeAuthorizations(), tx.To() == nil, true, rules.IsIstanbul, rules.IsShanghai)
 	if err != nil {
 		return err
 	}
@@ -198,6 +202,11 @@ func ValidateTransaction(tx *types.Transaction, head *types.Header, signer types
 			return types.ErrSamePayerSenderSponsoredTx
 		}
 	}
+	if tx.Type() == types.SetCodeTxType {
+		if len(tx.SetCodeAuthorizations()) == 0 {
+			return fmt.Errorf("set code tx must have at least one authorization tuple")
+		}
+	}
 	return nil
 }
 
@@ -257,6 +266,11 @@ type ValidationOptionsWithState struct {
 	// ExistingCost is a mandatory callback to retrieve an already pooled
 	// transaction's cost with the given nonce to check for overdrafts.
 	ExistingCost func(addr common.Address, nonce uint64) *big.Int
+
+	// KnownConflicts is an optional callback which iterates over the list of
+	// addresses and returns all addresses known to the pool with in-flight
+	// transactions.
+	KnownConflicts func(sender common.Address, authorizers []common.Address) []common.Address
 }
 
 // ValidateTransactionWithState is a helper method to check whether a transaction
@@ -393,6 +407,14 @@ func ValidateTransactionWithState(tx *types.Transaction, signer types.Signer, op
 				state.IsAddressBlacklisted(opts.State, contractAddr, tx.To()) ||
 				state.IsAddressBlacklisted(opts.State, contractAddr, &payer) {
 				return ErrAddressBlacklisted
+			}
+		}
+
+		// Verify no authorizations will invalidate existing transactions known to
+		// the pool.
+		if opts.KnownConflicts != nil {
+			if conflicts := opts.KnownConflicts(from, tx.SetCodeAuthorities()); len(conflicts) > 0 {
+				return fmt.Errorf("%w: authorization conflicts with other known tx", ErrAuthorityReserved)
 			}
 		}
 	}
