@@ -18,6 +18,7 @@ package core
 
 import (
 	"crypto/ecdsa"
+	"encoding/binary"
 	"fmt"
 	"math/big"
 	"strings"
@@ -33,6 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethdb/memorydb"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/trie"
 	"github.com/holiman/uint256"
@@ -622,4 +624,65 @@ func TestBaseFee(t *testing.T) {
 	if treasuryBalance != fee {
 		t.Fatalf("Treasury balance mismatches, expect %d got %d", fee, treasuryBalance)
 	}
+}
+
+func TestProcessParentBlockHash(t *testing.T) {
+	var (
+		chainConfig = &params.ChainConfig{
+			ChainID:             big.NewInt(1),
+			HomesteadBlock:      big.NewInt(0),
+			EIP150Block:         big.NewInt(0),
+			EIP155Block:         big.NewInt(0),
+			EIP158Block:         big.NewInt(0),
+			ByzantiumBlock:      big.NewInt(0),
+			ConstantinopleBlock: big.NewInt(0),
+			PetersburgBlock:     big.NewInt(0),
+			IstanbulBlock:       big.NewInt(0),
+			MuirGlacierBlock:    big.NewInt(0),
+			BerlinBlock:         big.NewInt(0),
+			LondonBlock:         big.NewInt(0),
+			ShanghaiBlock:       big.NewInt(0),
+			CancunBlock:         big.NewInt(0),
+			VenokiBlock:         big.NewInt(0),
+			PragueBlock:         big.NewInt(0),
+			Ethash:              new(params.EthashConfig),
+		}
+		hashA    = common.Hash{0x01}
+		hashB    = common.Hash{0x02}
+		header   = &types.Header{ParentHash: hashA, Number: big.NewInt(2), Difficulty: big.NewInt(0)}
+		parent   = &types.Header{ParentHash: hashB, Number: big.NewInt(1), Difficulty: big.NewInt(0)}
+		coinbase = common.Address{}
+	)
+	test := func(statedb *state.StateDB) {
+		statedb.SetNonce(params.HistoryStorageAddress, 1)
+		statedb.SetCode(params.HistoryStorageAddress, params.HistoryStorageCode)
+		statedb.IntermediateRoot(true)
+
+		vmContext := NewEVMBlockContext(header, nil, &coinbase)
+		evm := vm.NewEVM(vmContext, vm.TxContext{}, statedb, chainConfig, vm.Config{})
+		ProcessParentBlockHash(header.ParentHash, evm, statedb)
+
+		vmContext = NewEVMBlockContext(parent, nil, &coinbase)
+		evm = vm.NewEVM(vmContext, vm.TxContext{}, statedb, chainConfig, vm.Config{})
+		ProcessParentBlockHash(parent.ParentHash, evm, statedb)
+
+		// make sure that the state is correct
+		if have := getParentBlockHash(statedb, 1); have != hashA {
+			t.Errorf("want parent hash %v, have %v", hashA, have)
+		}
+		if have := getParentBlockHash(statedb, 0); have != hashB {
+			t.Errorf("want parent hash %v, have %v", hashB, have)
+		}
+	}
+	t.Run("MPT", func(t *testing.T) {
+		statedb, _ := state.New(types.EmptyRootHash, state.NewDatabase(rawdb.NewDatabase(memorydb.New())), nil)
+		test(statedb)
+	})
+}
+
+func getParentBlockHash(statedb *state.StateDB, number uint64) common.Hash {
+	ringIndex := number % params.HistoryServeWindow
+	var key common.Hash
+	binary.BigEndian.PutUint64(key[24:], ringIndex)
+	return statedb.GetState(params.HistoryStorageAddress, key)
 }

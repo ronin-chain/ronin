@@ -35,6 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/txpool"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
@@ -1300,6 +1301,14 @@ func (w *worker) commit(uncles []*types.Header, interval func(), update bool, st
 	if w.isRunning() {
 		// Deep copy receipts here to avoid interaction between different tasks.
 		env := w.current.copy()
+
+		// EIP-2935: Store the parent block hash in the history storage contract
+		if w.chainConfig.IsPrague(env.header.Number) {
+			vmctx := core.NewEVMBlockContext(env.header, w.chain, &w.coinbase)
+			vevm := vm.NewEVM(vmctx, vm.TxContext{}, env.state, w.chainConfig, vm.Config{})
+			core.ProcessParentBlockHash(env.header.ParentHash, vevm, env.state)
+		}
+
 		// As consortium does not use uncles, we don't care about copying uncles here
 		block, receipts, err := w.engine.FinalizeAndAssemble(w.chain, env.header, env.state, env.txs, uncles, env.receipts)
 		if err != nil {
