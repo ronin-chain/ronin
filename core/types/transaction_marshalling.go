@@ -140,7 +140,7 @@ func (t *Transaction) MarshalJSON() ([]byte, error) {
 			enc.Proofs = tx.Sidecar.Proofs
 		}
 	case *SetCodeTx:
-		enc.ChainID = (*hexutil.Big)(new(big.Int).SetUint64(tx.ChainID))
+		enc.ChainID = (*hexutil.Big)(tx.ChainID.ToBig())
 		enc.MaxFeePerGas = (*hexutil.Big)(tx.GasFeeCap.ToBig())
 		enc.MaxPriorityFeePerGas = (*hexutil.Big)(tx.GasTipCap.ToBig())
 		enc.AccessList = &tx.AccessList
@@ -334,7 +334,11 @@ func (t *Transaction) UnmarshalJSON(input []byte) error {
 		if dec.ChainID == nil {
 			return errors.New("missing required field 'chainId' in transaction")
 		}
-		itx.ChainID = uint256.MustFromBig((*big.Int)(dec.ChainID))
+		var overflow bool
+		itx.ChainID, overflow = uint256.FromBig(dec.ChainID.ToInt())
+		if overflow {
+			return errors.New("'chainId' value overflows uint256")
+		}
 		if dec.MaxPriorityFeePerGas == nil {
 			return errors.New("missing required field 'maxPriorityFeePerGas' for txdata")
 		}
@@ -360,7 +364,6 @@ func (t *Transaction) UnmarshalJSON(input []byte) error {
 			itx.AccessList = *dec.AccessList
 		}
 		// signature R
-		var overflow bool
 		itx.R, overflow = uint256.FromBig(r)
 		if overflow {
 			return errors.New("'r' value overflows uint256")
@@ -385,7 +388,11 @@ func (t *Transaction) UnmarshalJSON(input []byte) error {
 		if dec.ChainID == nil {
 			return errors.New("missing required field 'chainId' in transaction")
 		}
-		itx.ChainID = dec.ChainID.ToInt().Uint64()
+		var overflow bool
+		itx.ChainID, overflow = uint256.FromBig(dec.ChainID.ToInt())
+		if overflow {
+			return errors.New("'chainId' value overflows uint256")
+		}
 		if dec.To == nil {
 			return errors.New("missing required field 'to' in transaction")
 		}
@@ -407,7 +414,6 @@ func (t *Transaction) UnmarshalJSON(input []byte) error {
 		itx.AuthList = dec.AuthorizationList
 
 		// signature R
-		var overflow bool
 		itx.R, overflow = uint256.FromBig(r)
 		if overflow {
 			return errors.New("'r' value overflows uint256")

@@ -125,16 +125,6 @@ type stTransaction struct {
 	AuthorizationList    []*stAuthorization  `json:"authorizationList,omitempty"`
 }
 
-// Authorization is an authorization from an account to deploy code at it's address.
-type stAuthorization struct {
-	ChainID *big.Int       `json:"chainId" gencodec:"required"`
-	Address common.Address `json:"address" gencodec:"required"`
-	Nonce   uint64         `json:"nonce" gencodec:"required"`
-	V       uint8          `json:"v" gencodec:"required"`
-	R       *big.Int       `json:"r" gencodec:"required"`
-	S       *big.Int       `json:"s" gencodec:"required"`
-}
-
 type stTransactionMarshaling struct {
 	GasPrice             *math.HexOrDecimal256
 	MaxFeePerGas         *math.HexOrDecimal256
@@ -143,6 +133,18 @@ type stTransactionMarshaling struct {
 	GasLimit             []math.HexOrDecimal64
 	PrivateKey           hexutil.Bytes
 	BlobGasFeeCap        *math.HexOrDecimal256
+}
+
+//go:generate go run github.com/fjl/gencodec -type stAuthorization -field-override stAuthorizationMarshaling -out gen_stauthorization.go
+
+// Authorization is an authorization from an account to deploy code at it's address.
+type stAuthorization struct {
+	ChainID *big.Int       `json:"chainId" gencodec:"required"`
+	Address common.Address `json:"address" gencodec:"required"`
+	Nonce   uint64         `json:"nonce" gencodec:"required"`
+	V       uint8          `json:"v" gencodec:"required"`
+	R       *big.Int       `json:"r" gencodec:"required"`
+	S       *big.Int       `json:"s" gencodec:"required"`
 }
 
 // field type overrides for gencodec
@@ -423,7 +425,7 @@ func (tx *stTransaction) toMessage(ps stPostState, baseFee *big.Int) (core.Messa
 		authList = make([]types.SetCodeAuthorization, len(tx.AuthorizationList))
 		for i, auth := range tx.AuthorizationList {
 			authList[i] = types.SetCodeAuthorization{
-				ChainID: auth.ChainID.Uint64(),
+				ChainID: *uint256.MustFromBig(auth.ChainID),
 				Address: auth.Address,
 				Nonce:   auth.Nonce,
 				V:       auth.V,
