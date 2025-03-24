@@ -419,7 +419,7 @@ func (api *API) traceChain(start, end *types.Block, config *TraceConfig, closed 
 			if api.backend.ChainConfig().IsPrague(next.Number()) {
 				context := core.NewEVMBlockContext(next.Header(), api.chainContext(ctx), nil)
 				vmenv := vm.NewEVM(context, vm.TxContext{}, statedb, api.backend.ChainConfig(), vm.Config{})
-				core.ProcessParentBlockHash(next.ParentHash(), vmenv, statedb)
+				core.ProcessParentBlockHash(next.ParentHash(), vmenv)
 			}
 			// Clean out any pending release functions of trace state. Note this
 			// step must be done after constructing tracing state, because the
@@ -582,7 +582,7 @@ func (api *API) IntermediateRoots(ctx context.Context, hash common.Hash, config 
 	)
 	if chainConfig.IsPrague(block.Number()) {
 		vevm := vm.NewEVM(vmctx, vm.TxContext{}, statedb, chainConfig, vm.Config{})
-		core.ProcessParentBlockHash(block.ParentHash(), vevm, statedb)
+		core.ProcessParentBlockHash(block.ParentHash(), vevm)
 	}
 	for i, tx := range block.Transactions() {
 		if err := ctx.Err(); err != nil {
@@ -666,7 +666,7 @@ func (api *API) traceBlock(ctx context.Context, block *types.Block, config *Trac
 	)
 	if api.backend.ChainConfig().IsPrague(block.Number()) {
 		vmenv := vm.NewEVM(blockCtx, vm.TxContext{}, statedb, api.backend.ChainConfig(), vm.Config{})
-		core.ProcessParentBlockHash(block.ParentHash(), vmenv, statedb)
+		core.ProcessParentBlockHash(block.ParentHash(), vmenv)
 	}
 	for i, tx := range txs {
 		// Generate the next state snapshot fast without tracing
@@ -936,7 +936,7 @@ func (api *API) standardTraceBlockToFile(ctx context.Context, block *types.Block
 	}
 	if chainConfig.IsPrague(block.Number()) {
 		vmenv := vm.NewEVM(vmctx, vm.TxContext{}, statedb, chainConfig, vm.Config{})
-		core.ProcessParentBlockHash(block.ParentHash(), vmenv, statedb)
+		core.ProcessParentBlockHash(block.ParentHash(), vmenv)
 	}
 	for i, tx := range block.Transactions() {
 		// Prepare the transaction for un-traced execution

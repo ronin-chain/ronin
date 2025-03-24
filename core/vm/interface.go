@@ -84,6 +84,9 @@ type StateDB interface {
 	ValidDeployer(common.Address) bool
 	ValidDeployerV2(common.Address, uint64, *common.Address) bool
 	Blacklisted(*common.Address, *common.Address) bool
+
+	// Finalise must be invoked at the end of a transaction
+	Finalise(bool)
 }
 
 // CallContext provides a basic interface for the EVM calling conventions. The EVM
