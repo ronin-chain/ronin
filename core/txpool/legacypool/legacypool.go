@@ -629,10 +629,10 @@ func (pool *LegacyPool) validateTxBasics(tx *types.Transaction, local bool) erro
 	opts := &txpool.ValidationOptions{
 		Config: pool.chainconfig,
 		Accept: 0 |
-			1<<types.LegacyTxType |
-			1<<types.AccessListTxType |
-			1<<types.DynamicFeeTxType |
-			1<<types.SetCodeTxType,
+				1<<types.LegacyTxType |
+				1<<types.AccessListTxType |
+				1<<types.DynamicFeeTxType |
+				1<<types.SetCodeTxType,
 		MaxSize:           txMaxSize,
 		MinTip:            pool.gasTip.Load(),
 		AcceptSponsoredTx: true,
@@ -699,6 +699,17 @@ func (pool *LegacyPool) validateAuth(tx *types.Transaction) error {
 		// Replace the existing in-flight transaction for delegated accounts
 		// are still supported
 		if count >= 1 && !exists {
+			return ErrInflightTxLimitReached
+		}
+	}
+	// Allow at most one in-flight tx for delegated accounts or those with a
+	// pending authorization in case of sponsor tx.
+	if tx.Type() == types.SponsoredTxType {
+		payer, err := types.Payer(pool.signer, tx)
+		if err != nil {
+			return err
+		}
+		if pool.currentState.GetCodeHash(payer) != types.EmptyCodeHash || len(pool.all.auths[payer]) != 0 {
 			return ErrInflightTxLimitReached
 		}
 	}
@@ -1740,7 +1751,7 @@ func (pool *LegacyPool) demoteUnexecutables() {
 	}
 }
 
-// Clear implements txpool.SubPool, removing all tracked txs from the pool
+// Clear removing all tracked txs from the pool
 // and rotating the journal.
 func (pool *LegacyPool) Clear() {
 	pool.mu.Lock()
