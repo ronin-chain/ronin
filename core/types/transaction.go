@@ -473,6 +473,29 @@ func (tx *Transaction) SetCodeAuthorizations() []SetCodeAuthorization {
 	return setcodetx.AuthList
 }
 
+// SetCodeAuthorities returns a list of unique authorities from the
+// authorization list.
+func (tx *Transaction) SetCodeAuthorities() []common.Address {
+	setcodetx, ok := tx.inner.(*SetCodeTx)
+	if !ok {
+		return nil
+	}
+	var (
+		marks = make(map[common.Address]bool)
+		auths = make([]common.Address, 0, len(setcodetx.AuthList))
+	)
+	for _, auth := range setcodetx.AuthList {
+		if addr, err := auth.Authority(); err == nil {
+			if marks[addr] {
+				continue
+			}
+			marks[addr] = true
+			auths = append(auths, addr)
+		}
+	}
+	return auths
+}
+
 // BlobGasFeeCapCmp compares the blob fee cap of two transactions.
 func (tx *Transaction) BlobGasFeeCapCmp(other *Transaction) int {
 	return tx.BlobGasFeeCap().Cmp(other.BlobGasFeeCap())
