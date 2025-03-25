@@ -560,20 +560,34 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 		return nil, common.Address{}, gas, ErrNonceUintOverflow
 	}
 	evm.StateDB.SetNonce(caller.Address(), nonce+1)
-	// We add this to the access list _before_ taking a snapshot. Even if the creation fails,
-	// the access-list change should not be rolled back
+
+	// We add this to the access list _before_ taking a snapshot. Even if the
+	// creation fails, the access-list change should not be rolled back.
 	if evm.chainRules.IsBerlin {
 		evm.StateDB.AddAddressToAccessList(address)
 	}
 	// Ensure there's no existing contract already at the designated address
+	// Account is regarded as existent if any of these three conditions is met:
+	// - the nonce is non-zero
+	// - the code is non-empty
+	// - the storage is non-empty
 	contractHash := evm.StateDB.GetCodeHash(address)
 	if evm.StateDB.GetNonce(address) != 0 || (contractHash != (common.Hash{}) && contractHash != emptyCodeHash) {
 		captureTraceEarly(ErrContractAddressCollision)
 		return nil, common.Address{}, 0, ErrContractAddressCollision
 	}
-	// Create a new account on the state
+	// Create a new account on the state only if the object was not present.
+	// It might be possible the contract code is deployed to a pre-existent
+	// account with non-zero balance.
 	snapshot := evm.StateDB.Snapshot()
-	evm.StateDB.CreateAccount(address)
+	if !evm.StateDB.Exist(address) {
+		evm.StateDB.CreateAccount(address)
+	}
+	// CreateContract means that regardless of whether the account previously existed
+	// in the state trie or not, it _now_ becomes created as a _contract_ account.
+	// This is performed _prior_ to executing the initcode,  since the initcode
+	// acts inside that account.
+	evm.StateDB.CreateContract(address)
 	if evm.chainRules.IsEIP158 {
 		evm.StateDB.SetNonce(address, 1)
 	}
@@ -700,12 +714,12 @@ func (evm *EVM) ChainConfig() *params.ChainConfig { return evm.chainConfig }
 
 // PublishEvent executes Publish function from OpEvent if OpCode is found in Context.PublishEvents
 func (evm *EVM) PublishEvent(
-		opCode OpCode,
-		counter uint64,
-		from, to common.Address,
-		value *big.Int,
-		input, output []byte,
-		err error,
+	opCode OpCode,
+	counter uint64,
+	from, to common.Address,
+	value *big.Int,
+	input, output []byte,
+	err error,
 ) {
 	context := evm.Context
 	if context.CurrentTransaction == nil {
