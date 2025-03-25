@@ -716,7 +716,7 @@ func (pool *LegacyPool) validateAuth(tx *types.Transaction) error {
 	// Authorities cannot conflict with any pending or queued transactions.
 	if auths := tx.SetCodeAuthorities(); len(auths) > 0 {
 		for _, auth := range auths {
-			if pool.pending[auth] != nil || pool.queue[auth] != nil {
+			if pool.pending[auth] != nil || pool.queue[auth] != nil || pool.totalPendingPayerCost[auth] != nil {
 				return ErrAuthorityReserved
 			}
 		}
