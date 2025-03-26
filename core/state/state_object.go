@@ -599,7 +599,11 @@ func (s *stateObject) Nonce() uint64 {
 	return s.data.Nonce
 }
 
-// Never called, but must be present to allow stateObject to be used
+func (s *stateObject) Root() common.Hash {
+	return s.data.Root
+}
+
+// Value Never called, but must be present to allow stateObject to be used
 // as a vm.Account interface that also satisfies the vm.ContractRef
 // interface. Interfaces are awesome.
 func (s *stateObject) Value() *big.Int {
