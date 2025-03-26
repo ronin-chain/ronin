@@ -1381,7 +1381,6 @@ func (s *StateDB) DirtyAccounts(hash common.Hash, number uint64) []*types.DirtyS
 	dirtyAccounts := make([]*types.DirtyStateAccount, 0)
 	for addr, op := range s.mutations {
 		var (
-			emptyObj     bool
 			isDeleted    bool
 			selfDestruct bool
 			dirtyCode    bool
@@ -1392,26 +1391,20 @@ func (s *StateDB) DirtyAccounts(hash common.Hash, number uint64) []*types.DirtyS
 		)
 		if op.isDelete() {
 			isDeleted = true
-		}
-		if isDeleted {
 			stateAcc := s.stateObjectsDestruct[addr]
 			if stateAcc == nil {
-				emptyObj = true
-			} else {
-				nonce = stateAcc.Nonce
-				balance = stateAcc.Balance
-				root = stateAcc.Root
-				selfDestruct = true
+				continue
 			}
+			nonce = stateAcc.Nonce
+			balance = stateAcc.Balance
+			root = stateAcc.Root
+			selfDestruct = true
 		} else {
 			stateAcc := s.stateObjects[addr].data
 			nonce = stateAcc.Nonce
 			balance = stateAcc.Balance
 			root = stateAcc.Root
 			dirtyCode = s.stateObjects[addr].dirtyCode
-		}
-		if emptyObj {
-			continue
 		}
 
 		dirtyAccounts = append(dirtyAccounts, &types.DirtyStateAccount{
