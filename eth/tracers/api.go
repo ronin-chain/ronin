@@ -94,7 +94,7 @@ type Backend interface {
 	// N.B: For executing transactions on block N, the required stateRoot is block N-1,
 	// so this method should be called with the parent.
 	StateAtBlock(ctx context.Context, block *types.Block, reexec uint64, base *state.StateDB, checkLive, preferDisk bool) (*state.StateDB, StateReleaseFunc, error)
-	StateAtTransaction(ctx context.Context, block *types.Block, txIndex int, reexec uint64) (core.Message, vm.BlockContext, *state.StateDB, StateReleaseFunc, error)
+	StateAtTransaction(ctx context.Context, block *types.Block, txIndex int, reexec uint64) (*core.Message, vm.BlockContext, *state.StateDB, StateReleaseFunc, error)
 }
 
 // API is the collection of tracing APIs exposed over the private debugging endpoint.
@@ -308,7 +308,7 @@ func (api *API) traceChain(start, end *types.Block, config *TraceConfig, closed 
 				)
 				// Trace all the transactions contained within
 				for i, tx := range task.block.Transactions() {
-					msg, _ := tx.AsMessage(signer, task.block.BaseFee())
+					msg, _ := core.TransactionToMessage(tx, signer, task.block.BaseFee())
 					txctx := &Context{
 						BlockHash:   task.block.Hash(),
 						BlockNumber: task.block.Number(),
@@ -579,7 +579,7 @@ func (api *API) IntermediateRoots(ctx context.Context, hash common.Hash, config 
 			return nil, err
 		}
 		var (
-			msg, _    = tx.AsMessage(signer, block.BaseFee())
+			msg, _    = core.TransactionToMessage(tx, signer, block.BaseFee())
 			txContext = core.NewEVMTxContext(msg)
 			vmenv     = vm.NewEVM(vmctx, txContext, statedb, chainConfig, vm.Config{})
 		)
@@ -587,7 +587,7 @@ func (api *API) IntermediateRoots(ctx context.Context, hash common.Hash, config 
 		if consortium.HandleSystemTransaction(api.backend.Engine(), statedb, msg, block) {
 			vmenv.Config.IsSystemTransaction = true
 		}
-		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.Gas())); err != nil {
+		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.GasLimit)); err != nil {
 			log.Warn("Tracing intermediate roots did not complete", "txindex", i, "txhash", tx.Hash(), "err", err)
 			// We intentionally don't return the error here: if we do, then the RPC server will not
 			// return the roots. Most likely, the caller already knows that a certain transaction fails to
@@ -656,7 +656,7 @@ func (api *API) traceBlock(ctx context.Context, block *types.Block, config *Trac
 	)
 	for i, tx := range txs {
 		// Generate the next state snapshot fast without tracing
-		msg, _ := tx.AsMessage(signer, block.BaseFee())
+		msg, _ := core.TransactionToMessage(tx, signer, block.BaseFee())
 		txctx := &Context{
 			BlockHash:   blockHash,
 			BlockNumber: block.Number(),
@@ -699,7 +699,7 @@ func (api *API) traceBlockParallel(ctx context.Context, block *types.Block, stat
 			defer pend.Done()
 			// Fetch and execute the next transaction trace tasks
 			for task := range jobs {
-				msg, _ := txs[task.index].AsMessage(signer, block.BaseFee())
+				msg, _ := core.TransactionToMessage(txs[task.index], signer, block.BaseFee())
 				txctx := &Context{
 					BlockHash:   blockHash,
 					BlockNumber: block.Number(),
@@ -730,13 +730,13 @@ txloop:
 		}
 
 		// Generate the next state snapshot fast without tracing
-		msg, _ := tx.AsMessage(signer, block.BaseFee())
+		msg, _ := core.TransactionToMessage(tx, signer, block.BaseFee())
 		statedb.SetTxContext(tx.Hash(), i)
 		vmenv := vm.NewEVM(blockCtx, core.NewEVMTxContext(msg), statedb, api.backend.ChainConfig(), vm.Config{})
 		if consortium.HandleSystemTransaction(api.backend.Engine(), statedb, msg, block) {
 			vmenv.Config.IsSystemTransaction = true
 		}
-		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.Gas())); err != nil {
+		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.GasLimit)); err != nil {
 			failed = err
 			break txloop
 		}
@@ -800,7 +800,7 @@ func (api *API) traceInternalsAndAccounts(ctx context.Context, block *types.Bloc
 			defer pend.Done()
 			// Fetch and execute the next transaction trace tasks
 			for task := range jobs {
-				msg, _ := txs[task.index].AsMessage(signer, block.BaseFee())
+				msg, _ := core.TransactionToMessage(txs[task.index], signer, block.BaseFee())
 				txctx := &Context{
 					BlockHash:   blockHash,
 					BlockNumber: block.Number(),
@@ -828,13 +828,13 @@ txloop:
 		}
 
 		// Generate the next state snapshot fast without tracing
-		msg, _ := tx.AsMessage(signer, block.BaseFee())
+		msg, _ := core.TransactionToMessage(tx, signer, block.BaseFee())
 		statedb.SetTxContext(tx.Hash(), i)
 		vmenv := vm.NewEVM(blockCtx, core.NewEVMTxContext(msg), statedb, api.backend.ChainConfig(), vm.Config{})
 		if consortium.HandleSystemTransaction(api.backend.Engine(), statedb, msg, block) {
 			vmenv.Config.IsSystemTransaction = true
 		}
-		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.Gas())); err != nil {
+		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.GasLimit)); err != nil {
 			failed = err
 			break txloop
 		}
@@ -923,7 +923,7 @@ func (api *API) standardTraceBlockToFile(ctx context.Context, block *types.Block
 	for i, tx := range block.Transactions() {
 		// Prepare the transaction for un-traced execution
 		var (
-			msg, _    = tx.AsMessage(signer, block.BaseFee())
+			msg, _    = core.TransactionToMessage(tx, signer, block.BaseFee())
 			txContext = core.NewEVMTxContext(msg)
 			vmConf    vm.Config
 			dump      *os.File
@@ -956,7 +956,7 @@ func (api *API) standardTraceBlockToFile(ctx context.Context, block *types.Block
 		if consortium.HandleSystemTransaction(api.backend.Engine(), statedb, msg, block) {
 			vmenv.Config.IsSystemTransaction = true
 		}
-		_, err = core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.Gas()))
+		_, err = core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.GasLimit))
 		if writer != nil {
 			writer.Flush()
 		}
@@ -1092,7 +1092,7 @@ func (api *API) TraceCall(ctx context.Context, args ethapi.TransactionArgs, bloc
 // be tracer dependent.
 func (api *API) traceTx(
 	ctx context.Context,
-	message core.Message,
+	message *core.Message,
 	txctx *Context,
 	vmctx vm.BlockContext,
 	statedb *state.StateDB,
@@ -1144,7 +1144,7 @@ func (api *API) traceTx(
 	if consortium.HandleSystemTransaction(api.backend.Engine(), statedb, message, block) {
 		vmenv.Config.IsSystemTransaction = true
 	}
-	_, err = core.ApplyMessage(vmenv, message, new(core.GasPool).AddGas(message.Gas()))
+	_, err = core.ApplyMessage(vmenv, message, new(core.GasPool).AddGas(message.GasLimit))
 	if err != nil {
 		return nil, fmt.Errorf("tracing failed: %w", err)
 	}
