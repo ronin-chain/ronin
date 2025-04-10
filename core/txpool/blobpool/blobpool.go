@@ -285,10 +285,9 @@ func newBlobTxMeta(id uint64, size uint32, tx *types.Transaction) *blobTxMeta {
 //   - For the scenario where the pool does not con	chainconfig *params.ChainConfigll need to be done only starting at the swapped in/out nonce
 //     and leading up to the first no-change.
 type BlobPool struct {
-	config      Config              // Pool configuration
-	chainConfig *params.ChainConfig // Chain configuration
-
-	reserver       *txpool.Reserver          // Address reserver to ensure exclusivity across subpools
+	config         Config                    // Pool configuration
+	chainConfig    *params.ChainConfig       // Chain configuration
+	reserver       txpool.Reserver           // Address reserver to ensure exclusivity across subpools
 	hasPendingAuth func(common.Address) bool // Determine whether the specified address has a pending 7702-auth
 
 	store  billy.Database // Persistent data store for the tx metadata and blobs
@@ -340,7 +339,7 @@ func (p *BlobPool) Filter(tx *types.Transaction) bool {
 // Init sets the gas price needed to keep a transaction in the pool and the chain
 // head to allow balance / nonce checks. The transaction journal will be loaded
 // from disk and filtered based on the provided starting settings.
-func (p *BlobPool) Init(gasTip uint64, head *types.Header, reserver *txpool.Reserver) error {
+func (p *BlobPool) Init(gasTip uint64, head *types.Header, reserver txpool.Reserver) error {
 	p.reserver = reserver
 
 	var (
