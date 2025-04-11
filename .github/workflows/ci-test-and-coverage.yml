@@ -152,12 +152,12 @@ jobs:
             const fs = require('fs');
             const report = fs.readFileSync('coverage.md', 'utf8');
             
-            // Create a link to the workflow run that contains the artifacts
-            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            // Get the direct link to the artifact from the upload-artifact step
+            const artifactUrl = '${{ steps.upload-artifact.outputs.artifact-url }}';
             
-            // Add link to the GitHub Actions run page where artifacts can be downloaded
+            // Add link to the coverage report artifact
             const reportWithLink = report + 
-              '\n\n### 📈 [Download detailed HTML coverage report](' + runUrl + ')';
+              '\n\n### 📈 [Download detailed HTML coverage report](' + artifactUrl + ')';
             
             github.rest.issues.createComment({
               issue_number: context.issue.number,
