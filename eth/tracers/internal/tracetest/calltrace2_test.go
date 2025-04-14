@@ -171,7 +171,7 @@ func testCallTracer2(tracerName string, dirPath string, scheme string, t *testin
 				t.Fatalf("failed to create call tracer: %v", err)
 			}
 			evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Debug: true, Tracer: tracer})
-			msg, err := tx.AsMessage(signer, nil)
+			msg, err := core.TransactionToMessage(tx, signer, nil)
 			if err != nil {
 				t.Fatalf("failed to prepare transaction for tracing: %v", err)
 			}
@@ -194,7 +194,7 @@ func testCallTracer2(tracerName string, dirPath string, scheme string, t *testin
 				have, _ := json.MarshalIndent(ret, "", " ")
 				want, _ := json.MarshalIndent(test.Result, "", " ")
 				t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", string(have), string(want))
-				// t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
+				//  t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
 			}
 		})
 	}
@@ -249,7 +249,7 @@ func benchTracer2(tracerName string, test *callTracer2Test, b *testing.B) {
 		b.Fatalf("failed to parse testcase input: %v", err)
 	}
 	signer := types.MakeSigner(test.Genesis.Config, new(big.Int).SetUint64(uint64(test.Context.Number)))
-	msg, err := tx.AsMessage(signer, nil)
+	msg, err := core.TransactionToMessage(tx, signer, nil)
 	if err != nil {
 		b.Fatalf("failed to prepare transaction for tracing: %v", err)
 	}
@@ -327,7 +327,7 @@ func TestZeroValueToNotExitCall2(t *testing.T) {
 		byte(vm.DUP1), byte(vm.PUSH1), 0xff, byte(vm.GAS), // value=0,address=0xff, gas=GAS
 		byte(vm.CALL),
 	}
-	alloc := types.GenesisAlloc{
+	alloc := core.GenesisAlloc{
 		to: core.GenesisAccount{
 			Nonce:   1,
 			Code:    code,
@@ -346,7 +346,7 @@ func TestZeroValueToNotExitCall2(t *testing.T) {
 		t.Fatalf("failed to create call tracer: %v", err)
 	}
 	evm := vm.NewEVM(context, txContext, statedb, params.MainnetChainConfig, vm.Config{Debug: true, Tracer: tracer})
-	msg, err := tx.AsMessage(signer, nil)
+	msg, err := core.TransactionToMessage(tx, signer, nil)
 	if err != nil {
 		t.Fatalf("failed to prepare transaction for tracing: %v", err)
 	}

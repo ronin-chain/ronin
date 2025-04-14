@@ -165,17 +165,17 @@ func New(
 // transaction or not.
 // A system transaction is a transaction that has the recipient of the contract address
 // is defined in params.ConsortiumV2Contracts
-func (c *Consortium) IsSystemMessage(msg core.Message, header *types.Header) bool {
+func (c *Consortium) IsSystemMessage(msg *core.Message, header *types.Header) bool {
 	// deploy a contract
-	if msg.To() == nil {
+	if msg.To == nil {
 		return false
 	}
 	if c.chainConfig.IsBuba(header.Number) {
-		if msg.From() == header.Coinbase && c.IsSystemContract(msg.To()) {
+		if msg.From == header.Coinbase && c.IsSystemContract(msg.To) {
 			return true
 		}
 	} else {
-		if msg.From() == header.Coinbase && c.IsSystemContract(msg.To()) && msg.GasPrice().Cmp(big.NewInt(0)) == 0 {
+		if msg.From == header.Coinbase && c.IsSystemContract(msg.To) && msg.GasPrice.Cmp(big.NewInt(0)) == 0 {
 			return true
 		}
 	}
@@ -185,7 +185,7 @@ func (c *Consortium) IsSystemMessage(msg core.Message, header *types.Header) boo
 // In normal case, IsSystemTransaction in consortium/main.go is used instead of this function. This function
 // is only used in testing when we create standalone consortium v2 engine without the v1
 func (c *Consortium) IsSystemTransaction(tx *types.Transaction, header *types.Header) (bool, error) {
-	msg, err := tx.AsMessage(types.MakeSigner(c.chainConfig, header.Number), header.BaseFee)
+	msg, err := core.TransactionToMessage(tx, types.MakeSigner(c.chainConfig, header.Number), header.BaseFee)
 	if err != nil {
 		return false, err
 	}
@@ -700,9 +700,7 @@ func (c *Consortium) snapshot(chain consensus.ChainHeaderReader, number uint64, 
 
 		// init snapshot if it is at forkedBlock
 		if number == c.forkedBlock-1 {
-			var (
-				err error
-			)
+			var err error
 			snap, err = loadSnapshot(c.config, c.signatures, c.db, hash, c.ethAPI, c.chainConfig)
 			if err == nil {
 				log.Trace("Loaded snapshot from disk", "number", number, "hash", hash.Hex())
@@ -1107,8 +1105,8 @@ func (c *Consortium) Prepare(chain consensus.ChainHeaderReader, header *types.He
 }
 
 func (c *Consortium) processSystemTransactions(chain consensus.ChainHeaderReader, header *types.Header,
-	transactOpts *consortiumCommon.ApplyTransactOpts, isFinalizeAndAssemble bool) error {
-
+	transactOpts *consortiumCommon.ApplyTransactOpts, isFinalizeAndAssemble bool,
+) error {
 	snap, err := c.snapshot(chain, header.Number.Uint64()-1, header.ParentHash, nil)
 	if err != nil {
 		return err
@@ -1257,7 +1255,8 @@ func verifyValidatorExtraDataWithContract(
 // - Slash the validator who does not sign if it is in-turn
 // - SubmitBlockRewards of the current block
 func (c *Consortium) Finalize(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, txs *[]*types.Transaction,
-	uncles []*types.Header, receipts *[]*types.Receipt, systemTxs *[]*types.Transaction, internalTxs *[]*types.InternalTransaction, usedGas *uint64) error {
+	uncles []*types.Header, receipts *[]*types.Receipt, systemTxs *[]*types.Transaction, internalTxs *[]*types.InternalTransaction, usedGas *uint64,
+) error {
 	_, _, signTxFn, _ := c.readSignerAndContract()
 	evmContext := core.NewEVMBlockContext(header, consortiumCommon.ChainContext{Chain: chain, Consortium: c}, &header.Coinbase, chain.OpEvents()...)
 	transactOpts := &consortiumCommon.ApplyTransactOpts{
@@ -1360,7 +1359,8 @@ func (c *Consortium) Finalize(chain consensus.ChainHeaderReader, header *types.H
 // - Slash the validator who does not sign if it is in-turn
 // - SubmitBlockRewards of the current block
 func (c *Consortium) FinalizeAndAssemble(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB,
-	txs []*types.Transaction, uncles []*types.Header, receipts []*types.Receipt) (*types.Block, []*types.Receipt, error) {
+	txs []*types.Transaction, uncles []*types.Header, receipts []*types.Receipt,
+) (*types.Block, []*types.Receipt, error) {
 	// No block rewards in PoA, so the state remains as is and uncles are dropped
 	if txs == nil {
 		txs = make([]*types.Transaction, 0)

@@ -49,7 +49,7 @@ type Options struct {
 // Estimate returns the lowest possible gas limit that allows the transaction to
 // run successfully with the provided context optons. It returns an error if the
 // transaction would always revert, or if there are unexpected failures.
-func Estimate(ctx context.Context, call core.Message, opts *Options, gasCap uint64) (uint64, []byte, error) {
+func Estimate(ctx context.Context, call *core.Message, opts *Options, gasCap uint64) (uint64, []byte, error) {
 	// Binary search the gas limit, as it may need to be higher than the amount used
 	var (
 		lo uint64 // lowest-known gas limit where tx execution fails
@@ -57,34 +57,34 @@ func Estimate(ctx context.Context, call core.Message, opts *Options, gasCap uint
 	)
 	// Determine the highest gas limit can be used during the estimation.
 	hi = opts.Header.GasLimit
-	if call.Gas() >= params.TxGas {
-		hi = call.Gas()
+	if call.GasLimit >= params.TxGas {
+		hi = call.GasLimit
 	}
 	// Normalize the max fee per gas the call is willing to spend.
 	var feeCap *big.Int
-	if call.GasFeeCap() != nil {
-		feeCap = call.GasFeeCap()
-	} else if call.GasPrice() != nil {
-		feeCap = call.GasPrice()
+	if call.GasFeeCap != nil {
+		feeCap = call.GasFeeCap
+	} else if call.GasPrice != nil {
+		feeCap = call.GasPrice
 	} else {
 		feeCap = common.Big0
 	}
 	// Recap the highest gas limit with account's available balance.
 	if feeCap.BitLen() != 0 {
-		balance := opts.State.GetBalance(call.From())
+		balance := opts.State.GetBalance(call.From)
 
 		available := new(big.Int).Set(balance)
-		if call.Value() != nil {
-			if call.Value().Cmp(available) >= 0 {
+		if call.Value != nil {
+			if call.Value.Cmp(available) >= 0 {
 				return 0, nil, core.ErrInsufficientFundsForTransfer
 			}
-			available.Sub(available, call.Value())
+			available.Sub(available, call.Value)
 		}
-		if opts.Config.IsCancun(opts.Header.Number) && len(call.BlobHashes()) > 0 {
+		if opts.Config.IsCancun(opts.Header.Number) && len(call.BlobHashes) > 0 {
 			blobGasPerBlob := new(big.Int).SetUint64(params.BlobTxBlobGasPerBlob)
-			blobBalanceUsage := new(big.Int).SetUint64(uint64(len(call.BlobHashes())))
+			blobBalanceUsage := new(big.Int).SetUint64(uint64(len(call.BlobHashes)))
 			blobBalanceUsage.Mul(blobBalanceUsage, blobGasPerBlob)
-			blobBalanceUsage.Mul(blobBalanceUsage, call.BlobGasFeeCap())
+			blobBalanceUsage.Mul(blobBalanceUsage, call.BlobGasFeeCap)
 			if blobBalanceUsage.Cmp(available) >= 0 {
 				return 0, nil, core.ErrInsufficientFunds
 			}
@@ -94,7 +94,7 @@ func Estimate(ctx context.Context, call core.Message, opts *Options, gasCap uint
 
 		// If the allowance is larger than maximum uint64, skip checking
 		if allowance.IsUint64() && hi > allowance.Uint64() {
-			transfer := call.Value()
+			transfer := call.Value
 			if transfer == nil {
 				transfer = new(big.Int)
 			}
@@ -112,8 +112,8 @@ func Estimate(ctx context.Context, call core.Message, opts *Options, gasCap uint
 	// directly try 21000. Returning 21000 without any execution is dangerous as
 	// some tx field combos might bump the price up even for plain transfers (e.g.
 	// unused access list items). Ever so slightly wasteful, but safer overall.
-	if len(call.Data()) == 0 {
-		if call.To() != nil && opts.State.GetCodeSize(*call.To()) == 0 {
+	if len(call.Data) == 0 {
+		if call.To != nil && opts.State.GetCodeSize(*call.To) == 0 {
 			failed, _, err := execute(ctx, call, opts, params.TxGas)
 			if !failed && err == nil {
 				return params.TxGas, nil, nil
@@ -195,24 +195,22 @@ func Estimate(ctx context.Context, call core.Message, opts *Options, gasCap uint
 // returns true if the transaction fails for a reason that might be related to
 // not enough gas. A non-nil error means execution failed due to reasons unrelated
 // to the gas limit.
-func execute(ctx context.Context, call core.Message, opts *Options, gasLimit uint64) (bool, *core.ExecutionResult, error) {
-	msg := types.NewMessage(
-		call.From(),
-		call.To(),
-		call.Nonce(),
-		call.Value(),
-		gasLimit,
-		call.GasPrice(),
-		call.GasFeeCap(),
-		call.GasTipCap(),
-		call.Data(),
-		call.AccessList(),
-		// isFake == true means skipping nonce check
-		true,
-		call.BlobGasFeeCap(),
-		call.BlobHashes(),
-	)
-
+func execute(ctx context.Context, call *core.Message, opts *Options, gasLimit uint64) (bool, *core.ExecutionResult, error) {
+	msg := &core.Message{
+		From:              call.From,
+		To:                call.To,
+		Nonce:             call.Nonce,
+		Value:             call.Value,
+		GasLimit:          gasLimit,
+		GasPrice:          call.GasPrice,
+		GasFeeCap:         call.GasFeeCap,
+		GasTipCap:         call.GasTipCap,
+		Data:              call.Data,
+		AccessList:        call.AccessList,
+		BlobGasFeeCap:     call.BlobGasFeeCap,
+		BlobHashes:        call.BlobHashes,
+		SkipAccountChecks: true,
+	}
 	// Execute the call and separate execution faults caused by a lack of gas or
 	// other non-fixable conditions
 	result, err := run(ctx, msg, opts)
@@ -227,7 +225,7 @@ func execute(ctx context.Context, call core.Message, opts *Options, gasLimit uin
 
 // run assembles the EVM as defined by the consensus rules and runs the requested
 // call invocation.
-func run(ctx context.Context, call core.Message, opts *Options) (*core.ExecutionResult, error) {
+func run(ctx context.Context, call *core.Message, opts *Options) (*core.ExecutionResult, error) {
 	// Assemble the call and the call context
 	var (
 		msgContext = core.NewEVMTxContext(call)
@@ -252,7 +250,7 @@ func run(ctx context.Context, call core.Message, opts *Options) (*core.Execution
 		return nil, vmerr
 	}
 	if err != nil {
-		return result, fmt.Errorf("failed with %d gas: %w", call.Gas(), err)
+		return result, fmt.Errorf("failed with %d gas: %w", call.GasLimit, err)
 	}
 	return result, nil
 }

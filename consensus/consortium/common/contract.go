@@ -194,21 +194,10 @@ func (c *ContractIntegrator) WrapUpEpoch(opts *ApplyTransactOpts) error {
 	if err != nil {
 		return err
 	}
-	msg := types.NewMessage(
-		opts.Header.Coinbase,
-		tx.To(),
-		opts.State.GetNonce(opts.Header.Coinbase),
-		tx.Value(),
-		tx.Gas(),
-		big.NewInt(0),
-		big.NewInt(0),
-		big.NewInt(0),
-		tx.Data(),
-		tx.AccessList(),
-		false,
-		nil,
-		nil,
-	)
+	msg, err := core.TransactionToMessage(tx, c.signer, nil)
+	if err != nil {
+		return err
+	}
 
 	if err = ApplyTransaction(msg, opts); err != nil {
 		return err
@@ -233,23 +222,10 @@ func (c *ContractIntegrator) SubmitBlockReward(opts *ApplyTransactOpts) error {
 		return err
 	}
 	log.Debug("Submitted block reward", "block", opts.Header.Number, "amount", balance.Uint64())
-
-	msg := types.NewMessage(
-		opts.Header.Coinbase,
-		tx.To(),
-		opts.State.GetNonce(opts.Header.Coinbase),
-		// Reassign value with the current balance. It will be overridden the current one.
-		balance,
-		tx.Gas(),
-		big.NewInt(0),
-		big.NewInt(0),
-		big.NewInt(0),
-		tx.Data(),
-		tx.AccessList(),
-		false,
-		nil,
-		nil,
-	)
+	msg, err := core.TransactionToMessage(tx, c.signer, nil)
+	if err != nil {
+		return err
+	}
 
 	if err = ApplyTransaction(msg, opts); err != nil {
 		return err
@@ -268,22 +244,21 @@ func (c *ContractIntegrator) Slash(opts *ApplyTransactOpts, spoiledValidator com
 		return err
 	}
 
-	msg := types.NewMessage(
-		opts.Header.Coinbase,
-		tx.To(),
-		opts.State.GetNonce(opts.Header.Coinbase),
-		tx.Value(),
-		tx.Gas(),
-		big.NewInt(0),
-		big.NewInt(0),
-		big.NewInt(0),
-		tx.Data(),
-		tx.AccessList(),
-		false,
-		nil,
-		nil,
-	)
-
+	msg := &core.Message{
+		From:              opts.Header.Coinbase,
+		To:                tx.To(),
+		Nonce:             opts.State.GetNonce(opts.Header.Coinbase),
+		Value:             tx.Value(),
+		GasLimit:          tx.Gas(),
+		Data:              tx.Data(),
+		AccessList:        tx.AccessList(),
+		GasPrice:          big.NewInt(0),
+		GasFeeCap:         big.NewInt(0),
+		GasTipCap:         big.NewInt(0),
+		SkipAccountChecks: false,
+		BlobGasFeeCap:     nil,
+		BlobHashes:        nil,
+	}
 	if err = ApplyTransaction(msg, opts); err != nil {
 		return err
 	}
@@ -299,22 +274,21 @@ func (c *ContractIntegrator) FinalityReward(opts *ApplyTransactOpts, votedValida
 		return err
 	}
 
-	msg := types.NewMessage(
-		opts.Header.Coinbase,
-		tx.To(),
-		opts.State.GetNonce(opts.Header.Coinbase),
-		tx.Value(),
-		tx.Gas(),
-		big.NewInt(0),
-		big.NewInt(0),
-		big.NewInt(0),
-		tx.Data(),
-		tx.AccessList(),
-		false,
-		nil,
-		nil,
-	)
-
+	msg := &core.Message{
+		From:              opts.Header.Coinbase,
+		To:                tx.To(),
+		Nonce:             opts.State.GetNonce(opts.Header.Coinbase),
+		Value:             tx.Value(),
+		GasLimit:          tx.Gas(),
+		Data:              tx.Data(),
+		AccessList:        tx.AccessList(),
+		GasPrice:          big.NewInt(0),
+		GasFeeCap:         big.NewInt(0),
+		GasTipCap:         big.NewInt(0),
+		SkipAccountChecks: false,
+		BlobGasFeeCap:     nil,
+		BlobHashes:        nil,
+	}
 	if err = ApplyTransaction(msg, opts); err != nil {
 		return err
 	}
@@ -469,7 +443,7 @@ type ApplyTransactOpts struct {
 // ApplyTransaction attempts to apply a transaction to the given state database
 // and uses the input parameters for its environment. It returns nil if applied success
 // and an error if the transaction failed, indicating the block was invalid.
-func ApplyTransaction(msg types.Message, opts *ApplyTransactOpts) (err error) {
+func ApplyTransaction(msg *core.Message, opts *ApplyTransactOpts) (err error) {
 	var failed bool
 
 	signer := opts.Signer
@@ -482,13 +456,13 @@ func ApplyTransaction(msg types.Message, opts *ApplyTransactOpts) (err error) {
 	header := opts.Header
 	receipts := opts.Receipts
 	usedGas := opts.UsedGas
-	nonce := msg.Nonce()
+	nonce := msg.Nonce
 
 	// TODO(linh): This function is deprecated. Shall we replace it with NewTx?
-	expectedTx := types.NewTransaction(nonce, *msg.To(), msg.Value(), msg.Gas(), msg.GasPrice(), msg.Data())
+	expectedTx := types.NewTransaction(nonce, *msg.To, msg.Value, msg.GasLimit, msg.GasPrice, msg.Data)
 	expectedHash := signer.Hash(expectedTx)
 
-	sender := msg.From()
+	sender := msg.From
 	// An empty/non-existing account's code hash is 0x000...00, while an existing account with no code has code hash
 	// that is equal to crypto.Keccak256Hash(nil)
 	if codeHash := opts.State.GetCodeHash(sender); codeHash != crypto.Keccak256Hash(nil) && codeHash != (common.Hash{}) {
@@ -500,7 +474,7 @@ func ApplyTransaction(msg types.Message, opts *ApplyTransactOpts) (err error) {
 	}
 
 	if mining {
-		expectedTx, err = signTxFn(accounts.Account{Address: msg.From()}, expectedTx, chainConfig.ChainID)
+		expectedTx, err = signTxFn(accounts.Account{Address: msg.From}, expectedTx, chainConfig.ChainID)
 		if err != nil {
 			return err
 		}
@@ -526,7 +500,7 @@ func ApplyTransaction(msg types.Message, opts *ApplyTransactOpts) (err error) {
 		*receivedTxs = (*receivedTxs)[1:]
 	}
 	opts.State.SetTxContext(expectedTx.Hash(), len(*txs))
-	opts.State.SetNonce(msg.From(), nonce+1)
+	opts.State.SetNonce(msg.From, nonce+1)
 	gasUsed, err := applyMessage(opts.ApplyMessageOpts, expectedTx)
 	if err != nil {
 		failed = true
