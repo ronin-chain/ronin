@@ -23,6 +23,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/eth/tracers/logger"
 
 	"github.com/ethereum/go-ethereum/core/rawdb"
@@ -54,12 +55,12 @@ func TestState(t *testing.T) {
 
 	// Broken tests:
 	// Expected failures:
-	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/0`, "bug in test")
-	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/3`, "bug in test")
-	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Constantinople/0`, "bug in test")
-	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Constantinople/3`, "bug in test")
-	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/0`, "bug in test")
-	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/3`, "bug in test")
+	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/0`, "bug in test")
+	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/3`, "bug in test")
+	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Constantinople/0`, "bug in test")
+	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Constantinople/3`, "bug in test")
+	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/0`, "bug in test")
+	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/3`, "bug in test")
 
 	// For Istanbul, older tests were moved into LegacyTests
 	for _, dir := range []string{
@@ -67,59 +68,75 @@ func TestState(t *testing.T) {
 		legacyStateTestDir,
 	} {
 		st.walk(t, dir, func(t *testing.T, name string, test *StateTest) {
-			for _, subtest := range test.Subtests() {
-				subtest := subtest
-				key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
+			execStateTest(t, st, test)
+		})
+	}
+}
 
-				t.Run(key+"/hash/trie", func(t *testing.T) {
-					withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
-						var result error
-						test.Run(subtest, vmconfig, false, rawdb.HashScheme, func(err error, snaps *snapshot.Tree, state *state.StateDB) {
-							result = st.checkFailure(t, err)
-						})
-						return result
-					})
+// TestExecutionSpecState runs the test fixtures from execution-spec-tests.
+func TestExecutionSpecState(t *testing.T) {
+	if !common.FileExist(executionSpecStateTestDir) {
+		t.Skipf("directory %s does not exist", executionSpecStateTestDir)
+	}
+	st := new(testMatcher)
+	st.skipLoad(`frontier/precompiles/precompile_absence/.*`)
+	st.walk(t, executionSpecStateTestDir, func(t *testing.T, name string, test *StateTest) {
+		execStateTest(t, st, test)
+	})
+}
+
+func execStateTest(t *testing.T, st *testMatcher, test *StateTest) {
+	for _, subtest := range test.Subtests() {
+		subtest := subtest
+		key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
+
+		t.Run(key+"/hash/trie", func(t *testing.T) {
+			withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
+				var result error
+				test.Run(subtest, vmconfig, false, rawdb.HashScheme, func(err error, snaps *snapshot.Tree, state *state.StateDB) {
+					result = st.checkFailure(t, err)
 				})
-				t.Run(key+"/hash/snap", func(t *testing.T) {
-					withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
-						var result error
-						test.Run(subtest, vmconfig, true, rawdb.HashScheme, func(err error, snaps *snapshot.Tree, state *state.StateDB) {
-							if snaps != nil && state != nil {
-								if _, err := snaps.Journal(state.IntermediateRoot(false)); err != nil {
-									result = err
-									return
-								}
-							}
-							result = st.checkFailure(t, err)
-						})
-						return result
-					})
+				return result
+			})
+		})
+		t.Run(key+"/hash/snap", func(t *testing.T) {
+			withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
+				var result error
+				test.Run(subtest, vmconfig, true, rawdb.HashScheme, func(err error, snaps *snapshot.Tree, state *state.StateDB) {
+					if snaps != nil && state != nil {
+						if _, err := snaps.Journal(state.IntermediateRoot(false)); err != nil {
+							result = err
+							return
+						}
+					}
+					result = st.checkFailure(t, err)
 				})
-				t.Run(key+"/path/trie", func(t *testing.T) {
-					withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
-						var result error
-						test.Run(subtest, vmconfig, false, rawdb.PathScheme, func(err error, snaps *snapshot.Tree, state *state.StateDB) {
-							result = st.checkFailure(t, err)
-						})
-						return result
-					})
+				return result
+			})
+		})
+		t.Run(key+"/path/trie", func(t *testing.T) {
+			withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
+				var result error
+				test.Run(subtest, vmconfig, false, rawdb.PathScheme, func(err error, snaps *snapshot.Tree, state *state.StateDB) {
+					result = st.checkFailure(t, err)
 				})
-				t.Run(key+"/path/snap", func(t *testing.T) {
-					withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
-						var result error
-						test.Run(subtest, vmconfig, true, rawdb.PathScheme, func(err error, snaps *snapshot.Tree, state *state.StateDB) {
-							if snaps != nil && state != nil {
-								if _, err := snaps.Journal(state.IntermediateRoot(false)); err != nil {
-									result = err
-									return
-								}
-							}
-							result = st.checkFailure(t, err)
-						})
-						return result
-					})
+				return result
+			})
+		})
+		t.Run(key+"/path/snap", func(t *testing.T) {
+			withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
+				var result error
+				test.Run(subtest, vmconfig, true, rawdb.PathScheme, func(err error, snaps *snapshot.Tree, state *state.StateDB) {
+					if snaps != nil && state != nil {
+						if _, err := snaps.Journal(state.IntermediateRoot(false)); err != nil {
+							result = err
+							return
+						}
+					}
+					result = st.checkFailure(t, err)
 				})
-			}
+				return result
+			})
 		})
 	}
 }
