@@ -79,7 +79,12 @@ func TestExecutionSpecState(t *testing.T) {
 		t.Skipf("directory %s does not exist", executionSpecStateTestDir)
 	}
 	st := new(testMatcher)
+
 	st.skipLoad(`frontier/precompiles/precompile_absence/.*`)
+	// Skip due to: https://github.com/ethereum/go-ethereum/pull/29520
+	// Change func (s *StateDB) Selfdestruct6780(addr common.Address) behavior
+	st.skipLoad(`^.*cancun/eip6780_selfdestruct/selfdestruct.*`)
+	
 	st.walk(t, executionSpecStateTestDir, func(t *testing.T, name string, test *StateTest) {
 		execStateTest(t, st, test)
 	})
@@ -172,6 +177,4 @@ func withTrace(t *testing.T, gasLimit uint64, test func(vm.Config) error) {
 	} else {
 		t.Log("EVM operation log:\n" + buf.String())
 	}
-	// t.Logf("EVM output: 0x%x", tracer.Output())
-	// t.Logf("EVM error: %v", tracer.Error())
 }
