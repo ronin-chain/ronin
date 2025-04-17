@@ -66,6 +66,7 @@ func TestState(t *testing.T) {
 	for _, dir := range []string{
 		stateTestDir,
 		legacyStateTestDir,
+		executionSpecStateTestDir,
 	} {
 		st.walk(t, dir, func(t *testing.T, name string, test *StateTest) {
 			execStateTest(t, st, test)
@@ -81,10 +82,12 @@ func TestExecutionSpecState(t *testing.T) {
 	st := new(testMatcher)
 
 	st.skipLoad(`frontier/precompiles/precompile_absence/.*`)
-	// Skip due to: https://github.com/ethereum/go-ethereum/pull/29520
-	// Change func (s *StateDB) Selfdestruct6780(addr common.Address) behavior
-	st.skipLoad(`^.*cancun/eip6780_selfdestruct/selfdestruct.*`)
-	
+
+	// Skip this test until Prague Fork is merged
+	// PR: https://github.com/ronin-chain/ronin/pull/36
+	// PR: https://github.com/ronin-chain/ronin/pull/53
+	st.skipLoad(`^cancun/eip6780_selfdestruct/.*\\.json`)
+
 	st.walk(t, executionSpecStateTestDir, func(t *testing.T, name string, test *StateTest) {
 		execStateTest(t, st, test)
 	})

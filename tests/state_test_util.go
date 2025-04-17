@@ -19,6 +19,7 @@ package tests
 import (
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/big"
 	"strconv"
@@ -161,7 +162,13 @@ func (t *StateTest) Subtests() []StateSubtest {
 }
 
 // Run executes a specific subtest and verifies the post-state and logs
-func (t *StateTest) Run(subtest StateSubtest, vmconfig vm.Config, snapshotter bool, scheme string, postCheck func(err error, snaps *snapshot.Tree, state *state.StateDB)) (result error) {
+func (t *StateTest) Run(
+	subtest StateSubtest,
+	vmconfig vm.Config,
+	snapshotter bool,
+	scheme string,
+	postCheck func(err error, snaps *snapshot.Tree, state *state.StateDB),
+) (result error) {
 	triedb, snaps, statedb, root, err := t.RunNoVerify(subtest, vmconfig, snapshotter, scheme)
 	if err != nil {
 		return err
@@ -210,6 +217,17 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 	msg, err := t.json.Tx.toMessage(post, baseFee)
 	if err != nil {
 		return nil, nil, nil, common.Hash{}, err
+	}
+
+	{   // Blob transactions may be present after the Cancun fork.
+		// In production,
+		// - the header is verified against the max in eip4844.go:VerifyEIP4844Header
+		// - the block body is verified against the header in block_validator.go:ValidateBody
+		// Here, we just do this shortcut smaller fix, since state tests do not
+		// utilize those codepaths
+		if len(msg.BlobHashes())*params.BlobTxBlobGasPerBlob > params.MaxBlobGasPerBlock {
+			return nil, nil, nil, common.Hash{}, errors.New("blob gas exceeds maximum")
+		}
 	}
 
 	// Try to recover tx with current signer

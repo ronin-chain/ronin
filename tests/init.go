@@ -242,6 +242,7 @@ var Forks = map[string]*params.ChainConfig{
 		TrippBlock:              big.NewInt(0),
 		MikoBlock:               big.NewInt(0),
 		ShillinBlock:            big.NewInt(0),
+		CancunBlock:             big.NewInt(0),
 		TerminalTotalDifficulty: big.NewInt(0),
 	},
 }
