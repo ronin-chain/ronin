@@ -1,18 +1,27 @@
 #!/usr/bin/env bash
-cd ..
-git submodule update --init --depth 1 --recursive
-cd tests
-rm -rf spec-tests && mkdir spec-tests && cd spec-tests
-wget https://github.com/ronin-chain/execution-spec-tests/releases/download/v1.0.1/fixtures_stable.tar.gz
-tar xzf fixtures_stable.tar.gz && rm -f fixtures_stable.tar.gz
-cd ..
-go test -run . -v -short >test.log
-PASS=`cat test.log |grep "PASS:" |wc -l`
-cat test.log|grep FAIL > fail.log
-FAIL=`cat fail.log |grep "FAIL:" |wc -l`
-echo "PASS",$PASS,"FAIL",$FAIL
-if [ $FAIL -ne 0 ]
-then
-    cat fail.log
+EXCLUDED_TESTS="TestState|TestExecutionSpecState|TestTransaction|TestRLP"
+TESTS_TO_RUN=$(go test -list . | grep -vE "$EXCLUDED_TESTS" | grep -E "^Test")
+
+rm -f evm_test.log
+touch evm_test.log
+
+for test in $TESTS_TO_RUN; do
+    echo "Running test: $test"
+    go test -run "$test" -v -short >>evm_test.log
+done
+
+cat evm_test.log | grep FAIL >evm_test_fail.log
+
+TEST_PASS_COUNT=$(cat evm_test.log | grep "PASS" | wc -l)
+TEST_FAIL_COUNT=$(cat evm_test_fail.log | wc -l)
+
+if [ $TEST_FAIL_COUNT -ne 0 ]; then
+    cat evm_test_fail.log
+fi
+
+echo "Passed test cases: $TEST_PASS_COUNT"
+echo "Failed test cases: $TEST_FAIL_COUNT"
+
+if [ $TEST_FAIL_COUNT -ne 0 ]; then
     exit 1
 fi

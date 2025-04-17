@@ -42,6 +42,10 @@ jobs:
     - name: Make test script executable
       run: chmod +x tests/run-evm-tests.sh
 
+    - name: Download spec-tests fixtures
+      run: |
+        cd tests && bash -x download-fixtures.sh
+
     - name: Run EVM Tests
       env:
         CGO_CFLAGS: "-O -D__BLST_PORTABLE__"
@@ -49,3 +53,11 @@ jobs:
         ANDROID_HOME: "" # Skip android test
       run: |
         cd tests && bash -x run-evm-tests.sh
+    
+    - name: Run State Tests
+      env:
+        CGO_CFLAGS: "-O -D__BLST_PORTABLE__"
+        CGO_CFLAGS_ALLOW: "-O -D__BLST_PORTABLE__"
+        ANDROID_HOME: "" # Skip android test
+      run: |
+        cd tests && bash -x run-state-test.sh

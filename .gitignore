@@ -50,3 +50,6 @@ profile.cov
 
 # secrets
 .env
+
+# spec-tests fixtures
+tests/spec-tests/fixtures/
