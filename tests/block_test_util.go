@@ -219,6 +219,7 @@ func (t *BlockTest) insertBlocks(blockchain *core.BlockChain) ([]btBlock, error)
 			header := blocks[i].Header()
 			if header.Difficulty == nil || header.Difficulty.Cmp(big.NewInt(0)) == 0 {
 				header.Difficulty = big.NewInt(1)
+				blocks[i] = blocks[i].WithSeal(header)
 			}
 		}
 		i, err := blockchain.InsertChain(blocks, nil)
