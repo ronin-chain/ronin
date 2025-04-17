@@ -75,8 +75,10 @@ func TestExecutionSpecBlocktests(t *testing.T) {
 		t.Skipf("directory %s does not exist", executionSpecBlockchainTestDir)
 	}
 	bt := new(testMatcher)
-	// TODO: adapt blockchain tests to execution spec tests, skip tests for now
-	bt.skipLoad(`.*/`)
+
+	// Skip not supported transition fork tests
+	bt.skipLoad(`^cancun/eip7516_blobgasfee/blobgasfee_opcode/blobbasefee_before_fork.json`)
+
 	bt.walk(t, executionSpecBlockchainTestDir, func(t *testing.T, name string, test *BlockTest) {
 		execBlockTest(t, bt, test)
 	})
