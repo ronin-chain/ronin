@@ -215,6 +215,12 @@ func (t *BlockTest) insertBlocks(blockchain *core.BlockChain) ([]btBlock, error)
 		}
 		// RLP decoding worked, try to insert into chain:
 		blocks := types.Blocks{cb}
+		for i, _ := range blocks {
+			header := blocks[i].Header()
+			if header.Difficulty == nil || header.Difficulty.Cmp(big.NewInt(0)) == 0 {
+				header.Difficulty = big.NewInt(1)
+			}
+		}
 		i, err := blockchain.InsertChain(blocks, nil)
 		if err != nil {
 			if b.BlockHeader == nil {
