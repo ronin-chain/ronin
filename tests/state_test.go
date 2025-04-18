@@ -53,6 +53,9 @@ func TestState(t *testing.T) {
 	// Uses 1GB RAM per tested fork
 	st.skipLoad(`^stStaticCall/static_Call1MB`)
 
+	// Unsupported forks:
+	st.skipLoad(`.*Paris.*`) // The Merge (Move from POW to POS)
+
 	// Broken tests:
 	// Expected failures:
 	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/0`, "bug in test")
@@ -61,6 +64,8 @@ func TestState(t *testing.T) {
 	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Constantinople/3`, "bug in test")
 	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/0`, "bug in test")
 	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/3`, "bug in test")
+
+	st.fails(`.*stEIP3860.*`, "After Shanghai fork, max init code size is 65536")
 
 	// For Istanbul, older tests were moved into LegacyTests
 	for _, dir := range []string{
