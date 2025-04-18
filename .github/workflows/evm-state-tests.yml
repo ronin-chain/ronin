@@ -1,4 +1,4 @@
-name: State Test
+name: EVM Test (State | Transaction | RLP)
 
 on:
   push:

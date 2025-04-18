@@ -1,4 +1,4 @@
-name: EVM Test
+name: EVM Test (Other)
 
 on:
   push:
