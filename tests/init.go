@@ -181,6 +181,7 @@ var Forks = map[string]*params.ChainConfig{
 		MuirGlacierBlock:    big.NewInt(0),
 		BerlinBlock:         big.NewInt(0),
 		LondonBlock:         big.NewInt(0),
+		VenokiBlock:         big.NewInt(0),
 	},
 	"ArrowGlacier": {
 		ChainID:             big.NewInt(1),
@@ -212,6 +213,7 @@ var Forks = map[string]*params.ChainConfig{
 		LondonBlock:         big.NewInt(0),
 		ArrowGlacierBlock:   big.NewInt(0),
 		ShanghaiBlock:       big.NewInt(0),
+		VenokiBlock:         big.NewInt(0),
 	},
 	"Cancun": {
 		ChainID:                 big.NewInt(1),
@@ -230,6 +232,7 @@ var Forks = map[string]*params.ChainConfig{
 		ShanghaiBlock:           big.NewInt(0),
 		CancunBlock:             big.NewInt(0),
 		TerminalTotalDifficulty: big.NewInt(0),
+		VenokiBlock:             big.NewInt(0),
 	},
 }
 
