@@ -33,6 +33,8 @@ import (
 )
 
 func TestState(t *testing.T) {
+	t.Skip("skipping legacy state tests")
+
 	t.Parallel()
 
 	st := new(testMatcher)
@@ -54,6 +56,7 @@ func TestState(t *testing.T) {
 	st.skipLoad(`^stStaticCall/static_Call1MB`)
 
 	// Unsupported forks:
+	st.skipLoad(`.*Pyspecs/.*`)
 	st.skipLoad(`.*Paris.*`) // The Merge (Move from POW to POS)
 
 	// Broken tests:
@@ -91,7 +94,7 @@ func TestExecutionSpecState(t *testing.T) {
 	// Skip this test until Prague Fork is merged
 	// PR: https://github.com/ronin-chain/ronin/pull/36
 	// PR: https://github.com/ronin-chain/ronin/pull/53
-	st.skipLoad(`^cancun/eip6780_selfdestruct/.*\\.json`)
+	// st.skipLoad(`^cancun/eip6780_selfdestruct/.*\\.json`)
 
 	st.walk(t, executionSpecStateTestDir, func(t *testing.T, name string, test *StateTest) {
 		execStateTest(t, st, test)

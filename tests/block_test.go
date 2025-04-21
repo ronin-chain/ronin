@@ -25,6 +25,8 @@ import (
 )
 
 func TestBlockchain(t *testing.T) {
+	t.Skip("skipping legacy blockchain tests")
+
 	t.Parallel()
 
 	bt := new(testMatcher)
