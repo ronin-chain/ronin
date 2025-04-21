@@ -135,7 +135,7 @@ func (t *BlockTest) Run(snapshotter bool, scheme string) error {
 	}
 	var engine consensus.Engine
 	if t.json.SealEngine == "NoProof" {
-		engine = ethash.NewFaker()
+		engine = ethash.NewSpecTestFaker()
 	} else {
 		engine = ethash.NewShared()
 	}
