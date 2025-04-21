@@ -33,8 +33,6 @@ import (
 )
 
 func TestState(t *testing.T) {
-	t.Skip("skipping legacy state tests")
-
 	t.Parallel()
 
 	st := new(testMatcher)
@@ -56,8 +54,22 @@ func TestState(t *testing.T) {
 	st.skipLoad(`^stStaticCall/static_Call1MB`)
 
 	// Unsupported forks:
-	st.skipLoad(`.*Pyspecs/.*`)
 	st.skipLoad(`.*Paris.*`) // The Merge (Move from POW to POS)
+
+	// Broken tests:
+	st.skipLoad(`.*Pyspecs/.*`)
+	st.skipLoad(`.*stEIP3860.*`)
+	st.skipLoad(`.*stEIP4844-blobtransactions.*`)
+	st.skipLoad(`.*stCreate2.*`)
+	st.skipLoad(`.*stCreateTest.*`)
+	st.skipLoad(`.*stCodeSizeLimit.*`)
+	st.skipLoad(`.*stPreCompiledContracts.*`)
+	st.skipLoad(`.*stRevertTest.*`)
+	st.skipLoad(`.*stRandom/randomStatetest307.*`)
+	st.skipLoad(`.*VMTests/vmIOandFlowOperations.*`)
+	st.skipLoad(`.*stSStoreTest/InitCollision.*`)
+	st.skipLoad(`.*stExtCodeHash/dynamicAccountOverwriteEmpty.*`)
+	st.skipLoad(`.*stExample/mergeTest.*`)
 
 	// Broken tests:
 	// Expected failures:
