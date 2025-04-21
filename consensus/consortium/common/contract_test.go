@@ -312,9 +312,19 @@ func TestApplyTransaction(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	msg, err := core.TransactionToMessage(tx, signer, nil)
-	if err != nil {
-		t.Fatal(err)
+	msg := &core.Message{
+		From:              minerAddr,
+		To:                tx.To(),
+		Value:             tx.Value(),
+		Data:              tx.Data(),
+		GasLimit:          tx.Gas(),
+		GasPrice:          tx.GasPrice(),
+		GasFeeCap:         tx.GasFeeCap(),
+		GasTipCap:         tx.GasTipCap(),
+		AccessList:        tx.AccessList(),
+		SkipAccountChecks: false,
+		BlobGasFeeCap:     nil,
+		BlobHashes:        nil,
 	}
 
 	state, err := state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)

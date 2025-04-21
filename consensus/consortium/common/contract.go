@@ -194,9 +194,20 @@ func (c *ContractIntegrator) WrapUpEpoch(opts *ApplyTransactOpts) error {
 	if err != nil {
 		return err
 	}
-	msg, err := core.TransactionToMessage(tx, c.signer, nil)
-	if err != nil {
-		return err
+	msg := &core.Message{
+		From:              opts.Header.Coinbase,
+		To:                tx.To(),
+		Nonce:             opts.State.GetNonce(opts.Header.Coinbase),
+		Value:             tx.Value(),
+		GasLimit:          tx.Gas(),
+		Data:              tx.Data(),
+		AccessList:        tx.AccessList(),
+		GasPrice:          big.NewInt(0),
+		GasFeeCap:         big.NewInt(0),
+		GasTipCap:         big.NewInt(0),
+		SkipAccountChecks: false,
+		BlobGasFeeCap:     nil,
+		BlobHashes:        nil,
 	}
 
 	if err = ApplyTransaction(msg, opts); err != nil {
@@ -222,9 +233,21 @@ func (c *ContractIntegrator) SubmitBlockReward(opts *ApplyTransactOpts) error {
 		return err
 	}
 	log.Debug("Submitted block reward", "block", opts.Header.Number, "amount", balance.Uint64())
-	msg, err := core.TransactionToMessage(tx, c.signer, nil)
-	if err != nil {
-		return err
+	msg := &core.Message{
+		From:  opts.Header.Coinbase,
+		To:    tx.To(),
+		Nonce: opts.State.GetNonce(opts.Header.Coinbase),
+		// Reassign value with the current balance. It will be overridden the current one.
+		Value:             balance,
+		GasLimit:          tx.Gas(),
+		Data:              tx.Data(),
+		AccessList:        tx.AccessList(),
+		GasPrice:          big.NewInt(0),
+		GasFeeCap:         big.NewInt(0),
+		GasTipCap:         big.NewInt(0),
+		SkipAccountChecks: false,
+		BlobGasFeeCap:     nil,
+		BlobHashes:        nil,
 	}
 
 	if err = ApplyTransaction(msg, opts); err != nil {
