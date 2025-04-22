@@ -1,14 +1,8 @@
 #!/usr/bin/env bash
-EXCLUDED_TESTS="TestState|TestExecutionSpecState|TestTransaction|TestRLP"
-TESTS_TO_RUN=$(go test -list . | grep -vE "$EXCLUDED_TESTS" | grep -E "^Test")
-
 rm -f evm_test.log
 touch evm_test.log
 
-for test in $TESTS_TO_RUN; do
-    echo "Running test: $test"
-    go test -run "$test" -v -short >>evm_test.log
-done
+go test . -test.v -short >evm_test.log
 
 cat evm_test.log | grep FAIL >evm_test_fail.log
 

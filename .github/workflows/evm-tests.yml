@@ -1,4 +1,4 @@
-name: EVM Test (State | Transaction | RLP)
+name: EVM Test 
 
 on:
   push:
@@ -41,16 +41,16 @@ jobs:
       run: go mod download
 
     - name: Make test script executable
-      run: chmod +x tests/run-state-tests.sh
+      run: chmod +x tests/run-evm-tests.sh
 
     - name: Download spec-tests fixtures
       run: |
         cd tests && bash -x download-fixtures.sh
 
-    - name: Run State Tests
+    - name: Run EVM Tests
       env:
         CGO_CFLAGS: "-O -D__BLST_PORTABLE__"
         CGO_CFLAGS_ALLOW: "-O -D__BLST_PORTABLE__"
         ANDROID_HOME: "" # Skip android test
       run: |
-        cd tests && bash -x run-state-tests.sh 
+        cd tests && bash -x run-evm-tests.sh 
