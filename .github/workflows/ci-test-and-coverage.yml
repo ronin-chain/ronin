@@ -34,6 +34,9 @@ jobs:
           GOBIN: "./build/bin"
           COVERAGE_THRESHOLD: 50
         run: |
+          # Generate markdown report for changed files
+          echo "## 📊 Code Coverage Report" > coverage.md
+          
           # Run tests with coverage
           CGO_CFLAGS_ALLOW="$CFLAGS" CGO_CFLAGS="$CFLAGS" go test -covermode=set -coverprofile cover.out ./... -tags=blst_enabled,ckzg
           total_coverage=$(go tool cover -func=cover.out | grep total: | awk '{print $3}')
@@ -89,9 +92,6 @@ jobs:
                 # Generate HTML report for filtered coverage
                 go tool cover -html=cover.filtered.out -o coverage.html
                 echo "Generated filtered coverage report: coverage.html"
-
-                # Generate markdown report for changed files
-                echo "## 📊 Code Coverage Report" > coverage.md
                 
                 # If total coverage is less than threshold, add a warning icon, else add a checkmark icon
                 if [ $total_coverage_num -lt $COVERAGE_THRESHOLD ]; then
