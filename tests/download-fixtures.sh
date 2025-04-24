@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 cd ..
-# git submodule update --init --depth 1 --recursive
+git submodule update --init --depth 1 --recursive
 echo "skipping submodule update"
 cd tests
 rm -rf spec-tests && mkdir spec-tests && cd spec-tests
