@@ -56,31 +56,30 @@ func TestState(t *testing.T) {
 	// Unsupported forks:
 	st.skipLoad(`.*Paris.*`) // The Merge (Move from POW to POS)
 
-	// Broken tests:
-	st.skipLoad(`.*Pyspecs/.*`)
+	// Ronin set max initcode size is 64KB
+	st.skipLoad(`.*Pyspecs/shanghai/eip3860_initcode.*over_limit_(ones|zeros).*`)
 	st.skipLoad(`.*stEIP3860.*`)
-	st.skipLoad(`.*stEIP4844-blobtransactions.*`)
-	st.skipLoad(`.*stCreate2.*`)
-	st.skipLoad(`.*stCreateTest.*`)
-	st.skipLoad(`.*stCodeSizeLimit.*`)
+	st.skipLoad(`.*stCreateTest/CreateAddressWarmAfterFail.*`)
+	st.skipLoad(`.*stCreateTest/createLargeResult.json.*`)
+
+	// Enable after merge EIP-2537
 	st.skipLoad(`.*stPreCompiledContracts.*`)
-	st.skipLoad(`.*stRevertTest.*`)
-	st.skipLoad(`.*stRandom/randomStatetest307.*`)
-	st.skipLoad(`.*VMTests/vmIOandFlowOperations.*`)
+
+	// Ronin not include EIP-7610
+	st.skipLoad(`.*stRevertTest/RevertInCreateInInit.*`)
+	st.skipLoad(`.*stCreate2/create2collisionStorage.*`)
+	st.skipLoad(`.*stCreate2/RevertInCreateInInitCreate2.*`)
 	st.skipLoad(`.*stSStoreTest/InitCollision.*`)
-	st.skipLoad(`.*stExtCodeHash/dynamicAccountOverwriteEmpty.*`)
-	st.skipLoad(`.*stExample/mergeTest.*`)
+	st.skipLoad(`.*stCodeSizeLimit/codesizeOOGInvalidSize.json.*`)
 
 	// Broken tests:
-	// Expected failures:
-	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/0`, "bug in test")
-	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/3`, "bug in test")
-	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Constantinople/0`, "bug in test")
-	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Constantinople/3`, "bug in test")
-	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/0`, "bug in test")
-	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/3`, "bug in test")
-
-	st.fails(`.*stEIP3860.*`, "After Shanghai fork, max init code size is 65536")
+	st.skipLoad(`.*stExtCodeHash/dynamicAccountOverwriteEmpty.*`)
+	st.skipLoad(`.*VMTests/vmIOandFlowOperations/jumpToPush.json.*`)
+	st.skipLoad(`.*stQuadraticComplexityTest/Create1000.json*`)
+	st.skipLoad(`.*stRandom/randomStatetest307.json*`)
+	st.skipLoad(`.*stExample/mergeTest.*`)
+	st.skipLoad(`.*stCreate2/Create2OOGFromCallRefunds.json.*`)
+	st.skipLoad(`.*stCreateTest/CreateOOGFromCallRefunds.json.*`)
 
 	// For Istanbul, older tests were moved into LegacyTests
 	for _, dir := range []string{
