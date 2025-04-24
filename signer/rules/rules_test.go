@@ -78,6 +78,7 @@ type alwaysDenyUI struct{}
 func (alwaysDenyUI) OnInputRequired(info core.UserInputRequest) (core.UserInputResponse, error) {
 	return core.UserInputResponse{}, nil
 }
+
 func (alwaysDenyUI) RegisterUIServer(api *core.UIServerAPI) {
 }
 
@@ -152,7 +153,6 @@ func TestListRequest(t *testing.T) {
 }
 
 func TestSignTxRequest(t *testing.T) {
-
 	js := `
 	function ApproveTx(r){
 		console.log("transaction.from", r.transaction.from);
@@ -174,7 +174,6 @@ func TestSignTxRequest(t *testing.T) {
 		return
 	}
 	from, err := mixAddr("0000000000000000000000000000000000001337")
-
 	if err != nil {
 		t.Error(err)
 		return
@@ -183,7 +182,8 @@ func TestSignTxRequest(t *testing.T) {
 	resp, err := r.ApproveTx(&core.SignTxRequest{
 		Transaction: apitypes.SendTxArgs{
 			From: *from,
-			To:   to},
+			To:   to,
+		},
 		Callinfo: nil,
 		Meta:     core.Metadata{Remote: "remoteip", Local: "localip", Scheme: "inproc"},
 	})
@@ -243,9 +243,8 @@ func (d *dummyUI) OnApprovedTx(tx ethapi.SignTransactionResult) {
 func (d *dummyUI) OnSignerStartup(info core.StartupInfo) {
 }
 
-//TestForwarding tests that the rule-engine correctly dispatches requests to the next caller
+// TestForwarding tests that the rule-engine correctly dispatches requests to the next caller
 func TestForwarding(t *testing.T) {
-
 	js := ""
 	ui := &dummyUI{make([]string, 0)}
 	jsBackend := storage.NewEphemeralStorage()
@@ -263,16 +262,13 @@ func TestForwarding(t *testing.T) {
 	r.ShowError("test")
 	r.ShowInfo("test")
 
-	//This one is not forwarded
+	// This one is not forwarded
 	r.OnApprovedTx(ethapi.SignTransactionResult{})
 
 	expCalls := 6
 	if len(ui.calls) != expCalls {
-
 		t.Errorf("Expected %d forwarded calls, got %d: %s", expCalls, len(ui.calls), strings.Join(ui.calls, ","))
-
 	}
-
 }
 
 func TestMissingFunc(t *testing.T) {
@@ -296,10 +292,9 @@ func TestMissingFunc(t *testing.T) {
 		t.Errorf("Expected missing method to cause non-approval")
 	}
 	t.Logf("Err %v", err)
-
 }
-func TestStorage(t *testing.T) {
 
+func TestStorage(t *testing.T) {
 	js := `
 	function testStorage(){
 		storage.put("mykey", "myvalue")
@@ -334,7 +329,6 @@ func TestStorage(t *testing.T) {
 	}
 
 	v, err := r.execute("testStorage", nil)
-
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
 	}
@@ -348,7 +342,6 @@ func TestStorage(t *testing.T) {
 		t.Errorf("Unexpected data, expected '%v', got '%v'", exp, retval)
 	}
 	t.Logf("Err %v", err)
-
 }
 
 const ExampleTxWindow = `
@@ -544,11 +537,10 @@ func (d *dontCallMe) OnApprovedTx(tx ethapi.SignTransactionResult) {
 	d.t.Fatalf("Did not expect next-handler to be called")
 }
 
-//TestContextIsCleared tests that the rule-engine does not retain variables over several requests.
+// TestContextIsCleared tests that the rule-engine does not retain variables over several requests.
 // if it does, that would be bad since developers may rely on that to store data,
 // instead of using the disk-based data storage
 func TestContextIsCleared(t *testing.T) {
-
 	js := `
 	function ApproveTx(){
 		if (typeof foobar == 'undefined') {
@@ -580,7 +572,6 @@ func TestContextIsCleared(t *testing.T) {
 }
 
 func TestSignData(t *testing.T) {
-
 	js := `function ApproveListing(){
     return "Approve"
 }

@@ -148,7 +148,7 @@ func testCallTracer(tracerName string, dirPath string, scheme string, t *testing
 				t.Fatalf("failed to create call tracer: %v", err)
 			}
 			evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Tracer: tracer})
-			msg, err := tx.AsMessage(signer, nil)
+			msg, err := core.TransactionToMessage(tx, signer, nil)
 			if err != nil {
 				t.Fatalf("failed to prepare transaction for tracing: %v", err)
 			}
@@ -223,7 +223,7 @@ func benchTracer(tracerName string, test *callTracerTest, b *testing.B) {
 		b.Fatalf("failed to parse testcase input: %v", err)
 	}
 	signer := types.MakeSigner(test.Genesis.Config, new(big.Int).SetUint64(uint64(test.Context.Number)))
-	msg, err := tx.AsMessage(signer, nil)
+	msg, err := core.TransactionToMessage(tx, signer, nil)
 	if err != nil {
 		b.Fatalf("failed to prepare transaction for tracing: %v", err)
 	}
@@ -359,7 +359,7 @@ func TestInternals(t *testing.T) {
 			}, false, rawdb.HashScheme)
 		defer triedb.Close()
 		evm := vm.NewEVM(context, txContext, statedb, params.MainnetChainConfig, vm.Config{Tracer: tc.tracer})
-		msg := types.NewMessage(origin, &to, 0, big.NewInt(0), 50000, big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, nil, false, nil, nil, nil)
+		msg := core.NewMessage(origin, &to, 0, big.NewInt(0), 50000, big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, nil, false, nil, nil)
 		st := core.NewStateTransition(evm, msg, new(core.GasPool).AddGas(msg.Gas()))
 		if _, err := st.TransitionDb(); err != nil {
 			t.Fatalf("test %v: failed to execute transaction: %v", tc.name, err)

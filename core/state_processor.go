@@ -67,7 +67,7 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 		gp          = new(GasPool).AddGas(block.GasLimit())
 	)
 
-	var receipts = make([]*types.Receipt, 0)
+	receipts := make([]*types.Receipt, 0)
 	// Mutate the block and state according to any hard-fork specs
 	if p.config.DAOForkSupport && p.config.DAOForkBlock != nil && p.config.DAOForkBlock.Cmp(block.Number()) == 0 {
 		misc.ApplyDAOHardFork(statedb)
@@ -123,7 +123,7 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 		vmenv.Context.CurrentTransaction = tx
 		// reset counter to start counting opcodes in new transaction
 		vmenv.Context.Counter = 0
-		msg, err := tx.AsMessage(signer, header.BaseFee)
+		msg, err := TransactionToMessage(tx, signer, header.BaseFee)
 		if err != nil {
 			return nil, nil, nil, 0, fmt.Errorf("could not apply tx %d [%v]: %w", i, tx.Hash().Hex(), err)
 		}
@@ -162,7 +162,7 @@ func ProcessParentBlockHash(prevHash common.Hash, vmenv *vm.EVM) {
 }
 
 func applyTransaction(
-	msg types.Message,
+	msg *Message,
 	config *params.ChainConfig,
 	bc ChainContext,
 	author *common.Address,
@@ -255,7 +255,7 @@ func ApplyTransaction(
 	receiptProcessors ReceiptProcessor,
 	publishEvents ...*vm.PublishEvent,
 ) (*types.Receipt, *ExecutionResult, error) {
-	msg, err := tx.AsMessage(types.MakeSigner(config, header.Number), header.BaseFee)
+	msg, err := TransactionToMessage(tx, types.MakeSigner(config, header.Number), header.BaseFee)
 	if err != nil {
 		return nil, nil, err
 	}

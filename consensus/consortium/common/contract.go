@@ -194,7 +194,7 @@ func (c *ContractIntegrator) WrapUpEpoch(opts *ApplyTransactOpts) error {
 	if err != nil {
 		return err
 	}
-	msg := types.NewMessage(
+	msg := core.NewMessage(
 		opts.Header.Coinbase,
 		tx.To(),
 		opts.State.GetNonce(opts.Header.Coinbase),
@@ -235,7 +235,7 @@ func (c *ContractIntegrator) SubmitBlockReward(opts *ApplyTransactOpts) error {
 	}
 	log.Debug("Submitted block reward", "block", opts.Header.Number, "amount", balance.Uint64())
 
-	msg := types.NewMessage(
+	msg := core.NewMessage(
 		opts.Header.Coinbase,
 		tx.To(),
 		opts.State.GetNonce(opts.Header.Coinbase),
@@ -270,7 +270,7 @@ func (c *ContractIntegrator) Slash(opts *ApplyTransactOpts, spoiledValidator com
 		return err
 	}
 
-	msg := types.NewMessage(
+	msg := core.NewMessage(
 		opts.Header.Coinbase,
 		tx.To(),
 		opts.State.GetNonce(opts.Header.Coinbase),
@@ -302,7 +302,7 @@ func (c *ContractIntegrator) FinalityReward(opts *ApplyTransactOpts, votedValida
 		return err
 	}
 
-	msg := types.NewMessage(
+	msg := core.NewMessage(
 		opts.Header.Coinbase,
 		tx.To(),
 		opts.State.GetNonce(opts.Header.Coinbase),
@@ -473,7 +473,7 @@ type ApplyTransactOpts struct {
 // ApplyTransaction attempts to apply a transaction to the given state database
 // and uses the input parameters for its environment. It returns nil if applied success
 // and an error if the transaction failed, indicating the block was invalid.
-func ApplyTransaction(msg types.Message, opts *ApplyTransactOpts) (err error) {
+func ApplyTransaction(msg *core.Message, opts *ApplyTransactOpts) (err error) {
 	var failed bool
 
 	signer := opts.Signer
