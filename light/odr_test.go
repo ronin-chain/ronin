@@ -164,7 +164,7 @@ func odrAccounts(ctx context.Context, db ethdb.Database, bc *core.BlockChain, lc
 func TestOdrContractCallLes2(t *testing.T) { testChainOdr(t, 1, odrContractCall) }
 
 type callmsg struct {
-	types.Message
+	*core.Message
 }
 
 func (callmsg) CheckNonce() bool { return false }
@@ -194,7 +194,21 @@ func odrContractCall(ctx context.Context, db ethdb.Database, bc *core.BlockChain
 
 		// Perform read-only call.
 		st.SetBalance(testBankAddress, math.MaxBig256)
-		msg := callmsg{types.NewMessage(testBankAddress, &testContractAddr, 0, new(big.Int), 1000000, big.NewInt(params.InitialBaseFee), big.NewInt(params.InitialBaseFee), new(big.Int), data, nil, true, nil, nil, nil)}
+		msg := core.NewMessage(
+			testBankAddress,
+			&testContractAddr,
+			0,
+			new(big.Int),
+			1000000,
+			big.NewInt(params.InitialBaseFee),
+			big.NewInt(params.InitialBaseFee),
+			new(big.Int),
+			data,
+			nil,
+			true,
+			nil,
+			nil,
+		)
 		txContext := core.NewEVMTxContext(msg)
 		context := core.NewEVMBlockContext(header, chain, nil)
 		vmenv := vm.NewEVM(context, txContext, st, config, vm.Config{NoBaseFee: true})

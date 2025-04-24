@@ -22,14 +22,13 @@ import (
 	"math"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/crypto/kzg4844"
-
 	"github.com/ethereum/go-ethereum/common"
 	cmath "github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/crypto/kzg4844"
 	"github.com/ethereum/go-ethereum/params"
 )
 
@@ -56,7 +55,7 @@ The state transitioning model does all the necessary work to work out a valid ne
 */
 type StateTransition struct {
 	gp         *GasPool
-	msg        Message
+	msg        *Message
 	gas        uint64
 	gasPrice   *big.Int
 	gasFeeCap  *big.Int
@@ -68,32 +67,117 @@ type StateTransition struct {
 	evm        *vm.EVM
 }
 
-// Message represents a message sent to a contract.
-type Message interface {
-	From() common.Address
-	To() *common.Address
-
-	GasPrice() *big.Int
-	GasFeeCap() *big.Int
-	GasTipCap() *big.Int
-	Gas() uint64
-	Value() *big.Int
-
-	Nonce() uint64
-	IsFake() bool
-	Data() []byte
-	AccessList() types.AccessList
-	SetCodeAuthorizations() []types.SetCodeAuthorization
-
-	// In legacy transaction, this is the same as From.
-	// In sponsored transaction, this is the payer's
-	// address recovered from the payer's signature.
-	Payer() common.Address
-	ExpiredTime() uint64
-
-	BlobGasFeeCap() *big.Int
-	BlobHashes() []common.Hash
+type Message struct {
+	to            *common.Address
+	from          common.Address
+	nonce         uint64
+	amount        *big.Int
+	gasLimit      uint64
+	gasPrice      *big.Int
+	gasFeeCap     *big.Int
+	gasTipCap     *big.Int
+	data          []byte
+	accessList    types.AccessList
+	authList      []types.SetCodeAuthorization
+	isFake        bool
+	payer         common.Address
+	expiredTime   uint64
+	blobGasFeeCap *big.Int
+	blobHashes    []common.Hash
 }
+
+// Create a new message with payer is the same as from, expired time = 0
+func NewMessage(
+	from common.Address,
+	to *common.Address,
+	nonce uint64,
+	amount *big.Int,
+	gasLimit uint64,
+	gasPrice, gasFeeCap, gasTipCap *big.Int,
+	data []byte,
+	accessList types.AccessList,
+	isFake bool,
+	blobFeeCap *big.Int,
+	blobHashes []common.Hash,
+) *Message {
+	return &Message{
+		from:          from,
+		to:            to,
+		nonce:         nonce,
+		amount:        amount,
+		gasLimit:      gasLimit,
+		gasPrice:      gasPrice,
+		gasFeeCap:     gasFeeCap,
+		gasTipCap:     gasTipCap,
+		data:          data,
+		accessList:    accessList,
+		isFake:        isFake,
+		payer:         from,
+		expiredTime:   0,
+		blobGasFeeCap: blobFeeCap,
+		blobHashes:    blobHashes,
+	}
+}
+
+// AsMessage returns the transaction as a core.Message.
+func TransactionToMessage(tx *types.Transaction, signer types.Signer, baseFee *big.Int) (*Message, error) {
+	msg := &Message{
+		nonce:         tx.Nonce(),
+		gasLimit:      tx.Gas(),
+		gasPrice:      new(big.Int).Set(tx.GasPrice()),
+		gasFeeCap:     new(big.Int).Set(tx.GasFeeCap()),
+		gasTipCap:     new(big.Int).Set(tx.GasTipCap()),
+		to:            tx.To(),
+		amount:        tx.Value(),
+		data:          tx.Data(),
+		accessList:    tx.AccessList(),
+		isFake:        false,
+		expiredTime:   tx.ExpiredTime(),
+		blobGasFeeCap: tx.BlobGasFeeCap(),
+		blobHashes:    tx.BlobHashes(),
+	}
+	// If baseFee provided, set gasPrice to effectiveGasPrice.
+	if baseFee != nil {
+		msg.gasPrice = cmath.BigMin(msg.gasPrice.Add(msg.gasTipCap, baseFee), msg.gasFeeCap)
+	}
+	var err error
+	msg.from, err = types.Sender(signer, tx)
+	if err != nil {
+		return nil, err
+	}
+
+	if tx.Type() == types.SponsoredTxType {
+		msg.payer, err = types.Payer(signer, tx)
+		if err != nil {
+			return nil, err
+		}
+
+		if msg.payer == msg.from {
+			// Reject sponsored transaction with identical payer and sender
+			return nil, types.ErrSamePayerSenderSponsoredTx
+		}
+		return msg, nil
+	} else {
+		msg.payer = msg.from
+		return msg, nil
+	}
+}
+
+func (m Message) From() common.Address         { return m.from }
+func (m Message) To() *common.Address          { return m.to }
+func (m Message) GasPrice() *big.Int           { return m.gasPrice }
+func (m Message) GasFeeCap() *big.Int          { return m.gasFeeCap }
+func (m Message) GasTipCap() *big.Int          { return m.gasTipCap }
+func (m Message) Value() *big.Int              { return m.amount }
+func (m Message) Gas() uint64                  { return m.gasLimit }
+func (m Message) Nonce() uint64                { return m.nonce }
+func (m Message) Data() []byte                 { return m.data }
+func (m Message) AccessList() types.AccessList { return m.accessList }
+func (m Message) IsFake() bool                 { return m.isFake }
+func (m Message) Payer() common.Address        { return m.payer }
+func (m Message) ExpiredTime() uint64          { return m.expiredTime }
+func (m Message) BlobHashes() []common.Hash    { return m.blobHashes }
+func (m Message) BlobGasFeeCap() *big.Int      { return m.blobGasFeeCap }
 
 // ExecutionResult includes all output after executing given evm
 // message no matter the execution itself is successful or not.
@@ -204,7 +288,7 @@ func toWordSize(size uint64) uint64 {
 }
 
 // NewStateTransition initialises and returns a new state transition object.
-func NewStateTransition(evm *vm.EVM, msg Message, gp *GasPool) *StateTransition {
+func NewStateTransition(evm *vm.EVM, msg *Message, gp *GasPool) *StateTransition {
 	return &StateTransition{
 		gp:        gp,
 		evm:       evm,
@@ -225,7 +309,7 @@ func NewStateTransition(evm *vm.EVM, msg Message, gp *GasPool) *StateTransition 
 // the gas used (which includes gas refunds) and an error if it failed. An error always
 // indicates a core error meaning that the message would always fail for that particular
 // state and would never be accepted within a block.
-func ApplyMessage(evm *vm.EVM, msg Message, gp *GasPool) (*ExecutionResult, error) {
+func ApplyMessage(evm *vm.EVM, msg *Message, gp *GasPool) (*ExecutionResult, error) {
 	return NewStateTransition(evm, msg, gp).TransitionDb()
 }
 
