@@ -85,12 +85,12 @@ func BenchmarkTransactionTrace(b *testing.B) {
 	// Create the tracer, the EVM environment and run it
 	tracer := logger.NewStructLogger(&logger.Config{
 		Debug: false,
-		//DisableStorage: true,
-		//EnableMemory: false,
-		//EnableReturnData: false,
+		// DisableStorage: true,
+		// EnableMemory: false,
+		// EnableReturnData: false,
 	})
 	evm := vm.NewEVM(context, txContext, statedb, params.AllEthashProtocolChanges, vm.Config{Tracer: tracer})
-	msg, err := tx.AsMessage(signer, nil)
+	msg, err := core.TransactionToMessage(tx, signer, nil)
 	if err != nil {
 		b.Fatalf("failed to prepare transaction for tracing: %v", err)
 	}

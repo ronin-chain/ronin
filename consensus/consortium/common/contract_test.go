@@ -43,7 +43,7 @@ func TestApplyTransactionSender(t *testing.T) {
 		t.Fatalf("Failed to create stateDB, err %s", err)
 	}
 
-	msg, err := tx.AsMessage(signer, nil)
+	msg, err := core.TransactionToMessage(tx, signer, nil)
 	if err != nil {
 		t.Fatalf("Failed to create message, err %s", err)
 	}
@@ -312,7 +312,7 @@ func TestApplyTransaction(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	msg := types.NewMessage(minerAddr, tx.To(), tx.Nonce(), tx.Value(), tx.Gas(),
+	msg := core.NewMessage(minerAddr, tx.To(), tx.Nonce(), tx.Value(), tx.Gas(),
 		tx.GasPrice(), tx.GasFeeCap(), tx.GasTipCap(), tx.Data(), nil, false, nil, nil)
 
 	state, err := state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
