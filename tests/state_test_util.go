@@ -118,6 +118,8 @@ type stTransaction struct {
 	GasLimit             []uint64            `json:"gasLimit"`
 	Value                []string            `json:"value"`
 	PrivateKey           []byte              `json:"secretKey"`
+	BlobVersionedHashes  []common.Hash       `json:"blobVersionedHashes,omitempty"`
+	BlobGasFeeCap        *big.Int            `json:"maxFeePerBlobGas,omitempty"`
 }
 
 type stTransactionMarshaling struct {
@@ -127,6 +129,7 @@ type stTransactionMarshaling struct {
 	Nonce                math.HexOrDecimal64
 	GasLimit             []math.HexOrDecimal64
 	PrivateKey           hexutil.Bytes
+	BlobGasFeeCap        *math.HexOrDecimal256
 }
 
 // GetChainConfig takes a fork definition and returns a chain config.
@@ -395,7 +398,7 @@ func (tx *stTransaction) toMessage(ps stPostState, baseFee *big.Int) (core.Messa
 	}
 
 	msg := types.NewMessage(from, to, tx.Nonce, value, gasLimit, gasPrice,
-		tx.MaxFeePerGas, tx.MaxPriorityFeePerGas, data, accessList, false, nil, nil)
+		tx.MaxFeePerGas, tx.MaxPriorityFeePerGas, data, accessList, false, tx.BlobGasFeeCap, tx.BlobVersionedHashes)
 	return msg, nil
 }
 
