@@ -62,7 +62,7 @@ func TestState(t *testing.T) {
 	st.skipLoad(`.*stCreateTest/CreateAddressWarmAfterFail.*`)
 	st.skipLoad(`.*stCreateTest/createLargeResult.json.*`)
 
-	// Enable after merge EIP-2537
+	// TODO: Enable after merge EIP-2537
 	st.skipLoad(`.*stPreCompiledContracts.*`)
 
 	// Ronin not include EIP-7610
