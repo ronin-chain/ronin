@@ -167,15 +167,15 @@ func New(
 // is defined in params.ConsortiumV2Contracts
 func (c *Consortium) IsSystemMessage(msg *core.Message, header *types.Header) bool {
 	// deploy a contract
-	if msg.To() == nil {
+	if msg.To == nil {
 		return false
 	}
 	if c.chainConfig.IsBuba(header.Number) {
-		if msg.From() == header.Coinbase && c.IsSystemContract(msg.To()) {
+		if msg.From == header.Coinbase && c.IsSystemContract(msg.To) {
 			return true
 		}
 	} else {
-		if msg.From() == header.Coinbase && c.IsSystemContract(msg.To()) && msg.GasPrice().Cmp(big.NewInt(0)) == 0 {
+		if msg.From == header.Coinbase && c.IsSystemContract(msg.To) && msg.GasPrice.Cmp(big.NewInt(0)) == 0 {
 			return true
 		}
 	}

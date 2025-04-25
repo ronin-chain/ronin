@@ -587,7 +587,7 @@ func (api *API) IntermediateRoots(ctx context.Context, hash common.Hash, config 
 		if consortium.HandleSystemTransaction(api.backend.Engine(), statedb, msg, block) {
 			vmenv.Config.IsSystemTransaction = true
 		}
-		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.Gas())); err != nil {
+		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.GasLimit)); err != nil {
 			log.Warn("Tracing intermediate roots did not complete", "txindex", i, "txhash", tx.Hash(), "err", err)
 			// We intentionally don't return the error here: if we do, then the RPC server will not
 			// return the roots. Most likely, the caller already knows that a certain transaction fails to
@@ -736,7 +736,7 @@ txloop:
 		if consortium.HandleSystemTransaction(api.backend.Engine(), statedb, msg, block) {
 			vmenv.Config.IsSystemTransaction = true
 		}
-		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.Gas())); err != nil {
+		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.GasLimit)); err != nil {
 			failed = err
 			break txloop
 		}
@@ -834,7 +834,7 @@ txloop:
 		if consortium.HandleSystemTransaction(api.backend.Engine(), statedb, msg, block) {
 			vmenv.Config.IsSystemTransaction = true
 		}
-		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.Gas())); err != nil {
+		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.GasLimit)); err != nil {
 			failed = err
 			break txloop
 		}
@@ -956,7 +956,7 @@ func (api *API) standardTraceBlockToFile(ctx context.Context, block *types.Block
 		if consortium.HandleSystemTransaction(api.backend.Engine(), statedb, msg, block) {
 			vmenv.Config.IsSystemTransaction = true
 		}
-		_, err = core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.Gas()))
+		_, err = core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.GasLimit))
 		if writer != nil {
 			writer.Flush()
 		}
@@ -1144,7 +1144,7 @@ func (api *API) traceTx(
 	if consortium.HandleSystemTransaction(api.backend.Engine(), statedb, message, block) {
 		vmenv.Config.IsSystemTransaction = true
 	}
-	_, err = core.ApplyMessage(vmenv, message, new(core.GasPool).AddGas(message.Gas()))
+	_, err = core.ApplyMessage(vmenv, message, new(core.GasPool).AddGas(message.GasLimit))
 	if err != nil {
 		return nil, fmt.Errorf("tracing failed: %w", err)
 	}
