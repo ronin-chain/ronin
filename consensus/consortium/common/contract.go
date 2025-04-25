@@ -486,13 +486,13 @@ func ApplyTransaction(msg *core.Message, opts *ApplyTransactOpts) (err error) {
 	header := opts.Header
 	receipts := opts.Receipts
 	usedGas := opts.UsedGas
-	nonce := msg.Nonce()
+	nonce := msg.Nonce
 
 	// TODO(linh): This function is deprecated. Shall we replace it with NewTx?
-	expectedTx := types.NewTransaction(nonce, *msg.To(), msg.Value(), msg.Gas(), msg.GasPrice(), msg.Data())
+	expectedTx := types.NewTransaction(nonce, *msg.To, msg.Amount, msg.GasLimit, msg.GasPrice, msg.Data)
 	expectedHash := signer.Hash(expectedTx)
 
-	sender := msg.From()
+	sender := msg.From
 	// An empty/non-existing account's code hash is 0x000...00, while an existing account with no code has code hash
 	// that is equal to crypto.Keccak256Hash(nil)
 	if codeHash := opts.State.GetCodeHash(sender); codeHash != crypto.Keccak256Hash(nil) && codeHash != (common.Hash{}) {
@@ -504,7 +504,7 @@ func ApplyTransaction(msg *core.Message, opts *ApplyTransactOpts) (err error) {
 	}
 
 	if mining {
-		expectedTx, err = signTxFn(accounts.Account{Address: msg.From()}, expectedTx, chainConfig.ChainID)
+		expectedTx, err = signTxFn(accounts.Account{Address: msg.From}, expectedTx, chainConfig.ChainID)
 		if err != nil {
 			return err
 		}
@@ -530,7 +530,7 @@ func ApplyTransaction(msg *core.Message, opts *ApplyTransactOpts) (err error) {
 		*receivedTxs = (*receivedTxs)[1:]
 	}
 	opts.State.SetTxContext(expectedTx.Hash(), len(*txs))
-	opts.State.SetNonce(msg.From(), nonce+1)
+	opts.State.SetNonce(msg.From, nonce+1)
 	gasUsed, err := applyMessage(opts.ApplyMessageOpts, expectedTx)
 	if err != nil {
 		failed = true

@@ -281,7 +281,7 @@ func HandleSystemTransaction(engine consensus.Engine, statedb *state.StateDB, ms
 	if consortium.chainConfig.IsConsortiumV2(new(big.Int).Add(block.Number(), common.Big1)) {
 		isSystemMsg := consortium.v2.IsSystemMessage(msg, block.Header())
 		if isSystemMsg {
-			if msg.Value().Cmp(common.Big0) > 0 {
+			if msg.Amount.Cmp(common.Big0) > 0 {
 				balance := statedb.GetBalance(consensus.SystemAddress)
 				statedb.SetBalance(consensus.SystemAddress, big.NewInt(0))
 				statedb.AddBalance(block.Coinbase(), balance)
