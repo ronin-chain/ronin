@@ -177,15 +177,15 @@ func applyTransaction(
 	// Create a new context to be used in the EVM environment.
 	txContext := NewEVMTxContext(msg)
 	evm.Reset(txContext, statedb)
-	from := msg.From()
+	from := msg.From
 
 	// Check if sender and recipient are blacklisted
-	payer := msg.Payer()
+	payer := msg.Payer
 	// After the Venoki hardfork, all addresses now can submit transaction
 	if config.Consortium != nil && config.IsOdysseus(blockNumber) && !config.IsVenoki(blockNumber) {
 		contractAddr := config.BlacklistContractAddress
 		if state.IsAddressBlacklisted(statedb, contractAddr, &from) ||
-			state.IsAddressBlacklisted(statedb, contractAddr, msg.To()) ||
+			state.IsAddressBlacklisted(statedb, contractAddr, msg.To) ||
 			state.IsAddressBlacklisted(statedb, contractAddr, &payer) {
 			return nil, nil, ErrAddressBlacklisted
 		}
@@ -223,7 +223,7 @@ func applyTransaction(
 	}
 
 	// If the transaction created a contract, store the creation address in the receipt.
-	if msg.To() == nil {
+	if msg.To == nil {
 		receipt.ContractAddress = crypto.CreateAddress(evm.TxContext.Origin, tx.Nonce())
 	}
 
