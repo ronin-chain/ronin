@@ -67,21 +67,21 @@ type StateTransition struct {
 }
 
 type Message struct {
-	to            *common.Address
-	from          common.Address
-	nonce         uint64
-	amount        *big.Int
-	gasLimit      uint64
-	gasPrice      *big.Int
-	gasFeeCap     *big.Int
-	gasTipCap     *big.Int
-	data          []byte
-	accessList    types.AccessList
-	isFake        bool
-	payer         common.Address
-	expiredTime   uint64
-	blobGasFeeCap *big.Int
-	blobHashes    []common.Hash
+	to                *common.Address
+	from              common.Address
+	nonce             uint64
+	amount            *big.Int
+	gasLimit          uint64
+	gasPrice          *big.Int
+	gasFeeCap         *big.Int
+	gasTipCap         *big.Int
+	data              []byte
+	accessList        types.AccessList
+	skipAccountChecks bool
+	payer             common.Address
+	expiredTime       uint64
+	blobGasFeeCap     *big.Int
+	blobHashes        []common.Hash
 }
 
 // Create a new message with payer is the same as from, expired time = 0
@@ -94,45 +94,45 @@ func NewMessage(
 	gasPrice, gasFeeCap, gasTipCap *big.Int,
 	data []byte,
 	accessList types.AccessList,
-	isFake bool,
+	skipAccountChecks bool,
 	blobFeeCap *big.Int,
 	blobHashes []common.Hash,
 ) *Message {
 	return &Message{
-		from:          from,
-		to:            to,
-		nonce:         nonce,
-		amount:        amount,
-		gasLimit:      gasLimit,
-		gasPrice:      gasPrice,
-		gasFeeCap:     gasFeeCap,
-		gasTipCap:     gasTipCap,
-		data:          data,
-		accessList:    accessList,
-		isFake:        isFake,
-		payer:         from,
-		expiredTime:   0,
-		blobGasFeeCap: blobFeeCap,
-		blobHashes:    blobHashes,
+		from:              from,
+		to:                to,
+		nonce:             nonce,
+		amount:            amount,
+		gasLimit:          gasLimit,
+		gasPrice:          gasPrice,
+		gasFeeCap:         gasFeeCap,
+		gasTipCap:         gasTipCap,
+		data:              data,
+		accessList:        accessList,
+		skipAccountChecks: skipAccountChecks,
+		payer:             from,
+		expiredTime:       0,
+		blobGasFeeCap:     blobFeeCap,
+		blobHashes:        blobHashes,
 	}
 }
 
 // AsMessage returns the transaction as a core.Message.
 func TransactionToMessage(tx *types.Transaction, signer types.Signer, baseFee *big.Int) (*Message, error) {
 	msg := &Message{
-		nonce:         tx.Nonce(),
-		gasLimit:      tx.Gas(),
-		gasPrice:      new(big.Int).Set(tx.GasPrice()),
-		gasFeeCap:     new(big.Int).Set(tx.GasFeeCap()),
-		gasTipCap:     new(big.Int).Set(tx.GasTipCap()),
-		to:            tx.To(),
-		amount:        tx.Value(),
-		data:          tx.Data(),
-		accessList:    tx.AccessList(),
-		isFake:        false,
-		expiredTime:   tx.ExpiredTime(),
-		blobGasFeeCap: tx.BlobGasFeeCap(),
-		blobHashes:    tx.BlobHashes(),
+		nonce:             tx.Nonce(),
+		gasLimit:          tx.Gas(),
+		gasPrice:          new(big.Int).Set(tx.GasPrice()),
+		gasFeeCap:         new(big.Int).Set(tx.GasFeeCap()),
+		gasTipCap:         new(big.Int).Set(tx.GasTipCap()),
+		to:                tx.To(),
+		amount:            tx.Value(),
+		data:              tx.Data(),
+		accessList:        tx.AccessList(),
+		skipAccountChecks: false,
+		expiredTime:       tx.ExpiredTime(),
+		blobGasFeeCap:     tx.BlobGasFeeCap(),
+		blobHashes:        tx.BlobHashes(),
 	}
 	// If baseFee provided, set gasPrice to effectiveGasPrice.
 	if baseFee != nil {
@@ -171,7 +171,7 @@ func (m Message) Gas() uint64                  { return m.gasLimit }
 func (m Message) Nonce() uint64                { return m.nonce }
 func (m Message) Data() []byte                 { return m.data }
 func (m Message) AccessList() types.AccessList { return m.accessList }
-func (m Message) IsFake() bool                 { return m.isFake }
+func (m Message) SkipAccountChecks() bool      { return m.skipAccountChecks }
 func (m Message) Payer() common.Address        { return m.payer }
 func (m Message) ExpiredTime() uint64          { return m.expiredTime }
 func (m Message) BlobHashes() []common.Hash    { return m.blobHashes }
@@ -381,7 +381,7 @@ func (st *StateTransition) buyGas() error {
 func (st *StateTransition) preCheck() error {
 	msg := st.msg
 	// Only check transactions that are not fake
-	if !msg.IsFake() {
+	if !msg.SkipAccountChecks() {
 		// Make sure this transaction's nonce is correct.
 		stNonce := st.state.GetNonce(msg.From())
 		if msgNonce := msg.Nonce(); stNonce < msgNonce {
