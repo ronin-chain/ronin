@@ -37,6 +37,9 @@ type TransactionTest struct {
 	EIP158         ttFork
 	Frontier       ttFork
 	Homestead      ttFork
+	London         ttFork
+	Shanghai       ttFork
+	Cancun         ttFork
 }
 
 type ttFork struct {
@@ -80,6 +83,9 @@ func (tt *TransactionTest) Run(config *params.ChainConfig) error {
 		{"Byzantium", types.NewEIP155Signer(config.ChainID), tt.Byzantium, true, false},
 		{"Constantinople", types.NewEIP155Signer(config.ChainID), tt.Constantinople, true, false},
 		{"Istanbul", types.NewEIP155Signer(config.ChainID), tt.Istanbul, true, true},
+		{"Cancun", types.NewEIP155Signer(config.ChainID), tt.Cancun, true, true},
+		{"London", types.NewEIP155Signer(config.ChainID), tt.London, true, true},
+		{"Shanghai", types.NewEIP155Signer(config.ChainID), tt.Shanghai, true, true},
 	} {
 		sender, txhash, err := validateTx(tt.RLP, testcase.signer, testcase.isHomestead, testcase.isIstanbul)
 

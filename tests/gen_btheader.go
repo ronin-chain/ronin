@@ -34,6 +34,8 @@ func (b btHeader) MarshalJSON() ([]byte, error) {
 		GasUsed          math.HexOrDecimal64
 		Timestamp        math.HexOrDecimal64
 		BaseFeePerGas    *math.HexOrDecimal256
+		BlobGasUsed      *math.HexOrDecimal64
+		ExcessBlobGas    *math.HexOrDecimal64
 	}
 	var enc btHeader
 	enc.Bloom = b.Bloom
@@ -53,6 +55,8 @@ func (b btHeader) MarshalJSON() ([]byte, error) {
 	enc.GasUsed = math.HexOrDecimal64(b.GasUsed)
 	enc.Timestamp = math.HexOrDecimal64(b.Timestamp)
 	enc.BaseFeePerGas = (*math.HexOrDecimal256)(b.BaseFeePerGas)
+	enc.BlobGasUsed = (*math.HexOrDecimal64)(b.BlobGasUsed)
+	enc.ExcessBlobGas = (*math.HexOrDecimal64)(b.ExcessBlobGas)
 	return json.Marshal(&enc)
 }
 
@@ -76,6 +80,8 @@ func (b *btHeader) UnmarshalJSON(input []byte) error {
 		GasUsed          *math.HexOrDecimal64
 		Timestamp        *math.HexOrDecimal64
 		BaseFeePerGas    *math.HexOrDecimal256
+		BlobGasUsed      *math.HexOrDecimal64
+		ExcessBlobGas    *math.HexOrDecimal64
 	}
 	var dec btHeader
 	if err := json.Unmarshal(input, &dec); err != nil {
@@ -131,6 +137,12 @@ func (b *btHeader) UnmarshalJSON(input []byte) error {
 	}
 	if dec.BaseFeePerGas != nil {
 		b.BaseFeePerGas = (*big.Int)(dec.BaseFeePerGas)
+	}
+	if dec.BlobGasUsed != nil {
+		b.BlobGasUsed = (*uint64)(dec.BlobGasUsed)
+	}
+	if dec.ExcessBlobGas != nil {
+		b.ExcessBlobGas = (*uint64)(dec.ExcessBlobGas)
 	}
 	return nil
 }

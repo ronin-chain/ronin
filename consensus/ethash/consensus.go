@@ -602,7 +602,11 @@ func (ethash *Ethash) Prepare(chain consensus.ChainHeaderReader, header *types.H
 func (ethash *Ethash) Finalize(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, txs *[]*types.Transaction,
 	uncles []*types.Header, receipts *[]*types.Receipt, systemTxs *[]*types.Transaction, internalTxs *[]*types.InternalTransaction, usedGas *uint64) error {
 	// Accumulate any block and uncle rewards and commit the final state root
-	accumulateRewards(chain.Config(), state, header, uncles)
+	// Note: After Paris hardfork, the block reward is set to 0
+	// Keep the reward accumulation for fake mode to maintain backward compatibility for tests
+	if !ethash.config.SpectTestMode || !chain.Config().IsShanghai(header.Number) {
+		accumulateRewards(chain.Config(), state, header, uncles)
+	}
 	header.Root = state.IntermediateRoot(chain.Config().IsEIP158(header.Number))
 	return nil
 }

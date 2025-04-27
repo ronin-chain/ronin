@@ -17,12 +17,16 @@
 package tests
 
 import (
+	"math/rand"
 	"testing"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 )
 
 func TestBlockchain(t *testing.T) {
+	t.Skip("skipping legacy blockchain tests")
+
 	t.Parallel()
 
 	bt := new(testMatcher)
@@ -56,7 +60,6 @@ func TestBlockchain(t *testing.T) {
 			t.Errorf("test in hash mode with snapshotter failed: %v", err)
 		}
 		// if err := bt.checkFailure(t, test.Run(false, rawdb.PathScheme)); err != nil {
-
 		// 	t.Errorf("test in path mode without snapshotter failed: %v", err)
 		// }
 		// if err := bt.checkFailure(t, test.Run(true, rawdb.PathScheme)); err != nil {
@@ -66,4 +69,43 @@ func TestBlockchain(t *testing.T) {
 	// There is also a LegacyTests folder, containing blockchain tests generated
 	// prior to Istanbul. However, they are all derived from GeneralStateTests,
 	// which run natively, so there's no reason to run them here.
+}
+
+// TestExecutionSpecBlocktests runs the test fixtures from execution-spec-tests.
+func TestExecutionSpecBlocktests(t *testing.T) {
+	if !common.FileExist(executionSpecBlockchainTestDir) {
+		t.Skipf("directory %s does not exist", executionSpecBlockchainTestDir)
+	}
+	bt := new(testMatcher)
+
+	// Skip not supported transition fork tests
+	bt.skipLoad(`^cancun/eip7516_blobgasfee/blobgasfee_opcode/blobbasefee_before_fork.json`)
+
+	bt.walk(t, executionSpecBlockchainTestDir, func(t *testing.T, name string, test *BlockTest) {
+		execBlockTest(t, bt, test)
+	})
+}
+
+func execBlockTest(t *testing.T, bt *testMatcher, test *BlockTest) {
+	// Define all the different flag combinations we should run the tests with,
+	// picking only one for short tests.
+	//
+	// Note, witness building and self-testing is always enabled as it's a very
+	// good test to ensure that we don't break it.
+	var (
+		snapshotConf = []bool{false, true}
+		dbschemeConf = []string{rawdb.HashScheme, rawdb.PathScheme}
+	)
+	if testing.Short() {
+		snapshotConf = []bool{snapshotConf[rand.Int()%2]}
+		dbschemeConf = []string{dbschemeConf[rand.Int()%2]}
+	}
+	for _, snapshot := range snapshotConf {
+		for _, dbscheme := range dbschemeConf {
+			if err := bt.checkFailure(t, test.Run(snapshot, dbscheme)); err != nil {
+				t.Errorf("test with config {snapshotter:%v, scheme:%v} failed: %v", snapshot, dbscheme, err)
+				return
+			}
+		}
+	}
 }

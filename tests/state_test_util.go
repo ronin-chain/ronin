@@ -19,6 +19,7 @@ package tests
 import (
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/big"
 	"strconv"
@@ -27,6 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/consensus/misc/eip4844"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
@@ -82,21 +84,25 @@ type stPostState struct {
 //go:generate gencodec -type stEnv -field-override stEnvMarshaling -out gen_stenv.go
 
 type stEnv struct {
-	Coinbase   common.Address `json:"currentCoinbase"   gencodec:"required"`
-	Difficulty *big.Int       `json:"currentDifficulty" gencodec:"required"`
-	GasLimit   uint64         `json:"currentGasLimit"   gencodec:"required"`
-	Number     uint64         `json:"currentNumber"     gencodec:"required"`
-	Timestamp  uint64         `json:"currentTimestamp"  gencodec:"required"`
-	BaseFee    *big.Int       `json:"currentBaseFee"  gencodec:"optional"`
+	Coinbase      common.Address `json:"currentCoinbase"      gencodec:"required"`
+	Difficulty    *big.Int       `json:"currentDifficulty"    gencodec:"optional"`
+	Random        *big.Int       `json:"currentRandom"        gencodec:"optional"`
+	GasLimit      uint64         `json:"currentGasLimit"      gencodec:"required"`
+	Number        uint64         `json:"currentNumber"        gencodec:"required"`
+	Timestamp     uint64         `json:"currentTimestamp"     gencodec:"required"`
+	BaseFee       *big.Int       `json:"currentBaseFee"       gencodec:"optional"`
+	ExcessBlobGas *uint64        `json:"currentExcessBlobGas" gencodec:"optional"`
 }
 
 type stEnvMarshaling struct {
-	Coinbase   common.UnprefixedAddress
-	Difficulty *math.HexOrDecimal256
-	GasLimit   math.HexOrDecimal64
-	Number     math.HexOrDecimal64
-	Timestamp  math.HexOrDecimal64
-	BaseFee    *math.HexOrDecimal256
+	Coinbase      common.UnprefixedAddress
+	Difficulty    *math.HexOrDecimal256
+	Random        *math.HexOrDecimal256
+	GasLimit      math.HexOrDecimal64
+	Number        math.HexOrDecimal64
+	Timestamp     math.HexOrDecimal64
+	BaseFee       *math.HexOrDecimal256
+	ExcessBlobGas *math.HexOrDecimal64
 }
 
 //go:generate gencodec -type stTransaction -field-override stTransactionMarshaling -out gen_sttransaction.go
@@ -161,7 +167,13 @@ func (t *StateTest) Subtests() []StateSubtest {
 }
 
 // Run executes a specific subtest and verifies the post-state and logs
-func (t *StateTest) Run(subtest StateSubtest, vmconfig vm.Config, snapshotter bool, scheme string, postCheck func(err error, snaps *snapshot.Tree, state *state.StateDB)) (result error) {
+func (t *StateTest) Run(
+	subtest StateSubtest,
+	vmconfig vm.Config,
+	snapshotter bool,
+	scheme string,
+	postCheck func(err error, snaps *snapshot.Tree, state *state.StateDB),
+) (result error) {
 	triedb, snaps, statedb, root, err := t.RunNoVerify(subtest, vmconfig, snapshotter, scheme)
 	if err != nil {
 		return err
@@ -212,6 +224,17 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 		return nil, nil, nil, common.Hash{}, err
 	}
 
+	{ // Blob transactions may be present after the Cancun fork.
+		// In production,
+		// - the header is verified against the max in eip4844.go:VerifyEIP4844Header
+		// - the block body is verified against the header in block_validator.go:ValidateBody
+		// Here, we just do this shortcut smaller fix, since state tests do not
+		// utilize those codepaths
+		if len(msg.BlobHashes())*params.BlobTxBlobGasPerBlob > params.MaxBlobGasPerBlock {
+			return nil, nil, nil, common.Hash{}, errors.New("blob gas exceeds maximum")
+		}
+	}
+
 	// Try to recover tx with current signer
 	if len(post.TxBytes) != 0 {
 		var ttx types.Transaction
@@ -232,6 +255,9 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 	context.BaseFee = baseFee
 	if t.json.Env.Difficulty != nil {
 		context.Difficulty = new(big.Int).Set(t.json.Env.Difficulty)
+	}
+	if config.IsCancun(new(big.Int)) && t.json.Env.ExcessBlobGas != nil {
+		context.BlobBaseFee = eip4844.CalcBlobFee(*t.json.Env.ExcessBlobGas)
 	}
 	evm := vm.NewEVM(context, txContext, statedb, config, vmconfig)
 	// Execute the message.
