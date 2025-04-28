@@ -121,29 +121,28 @@ func NewMessage(
 
 // AsMessage returns the transaction as a core.Message.
 func TransactionToMessage(tx *types.Transaction, signer types.Signer, baseFee *big.Int) (*Message, error) {
-	msg := &Message{
-		Nonce:             tx.Nonce(),
-		GasLimit:          tx.Gas(),
-		GasPrice:          new(big.Int).Set(tx.GasPrice()),
-		GasFeeCap:         new(big.Int).Set(tx.GasFeeCap()),
-		GasTipCap:         new(big.Int).Set(tx.GasTipCap()),
-		To:                tx.To(),
-		Amount:            tx.Value(),
-		Data:              tx.Data(),
-		AccessList:        tx.AccessList(),
-		SkipAccountChecks: false,
-		ExpiredTime:       tx.ExpiredTime(),
-		BlobGasFeeCap:     tx.BlobGasFeeCap(),
-		BlobHashes:        tx.BlobHashes(),
+	from, err := types.Sender(signer, tx)
+	if err != nil {
+		return nil, err
 	}
+	msg := NewMessage(
+		from,
+		tx.To(),
+		tx.Nonce(),
+		tx.Value(),
+		tx.Gas(),
+		tx.GasPrice(),
+		tx.GasFeeCap(),
+		tx.GasTipCap(),
+		tx.Data(),
+		tx.AccessList(),
+		false,
+		tx.BlobGasFeeCap(),
+		tx.BlobHashes(),
+	)
 	// If baseFee provided, set gasPrice to effectiveGasPrice.
 	if baseFee != nil {
 		msg.GasPrice = cmath.BigMin(msg.GasPrice.Add(msg.GasTipCap, baseFee), msg.GasFeeCap)
-	}
-	var err error
-	msg.From, err = types.Sender(signer, tx)
-	if err != nil {
-		return nil, err
 	}
 
 	if tx.Type() == types.SponsoredTxType {
