@@ -131,15 +131,21 @@ func TransactionToMessage(tx *types.Transaction, signer types.Signer, baseFee *b
 		tx.Nonce(),
 		tx.Value(),
 		tx.Gas(),
-		tx.GasPrice(),
-		tx.GasFeeCap(),
-		tx.GasTipCap(),
+		new(big.Int).Set(tx.GasPrice()),
+		new(big.Int).Set(tx.GasFeeCap()),
+		new(big.Int).Set(tx.GasTipCap()),
 		tx.Data(),
 		tx.AccessList(),
 		false,
 		tx.BlobGasFeeCap(),
 		tx.BlobHashes(),
 	)
+
+	// If expired time is set, set it to the message
+	if tx.ExpiredTime() != 0 {
+		msg.ExpiredTime = tx.ExpiredTime()
+	}
+
 	// If baseFee provided, set gasPrice to effectiveGasPrice.
 	if baseFee != nil {
 		msg.GasPrice = cmath.BigMin(msg.GasPrice.Add(msg.GasTipCap, baseFee), msg.GasFeeCap)
