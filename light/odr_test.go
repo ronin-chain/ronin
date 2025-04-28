@@ -163,12 +163,6 @@ func odrAccounts(ctx context.Context, db ethdb.Database, bc *core.BlockChain, lc
 
 func TestOdrContractCallLes2(t *testing.T) { testChainOdr(t, 1, odrContractCall) }
 
-type callmsg struct {
-	*core.Message
-}
-
-func (callmsg) CheckNonce() bool { return false }
-
 func odrContractCall(ctx context.Context, db ethdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error) {
 	data := common.Hex2Bytes("60CD26850000000000000000000000000000000000000000000000000000000000000000")
 	config := params.TestChainConfig
