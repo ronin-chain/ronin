@@ -616,3 +616,42 @@ func TestVotePoolWrongTargetNumber(t *testing.T) {
 		t.Fatalf("Current vote length, expect %d have %d", 0, len(votePool.curVotes))
 	}
 }
+
+func TestVotePoolDropPeer(t *testing.T) {
+	secretKey, err := bls.RandKey()
+	if err != nil {
+		t.Fatalf("Failed to create secret key, err %s", err)
+	}
+
+	db := rawdb.NewMemoryDatabase()
+	gspec := &core.Genesis{
+		Config:  params.TestChainConfig,
+		Alloc:   types.GenesisAlloc{testAddr: {Balance: big.NewInt(1000000)}},
+		BaseFee: big.NewInt(params.InitialBaseFee),
+	}
+	genesis := gspec.MustCommit(db, trie.NewDatabase(db, trie.HashDefaults))
+	chain, _ := core.NewBlockChain(db, nil, gspec, nil, ethash.NewFullFaker(), vm.Config{}, nil, nil)
+
+	bs, _ := core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), db, 1, nil, true)
+	if _, err := chain.InsertChain(bs[:1], nil); err != nil {
+		panic(err)
+	}
+
+	var dropPeerCalled bool
+	dropPeer := func(peer string) {
+		dropPeerCalled = true
+	}
+
+	mockEngine := &mockPOSAv2{}
+	votePool := NewVotePool(chain, mockEngine, 22, dropPeer)
+
+	for i := 0; i < 5; i++ {
+		vote := generateVote(i, bs[0].Hash(), secretKey)
+		votePool.PutVote("AAAA", vote)
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	if !dropPeerCalled {
+		t.Errorf("Drop peer not called")
+	}
+}

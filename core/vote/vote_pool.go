@@ -95,6 +95,7 @@ func NewVotePool(
 		numFutureVotePerPeer:     make(map[string]uint64),
 		lastFutureVoteBlock:      make(map[string]uint64),
 		originatedFrom:           make(map[common.Hash]string),
+		dropPeer:                 dropPeer,
 	}
 
 	// Subscribe events from blockchain and start the main event loop.
