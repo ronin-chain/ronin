@@ -97,10 +97,10 @@ type Message interface {
 // ExecutionResult includes all output after executing given evm
 // message no matter the execution itself is successful or not.
 type ExecutionResult struct {
-	UsedGas     uint64 // Total used gas, not including the refunded gas
-	RefundedGas uint64 // Total gas refunded after execution
-	Err         error  // Any error encountered during the execution(listed in core/vm/errors.go)
-	ReturnData  []byte // Returned data from evm(function result or data supplied with revert opcode)
+	UsedGas    uint64 // Total used gas, not including the refunded gas
+	MaxUsedGas uint64 // Maximum gas consumed during execution, excluding gas refunds.
+	Err        error  // Any error encountered during the execution(listed in core/vm/errors.go)
+	ReturnData []byte // Returned data from evm(function result or data supplied with revert opcode)
 }
 
 // Unwrap returns the internal evm error which allows us for further
@@ -502,15 +502,21 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		ret, st.gas, vmerr = st.evm.Call(sender, st.to(), st.data, st.gas, st.value)
 	}
 
-	var gasRefund uint64
+	var peakGasUsed uint64
 	if !st.evm.Config.IsSystemTransaction {
+		// Record the gas used excluding gas refunds. This value represents the actual
+		// gas allowance required to complete execution.
+		peakGasUsed = st.gasUsed()
+
 		// Compute refund counter, capped to a refund quotient.
-		gasRefund = st.calcRefund()
-		st.gas += gasRefund
+		st.gas += st.calcRefund()
 		if rules.IsPrague {
 			// After EIP-7623: Data-heavy transactions pay the floor gas.
 			if st.gasUsed() < floorDataGas {
 				st.gas = st.initialGas - floorDataGas
+			}
+			if peakGasUsed < floorDataGas {
+				peakGasUsed = floorDataGas
 			}
 		}
 		st.returnGas()
@@ -539,10 +545,10 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	}
 
 	return &ExecutionResult{
-		UsedGas:     st.gasUsed(),
-		RefundedGas: gasRefund,
-		Err:         vmerr,
-		ReturnData:  ret,
+		UsedGas:    st.gasUsed(),
+		MaxUsedGas: peakGasUsed,
+		Err:        vmerr,
+		ReturnData: ret,
 	}, nil
 }
 
