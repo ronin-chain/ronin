@@ -22,17 +22,19 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/log"
 )
 
 // Config are the configuration options for the Interpreter
 type Config struct {
-	Debug                   bool      // Enables debugging
-	Tracer                  EVMLogger // Opcode logger
-	FullCallTracing         bool      // Emit trace error
-	NoRecursion             bool      // Disables call, callcode, delegate call and create
-	NoBaseFee               bool      // Forces the EIP-1559 baseFee to 0 (needed for 0 price calls)
-	EnablePreimageRecording bool      // Enables recording of SHA3/keccak preimages
+	Debug                   bool           // Enables debugging
+	Tracer                  EVMLogger      // Opcode logger
+	LiveTracer              *tracing.Hooks // Live tracer
+	FullCallTracing         bool           // Emit trace error
+	NoRecursion             bool           // Disables call, callcode, delegate call and create
+	NoBaseFee               bool           // Forces the EIP-1559 baseFee to 0 (needed for 0 price calls)
+	EnablePreimageRecording bool           // Enables recording of SHA3/keccak preimages
 
 	JumpTable [256]*operation // EVM instruction table, automatically populated if unset
 
@@ -129,7 +131,6 @@ func NewEVMInterpreter(evm *EVM, cfg Config) *EVMInterpreter {
 // considered a revert-and-consume-all-gas operation except for
 // ErrExecutionReverted which means revert-and-keep-gas-left.
 func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (ret []byte, err error) {
-
 	// Increment the call depth which is restricted to 1024
 	in.evm.depth++
 	defer func() { in.evm.depth-- }()
