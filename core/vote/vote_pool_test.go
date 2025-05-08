@@ -10,15 +10,14 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
+	"sync/atomic"
 	"testing"
 	"time"
 
-	wallet "github.com/ethereum/go-ethereum/accounts/bls"
-	"github.com/ethereum/go-ethereum/crypto/bls"
-	"github.com/ethereum/go-ethereum/trie"
 	"github.com/google/uuid"
 	keystorev4 "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
 
+	wallet "github.com/ethereum/go-ethereum/accounts/bls"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
@@ -27,10 +26,12 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/crypto/bls"
 	blsCommon "github.com/ethereum/go-ethereum/crypto/bls/common"
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/trie"
 )
 
 var (
@@ -618,9 +619,14 @@ func TestVotePoolWrongTargetNumber(t *testing.T) {
 }
 
 func TestVotePoolDropPeer(t *testing.T) {
-	secretKey, err := bls.RandKey()
-	if err != nil {
-		t.Fatalf("Failed to create secret key, err %s", err)
+	numPeers := 256
+	secretKeys := make([]blsCommon.SecretKey, numPeers)
+	for i := range numPeers {
+		secretKey, err := bls.RandKey()
+		if err != nil {
+			t.Fatalf("Failed to create secret key, err %s", err)
+		}
+		secretKeys[i] = secretKey
 	}
 
 	db := rawdb.NewMemoryDatabase()
@@ -637,21 +643,32 @@ func TestVotePoolDropPeer(t *testing.T) {
 		panic(err)
 	}
 
-	var dropPeerCalled bool
+	var dropPeerCalled atomic.Uint64
 	dropPeer := func(peer string) {
-		dropPeerCalled = true
+		dropPeerCalled.Add(1)
 	}
 
 	mockEngine := &mockPOSAv2{}
-	votePool := NewVotePool(chain, mockEngine, 22, dropPeer)
+	votePool := NewVotePool(chain, mockEngine, 64, dropPeer)
 
-	for i := 0; i < 5; i++ {
-		vote := generateVote(i, bs[0].Hash(), secretKey)
-		votePool.PutVote("AAAA", vote)
-		time.Sleep(100 * time.Millisecond)
+	// Create invalid vote, peer will be dropped
+	invalidVote := generateVote(1, bs[0].Hash(), secretKeys[0])
+	invalidVote.Data.TargetNumber = bs[0].NumberU64() + 1
+	votePool.PutVote("AAAA-0", invalidVote)
+	time.Sleep(100 * time.Millisecond)
+	if dropPeerCalled.Load() != 1 {
+		t.Errorf("Drop peer not matched, expect %d have %d", 1, dropPeerCalled.Load())
 	}
 
-	if !dropPeerCalled {
-		t.Errorf("Drop peer not called")
+	// Create valid votes, peer will not be dropped but the vote will be dropped
+	dropPeerCalled.Store(0)
+	votePool = NewVotePool(chain, mockEngine, 64, dropPeer)
+	for i := 0; i < numPeers; i++ {
+		vote := generateVote(1, bs[0].Hash(), secretKeys[i])
+		votePool.PutVote(fmt.Sprintf("AAAA-%d", i), vote)
+	}
+	time.Sleep(100 * time.Millisecond)
+	if dropPeerCalled.Load() != 0 {
+		t.Errorf("Drop peer not matched, expect %d have %d", 0, dropPeerCalled.Load())
 	}
 }

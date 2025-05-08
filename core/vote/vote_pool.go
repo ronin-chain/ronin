@@ -205,7 +205,14 @@ func (pool *VotePool) putIntoVotePool(voteWithPeerInfo *voteWithPeer) bool {
 		}
 	}
 
-	if ok := pool.basicVerify(vote, headNumber, votes, isFutureVote, voteHash); !ok {
+	// If the vote pool is exceed the max vote per block, drop the vote.
+	if pool.isExceedMaxVotePerBlock(vote, headNumber, votes, isFutureVote, voteHash) {
+		return true
+	}
+
+	// Verify bls signature.
+	if err := vote.Verify(); err != nil {
+		log.Error("Failed to verify voteMessage", "err", err)
 		return false
 	}
 
@@ -458,7 +465,7 @@ func (pool *VotePool) FetchVoteByBlockHash(blockHash common.Hash) []*types.VoteE
 	}
 }
 
-func (pool *VotePool) basicVerify(vote *types.VoteEnvelope, headNumber uint64, m map[common.Hash]*VoteBox, isFutureVote bool, voteHash common.Hash) bool {
+func (pool *VotePool) isExceedMaxVotePerBlock(vote *types.VoteEnvelope, headNumber uint64, m map[common.Hash]*VoteBox, isFutureVote bool, voteHash common.Hash) bool {
 	targetHash := vote.Data.TargetHash
 
 	// To prevent DOS attacks, make sure no more than 21 votes per blockHash if not futureVotes
@@ -469,17 +476,11 @@ func (pool *VotePool) basicVerify(vote *types.VoteEnvelope, headNumber uint64, m
 	}
 	if voteBox, ok := m[targetHash]; ok {
 		if len(voteBox.voteMessages) >= maxVoteAmountPerBlock {
-			return false
+			return true
 		}
 	}
 
-	// Verify bls signature.
-	if err := vote.Verify(); err != nil {
-		log.Error("Failed to verify voteMessage", "err", err)
-		return false
-	}
-
-	return true
+	return false
 }
 
 // stats returns the vote pool's
