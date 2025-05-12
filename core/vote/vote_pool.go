@@ -206,7 +206,7 @@ func (pool *VotePool) putIntoVotePool(voteWithPeerInfo *voteWithPeer) bool {
 	}
 
 	// If the vote pool is exceed the max vote per block, drop the vote.
-	if pool.isExceedMaxVotePerBlock(vote, headNumber, votes, isFutureVote, voteHash) {
+	if pool.isExceedMaxVotePerBlock(vote, votes, isFutureVote) {
 		return true
 	}
 
@@ -465,7 +465,7 @@ func (pool *VotePool) FetchVoteByBlockHash(blockHash common.Hash) []*types.VoteE
 	}
 }
 
-func (pool *VotePool) isExceedMaxVotePerBlock(vote *types.VoteEnvelope, headNumber uint64, m map[common.Hash]*VoteBox, isFutureVote bool, voteHash common.Hash) bool {
+func (pool *VotePool) isExceedMaxVotePerBlock(vote *types.VoteEnvelope, m map[common.Hash]*VoteBox, isFutureVote bool) bool {
 	targetHash := vote.Data.TargetHash
 
 	// To prevent DOS attacks, make sure no more than 21 votes per blockHash if not futureVotes
