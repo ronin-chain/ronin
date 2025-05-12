@@ -502,12 +502,11 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		ret, st.gas, vmerr = st.evm.Call(sender, st.to(), st.data, st.gas, st.value)
 	}
 
-	var peakGasUsed uint64
-	if !st.evm.Config.IsSystemTransaction {
-		// Record the gas used excluding gas refunds. This value represents the actual
-		// gas allowance required to complete execution.
-		peakGasUsed = st.gasUsed()
+	// Record the gas used excluding gas refunds. This value represents the actual
+	// gas allowance required to complete execution.
+	peakGasUsed := st.gasUsed()
 
+	if !st.evm.Config.IsSystemTransaction {
 		// Compute refund counter, capped to a refund quotient.
 		st.gas += st.calcRefund()
 		if rules.IsPrague {
