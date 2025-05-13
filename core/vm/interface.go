@@ -29,7 +29,7 @@ import (
 type StateDB interface {
 	CreateAccount(common.Address)
 
-	SubBalance(common.Address, *big.Int)
+	SubBalance(common.Address, *big.Int, tracing.BalanceChangeReason)
 	AddBalance(common.Address, *big.Int, tracing.BalanceChangeReason)
 	GetBalance(common.Address) *big.Int
 

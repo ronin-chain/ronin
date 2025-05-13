@@ -424,10 +424,10 @@ func (s *StateDB) AddBalance(addr common.Address, amount *big.Int, reason tracin
 }
 
 // SubBalance subtracts amount from the account associated with addr.
-func (s *StateDB) SubBalance(addr common.Address, amount *big.Int) {
+func (s *StateDB) SubBalance(addr common.Address, amount *big.Int, reason tracing.BalanceChangeReason) {
 	stateObject := s.GetOrNewStateObject(addr)
 	if stateObject != nil {
-		stateObject.SubBalance(amount, tracing.BalanceChangeUnspecified)
+		stateObject.SubBalance(amount, reason)
 	}
 }
 

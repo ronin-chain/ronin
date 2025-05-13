@@ -364,7 +364,7 @@ func (st *StateTransition) buyGas() error {
 
 	// Subtract the gas fee from balance of the fee payer,
 	// the msg.value is transfered to the recipient in later step.
-	st.state.SubBalance(msg.Payer, effectiveGasFee)
+	st.state.SubBalance(msg.Payer, effectiveGasFee, tracing.BalanceDecreaseGasBuy)
 	return nil
 }
 

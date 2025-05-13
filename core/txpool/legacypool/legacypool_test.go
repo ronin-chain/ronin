@@ -3129,7 +3129,7 @@ func TestSponsoredTxInTxPoolQueue(t *testing.T) {
 	}
 
 	// 1. Payer fund is insufficient, 2 txs are removed from pending and queued
-	statedb.SubBalance(payerAddr, common.Big1)
+	statedb.SubBalance(payerAddr, common.Big1, tracing.BalanceChangeUnspecified)
 	<-txpool.requestReset(nil, nil)
 	pending, queued = txpool.Stats()
 	if pending != 0 {
@@ -3156,7 +3156,7 @@ func TestSponsoredTxInTxPoolQueue(t *testing.T) {
 		t.Fatalf("Queued txpool, expect %d get %d", 1, queued)
 	}
 
-	statedb.SubBalance(senderAddr, common.Big1)
+	statedb.SubBalance(senderAddr, common.Big1, tracing.BalanceChangeUnspecified)
 	<-txpool.requestReset(nil, nil)
 	pending, queued = txpool.Stats()
 	if pending != 0 {
@@ -3216,7 +3216,7 @@ func TestSponsoredTxInTxPoolQueue(t *testing.T) {
 		t.Fatalf("Queued txpool, expect %d get %d", 1, queued)
 	}
 
-	statedb.SubBalance(payerAddr, common.Big1)
+	statedb.SubBalance(payerAddr, common.Big1, tracing.BalanceChangeUnspecified)
 	<-txpool.requestReset(nil, nil)
 	// tx3 must be removed now
 	_, queued = txpool.Stats()
