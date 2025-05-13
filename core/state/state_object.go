@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
@@ -291,6 +292,9 @@ func (s *stateObject) SetState(key, value common.Hash) {
 		key:      key,
 		prevalue: prev,
 	})
+	if s.db.logger != nil && s.db.logger.OnStorageChange != nil {
+		s.db.logger.OnStorageChange(s.address, key, prev, value)
+	}
 	s.setState(key, value)
 }
 
@@ -499,6 +503,9 @@ func (s *stateObject) SetBalance(amount *big.Int) {
 		account: &s.address,
 		prev:    new(big.Int).Set(s.data.Balance),
 	})
+	if s.db.logger != nil && s.db.logger.OnBalanceChange != nil {
+		s.db.logger.OnBalanceChange(s.address, s.Balance(), amount, tracing.BalanceChangeUnspecified)
+	}
 	s.setBalance(amount)
 }
 
@@ -576,6 +583,9 @@ func (s *stateObject) SetCode(codeHash common.Hash, code []byte) {
 		prevhash: s.CodeHash(),
 		prevcode: prevcode,
 	})
+	if s.db.logger != nil && s.db.logger.OnCodeChange != nil {
+		s.db.logger.OnCodeChange(s.address, common.BytesToHash(s.CodeHash()), prevcode, codeHash, code)
+	}
 	s.setCode(codeHash, code)
 }
 
@@ -590,6 +600,9 @@ func (s *stateObject) SetNonce(nonce uint64) {
 		account: &s.address,
 		prev:    s.data.Nonce,
 	})
+	if s.db.logger != nil && s.db.logger.OnNonceChange != nil {
+		s.db.logger.OnNonceChange(s.address, s.data.Nonce, nonce)
+	}
 	s.setNonce(nonce)
 }
 
