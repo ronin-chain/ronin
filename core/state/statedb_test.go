@@ -31,6 +31,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/trie"
 )
@@ -154,7 +155,7 @@ func TestCopy(t *testing.T) {
 
 	for i := byte(0); i < 255; i++ {
 		obj := orig.GetOrNewStateObject(common.BytesToAddress([]byte{i}))
-		obj.AddBalance(big.NewInt(int64(i)))
+		obj.AddBalance(big.NewInt(int64(i)), tracing.BalanceChangeUnspecified)
 		orig.updateStateObject(obj)
 	}
 	orig.Finalise(false)
@@ -171,9 +172,9 @@ func TestCopy(t *testing.T) {
 		copyObj := copy.GetOrNewStateObject(common.BytesToAddress([]byte{i}))
 		ccopyObj := ccopy.GetOrNewStateObject(common.BytesToAddress([]byte{i}))
 
-		origObj.AddBalance(big.NewInt(2 * int64(i)))
-		copyObj.AddBalance(big.NewInt(3 * int64(i)))
-		ccopyObj.AddBalance(big.NewInt(4 * int64(i)))
+		origObj.AddBalance(big.NewInt(2*int64(i)), tracing.BalanceChangeUnspecified)
+		copyObj.AddBalance(big.NewInt(3*int64(i)), tracing.BalanceChangeUnspecified)
+		ccopyObj.AddBalance(big.NewInt(4*int64(i)), tracing.BalanceChangeUnspecified)
 
 		orig.updateStateObject(origObj)
 		copy.updateStateObject(copyObj)
