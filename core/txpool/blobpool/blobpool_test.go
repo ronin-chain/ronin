@@ -1538,8 +1538,8 @@ func TestSponsoredTxRejection(t *testing.T) {
 	}
 
 	recipient := common.HexToAddress("1000000000000000000000000000000000000001")
-	statedb.SetBalance(crypto.PubkeyToAddress(payerKey.PublicKey), new(big.Int).Mul(big.NewInt(100000), big.NewInt(22000)))
-	statedb.SetBalance(crypto.PubkeyToAddress(senderKey.PublicKey), big.NewInt(10))
+	statedb.SetBalance(crypto.PubkeyToAddress(payerKey.PublicKey), new(big.Int).Mul(big.NewInt(100000), big.NewInt(22000)), tracing.BalanceChangeUnspecified)
+	statedb.SetBalance(crypto.PubkeyToAddress(senderKey.PublicKey), big.NewInt(10), tracing.BalanceChangeUnspecified)
 
 	innerTx := types.SponsoredTx{
 		ChainID:     big.NewInt(2020),

@@ -431,10 +431,10 @@ func (s *StateDB) SubBalance(addr common.Address, amount *big.Int, reason tracin
 	}
 }
 
-func (s *StateDB) SetBalance(addr common.Address, amount *big.Int) {
+func (s *StateDB) SetBalance(addr common.Address, amount *big.Int, reason tracing.BalanceChangeReason) {
 	stateObject := s.GetOrNewStateObject(addr)
 	if stateObject != nil {
-		stateObject.SetBalance(amount, tracing.BalanceChangeUnspecified)
+		stateObject.SetBalance(amount, reason)
 	}
 }
 

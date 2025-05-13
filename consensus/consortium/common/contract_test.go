@@ -17,6 +17,7 @@ import (
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -64,7 +65,7 @@ func TestApplyTransactionSender(t *testing.T) {
 
 	// Sender is not an empty account but still has no code, we must
 	// not get core.ErrSenderNoEOA
-	state.SetBalance(sender, common.Big1)
+	state.SetBalance(sender, common.Big1, tracing.BalanceChangeUnspecified)
 	err = ApplyTransaction(
 		msg,
 		&ApplyTransactOpts{

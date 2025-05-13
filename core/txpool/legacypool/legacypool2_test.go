@@ -235,7 +235,7 @@ func TestTransactionZAttack(t *testing.T) {
 
 	payerKey, _ := crypto.GenerateKey()
 	payerAccount := crypto.PubkeyToAddress(payerKey.PublicKey)
-	pool.currentState.SetBalance(payerAccount, new(big.Int).SetUint64(1000*21000*pool.config.GlobalSlots))
+	pool.currentState.SetBalance(payerAccount, new(big.Int).SetUint64(1000*21000*pool.config.GlobalSlots), tracing.BalanceChangeUnspecified)
 	overDraftSenderSponsoredTxs := types.Transactions{}
 	{
 		key, _ := crypto.GenerateKey()
@@ -286,7 +286,7 @@ func TestTransactionZAttack(t *testing.T) {
 
 	payerKey2, _ := crypto.GenerateKey()
 	payerAccount2 := crypto.PubkeyToAddress(payerKey2.PublicKey)
-	pool.currentState.SetBalance(payerAccount2, new(big.Int).SetUint64(21000*600))
+	pool.currentState.SetBalance(payerAccount2, new(big.Int).SetUint64(21000*600), tracing.BalanceChangeUnspecified)
 	overDraftPayerSponsoredTxs := types.Transactions{}
 	{
 		key, _ := crypto.GenerateKey()

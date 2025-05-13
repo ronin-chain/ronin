@@ -224,7 +224,7 @@ func (c *ContractIntegrator) WrapUpEpoch(opts *ApplyTransactOpts) error {
 func (c *ContractIntegrator) SubmitBlockReward(opts *ApplyTransactOpts) error {
 	coinbase := opts.Header.Coinbase
 	balance := opts.State.GetBalance(consensus.SystemAddress)
-	opts.State.SetBalance(consensus.SystemAddress, big.NewInt(0))
+	opts.State.SetBalance(consensus.SystemAddress, big.NewInt(0), tracing.BalanceDecreaseSystemAddress)
 	opts.State.AddBalance(coinbase, balance, tracing.BalanceIncreaseRewardMineBlock)
 
 	nonce := opts.State.GetNonce(c.coinbase)

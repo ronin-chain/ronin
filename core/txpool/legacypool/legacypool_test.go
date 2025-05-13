@@ -225,7 +225,7 @@ func (c *testChain) State() (*state.StateDB, error) {
 		c.statedb, _ = state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
 		// simulate that the new head block included tx0 and tx1
 		c.statedb.SetNonce(c.address, 2)
-		c.statedb.SetBalance(c.address, new(big.Int).SetUint64(params.Ether))
+		c.statedb.SetBalance(c.address, new(big.Int).SetUint64(params.Ether), tracing.BalanceChangeUnspecified)
 		*c.trigger = false
 	}
 	return stdb, nil
@@ -245,7 +245,7 @@ func TestStateChangeDuringReset(t *testing.T) {
 	)
 
 	// setup pool with 2 transaction in it
-	statedb.SetBalance(address, new(big.Int).SetUint64(params.Ether))
+	statedb.SetBalance(address, new(big.Int).SetUint64(params.Ether), tracing.BalanceChangeUnspecified)
 	blockchain := &testChain{&testBlockChain{1000000000, statedb, new(event.Feed), 0}, address, &trigger}
 
 	tx0 := transaction(0, 100000, key)
@@ -2961,14 +2961,14 @@ func TestExpiredTimeAndGasCheckSponsoredTx(t *testing.T) {
 	}
 
 	// 5. Failed when sender does not have sufficient fund for msg.value
-	statedb.SetBalance(crypto.PubkeyToAddress(payerKey.PublicKey), new(big.Int).Mul(big.NewInt(100000), big.NewInt(22000)))
+	statedb.SetBalance(crypto.PubkeyToAddress(payerKey.PublicKey), new(big.Int).Mul(big.NewInt(100000), big.NewInt(22000)), tracing.BalanceChangeUnspecified)
 	err = txpool.addRemoteSync(tx)
 	if err == nil || !errors.Is(err, core.ErrInsufficientSenderFunds) {
 		t.Fatalf("Expect error %s, get %s", core.ErrInsufficientSenderFunds, err)
 	}
 
 	// 6. Successfully add tx
-	statedb.SetBalance(crypto.PubkeyToAddress(senderKey.PublicKey), big.NewInt(10))
+	statedb.SetBalance(crypto.PubkeyToAddress(senderKey.PublicKey), big.NewInt(10), tracing.BalanceChangeUnspecified)
 	err = txpool.addRemoteSync(tx)
 	if err != nil {
 		t.Fatalf("Expect successfully add tx, get %s", err)
@@ -3002,7 +3002,7 @@ func TestExpiredTimeAndGasCheckSponsoredTx(t *testing.T) {
 	innerTx.Nonce = 3
 	innerTx.GasFeeCap = big.NewInt(params.MinimumBaseFee + 1)
 	innerTx.Value = common.Big0
-	statedb.SetBalance(crypto.PubkeyToAddress(payerKey.PublicKey), new(big.Int).Mul(innerTx.GasFeeCap, big.NewInt(22000)))
+	statedb.SetBalance(crypto.PubkeyToAddress(payerKey.PublicKey), new(big.Int).Mul(innerTx.GasFeeCap, big.NewInt(22000)), tracing.BalanceChangeUnspecified)
 	innerTx.PayerR, innerTx.PayerS, innerTx.PayerV, err = types.PayerSign(
 		payerKey,
 		mikoSigner,
@@ -3079,8 +3079,8 @@ func TestSponsoredTxInTxPoolQueue(t *testing.T) {
 		ExpiredTime: 100,
 	}
 	gasFee := new(big.Int).Mul(sponsoredTx1.GasFeeCap, new(big.Int).SetUint64(sponsoredTx1.Gas))
-	statedb.SetBalance(payerAddr, gasFee)
-	statedb.SetBalance(senderAddr, sponsoredTx1.Value)
+	statedb.SetBalance(payerAddr, gasFee, tracing.BalanceChangeUnspecified)
+	statedb.SetBalance(senderAddr, sponsoredTx1.Value, tracing.BalanceChangeUnspecified)
 
 	mikoSigner := types.NewMikoSigner(big.NewInt(2020))
 	sponsoredTx1.PayerR, sponsoredTx1.PayerS, sponsoredTx1.PayerV, err = types.PayerSign(
@@ -3207,7 +3207,7 @@ func TestSponsoredTxInTxPoolQueue(t *testing.T) {
 	}
 
 	gasFee = new(big.Int).Mul(sponsoredTx3.GasFeeCap, new(big.Int).SetUint64(sponsoredTx3.Gas))
-	statedb.SetBalance(payerAddr, gasFee)
+	statedb.SetBalance(payerAddr, gasFee, tracing.BalanceChangeUnspecified)
 	<-txpool.requestReset(nil, nil)
 
 	// tx2 must be removed from queue but not tx3
@@ -3226,7 +3226,7 @@ func TestSponsoredTxInTxPoolQueue(t *testing.T) {
 
 	// 4. Expired txs are removed from pending and queued
 	gasFee = new(big.Int).Mul(sponsoredTx1.GasFeeCap, new(big.Int).SetUint64(sponsoredTx1.Gas))
-	statedb.SetBalance(payerAddr, gasFee)
+	statedb.SetBalance(payerAddr, gasFee, tracing.BalanceChangeUnspecified)
 	errs = txpool.AddRemotesSync([]*types.Transaction{tx1, tx2})
 	for _, err := range errs {
 		if err != nil {

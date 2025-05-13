@@ -284,7 +284,7 @@ func HandleSystemTransaction(engine consensus.Engine, statedb *state.StateDB, ms
 		if isSystemMsg {
 			if msg.Amount.Cmp(common.Big0) > 0 {
 				balance := statedb.GetBalance(consensus.SystemAddress)
-				statedb.SetBalance(consensus.SystemAddress, big.NewInt(0))
+				statedb.SetBalance(consensus.SystemAddress, big.NewInt(0), tracing.BalanceDecreaseSystemAddress)
 				statedb.AddBalance(block.Coinbase(), balance, tracing.BalanceIncreaseRewardMineBlock)
 			}
 

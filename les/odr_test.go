@@ -159,7 +159,7 @@ func odrContractCall(ctx context.Context, db ethdb.Database, config *params.Chai
 		} else {
 			header := lc.GetHeaderByHash(bhash)
 			state := light.NewState(ctx, header, lc.Odr())
-			state.SetBalance(bankAddr, math.MaxBig256)
+			state.SetBalance(bankAddr, math.MaxBig256, tracing.BalanceChangeUnspecified)
 			msg := core.NewMessage(
 				bankAddr,
 				&testContractAddr,
