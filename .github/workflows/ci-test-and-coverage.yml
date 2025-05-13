@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - evm-tracer*
   pull_request:
     branches:
       - main
+      - evm-tracer*
 
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
