@@ -32,6 +32,7 @@ import (
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/txpool"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -282,7 +283,7 @@ func TestStateChangeDuringReset(t *testing.T) {
 
 func testAddBalance(pool *LegacyPool, addr common.Address, amount *big.Int) {
 	pool.mu.Lock()
-	pool.currentState.AddBalance(addr, amount)
+	pool.currentState.AddBalance(addr, amount, tracing.BalanceChangeUnspecified)
 	pool.mu.Unlock()
 }
 
@@ -443,7 +444,7 @@ func TestChainFork(t *testing.T) {
 	addr := crypto.PubkeyToAddress(key.PublicKey)
 	resetState := func() {
 		statedb, _ := state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
-		statedb.AddBalance(addr, big.NewInt(100000000000000))
+		statedb.AddBalance(addr, big.NewInt(100000000000000), tracing.BalanceChangeUnspecified)
 
 		pool.chain = &testBlockChain{1000000, statedb, new(event.Feed), 0}
 		<-pool.requestReset(nil, nil)
@@ -472,7 +473,7 @@ func TestDoubleNonce(t *testing.T) {
 	addr := crypto.PubkeyToAddress(key.PublicKey)
 	resetState := func() {
 		statedb, _ := state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
-		statedb.AddBalance(addr, big.NewInt(100000000000000))
+		statedb.AddBalance(addr, big.NewInt(100000000000000), tracing.BalanceChangeUnspecified)
 
 		pool.chain = &testBlockChain{1000000, statedb, new(event.Feed), 0}
 		<-pool.requestReset(nil, nil)
@@ -2768,7 +2769,7 @@ func BenchmarkMultiAccountBatchInsert(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		key, _ := crypto.GenerateKey()
 		account := crypto.PubkeyToAddress(key.PublicKey)
-		pool.currentState.AddBalance(account, big.NewInt(1000000))
+		pool.currentState.AddBalance(account, big.NewInt(1000000), tracing.BalanceChangeUnspecified)
 		tx := transaction(uint64(0), 100000, key)
 		batches[i] = tx
 	}
@@ -3139,7 +3140,7 @@ func TestSponsoredTxInTxPoolQueue(t *testing.T) {
 	}
 
 	// 2. Sender fund is insufficient, 2 txs are removed from pending and queued
-	statedb.AddBalance(payerAddr, common.Big1)
+	statedb.AddBalance(payerAddr, common.Big1, tracing.BalanceChangeUnspecified)
 	errs = txpool.AddRemotesSync([]*types.Transaction{tx1, tx2})
 	for _, err := range errs {
 		if err != nil {
@@ -3166,7 +3167,7 @@ func TestSponsoredTxInTxPoolQueue(t *testing.T) {
 	}
 
 	// 3. Payer fund is insufficient, 2 txs with the same payer in a queue
-	statedb.AddBalance(senderAddr, common.Big1)
+	statedb.AddBalance(senderAddr, common.Big1, tracing.BalanceChangeUnspecified)
 	sponsoredTx3 := types.SponsoredTx{
 		ChainID:     big.NewInt(2020),
 		Nonce:       3,
@@ -3304,7 +3305,7 @@ func TestFeeCapCheckVenoki(t *testing.T) {
 	senderAddr := crypto.PubkeyToAddress(senderKey.PublicKey)
 
 	statedb, _ := state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
-	statedb.AddBalance(senderAddr, new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil))
+	statedb.AddBalance(senderAddr, new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil), tracing.BalanceChangeUnspecified)
 
 	blockchain := &testBlockChain{10000000, statedb, new(event.Feed), 0}
 

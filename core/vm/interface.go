@@ -20,6 +20,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 )
@@ -29,7 +30,7 @@ type StateDB interface {
 	CreateAccount(common.Address)
 
 	SubBalance(common.Address, *big.Int)
-	AddBalance(common.Address, *big.Int)
+	AddBalance(common.Address, *big.Int, tracing.BalanceChangeReason)
 	GetBalance(common.Address) *big.Int
 
 	GetNonce(common.Address) uint64
