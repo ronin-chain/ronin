@@ -502,18 +502,6 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		return nil, err
 	}
 
-	if tracer := st.evm.Config.Tracer; tracer != nil {
-		var payer *common.Address
-		if st.msg.From != st.msg.Payer {
-			payerAddr := st.msg.Payer
-			payer = &payerAddr
-		}
-		tracer.CaptureTxStart(st.initialGas, payer)
-		defer func() {
-			tracer.CaptureTxEnd(st.gas)
-		}()
-	}
-
 	msg := st.msg
 	sender := vm.AccountRef(msg.From)
 	rules := st.evm.ChainConfig().Rules(st.evm.Context.BlockNumber)
