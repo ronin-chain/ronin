@@ -22,6 +22,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
@@ -47,11 +48,11 @@ func TestDump(t *testing.T) {
 
 	// generate a few entries
 	obj1 := s.state.GetOrNewStateObject(common.BytesToAddress([]byte{0x01}))
-	obj1.AddBalance(big.NewInt(22))
+	obj1.AddBalance(big.NewInt(22), tracing.BalanceChangeUnspecified)
 	obj2 := s.state.GetOrNewStateObject(common.BytesToAddress([]byte{0x01, 0x02}))
 	obj2.SetCode(crypto.Keccak256Hash([]byte{3, 3, 3, 3, 3, 3, 3}), []byte{3, 3, 3, 3, 3, 3, 3})
 	obj3 := s.state.GetOrNewStateObject(common.BytesToAddress([]byte{0x02}))
-	obj3.SetBalance(big.NewInt(44))
+	obj3.SetBalance(big.NewInt(44), tracing.BalanceChangeUnspecified)
 
 	// write some of them to the trie
 	s.state.updateStateObject(obj1)
@@ -98,7 +99,7 @@ func TestNull(t *testing.T) {
 	s := newStateEnv()
 	address := common.HexToAddress("0x823140710bf13990e4500136726d8b55")
 	s.state.CreateAccount(address)
-	//value := common.FromHex("0x823140710bf13990e4500136726d8b55")
+	// value := common.FromHex("0x823140710bf13990e4500136726d8b55")
 	var value common.Hash
 
 	s.state.SetState(address, common.Hash{}, value)
@@ -159,7 +160,7 @@ func TestCreateObjectRevert(t *testing.T) {
 
 	state.CreateAccount(addr)
 	so0 := state.getStateObject(addr)
-	so0.SetBalance(big.NewInt(42))
+	so0.SetBalance(big.NewInt(42), tracing.BalanceChangeUnspecified)
 	so0.SetNonce(43)
 	so0.SetCode(crypto.Keccak256Hash([]byte{'c', 'a', 'f', 'e'}), []byte{'c', 'a', 'f', 'e'})
 	state.setStateObject(so0)

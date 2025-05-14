@@ -11,6 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/consortium/v2/finality"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/internal/ethapi"
@@ -283,8 +284,8 @@ func HandleSystemTransaction(engine consensus.Engine, statedb *state.StateDB, ms
 		if isSystemMsg {
 			if msg.Amount.Cmp(common.Big0) > 0 {
 				balance := statedb.GetBalance(consensus.SystemAddress)
-				statedb.SetBalance(consensus.SystemAddress, big.NewInt(0))
-				statedb.AddBalance(block.Coinbase(), balance)
+				statedb.SetBalance(consensus.SystemAddress, big.NewInt(0), tracing.BalanceDecreaseSystemAddress)
+				statedb.AddBalance(block.Coinbase(), balance, tracing.BalanceIncreaseRewardMineBlock)
 			}
 
 			return true
