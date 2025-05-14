@@ -173,7 +173,15 @@ func applyTransaction(
 	tx *types.Transaction,
 	usedGas *uint64, evm *vm.EVM,
 	receiptProcessor ReceiptProcessor,
-) (*types.Receipt, *ExecutionResult, error) {
+) (receipt *types.Receipt, result *ExecutionResult, err error) {
+	if evm.Config.LiveTracer != nil && evm.Config.LiveTracer.OnTxStart != nil {
+		evm.Config.LiveTracer.OnTxStart(evm.GetVMContext(), tx, msg.From)
+		if evm.Config.LiveTracer.OnTxEnd != nil {
+			defer func() {
+				evm.Config.LiveTracer.OnTxEnd(receipt, err)
+			}()
+		}
+	}
 	// Create a new context to be used in the EVM environment.
 	txContext := NewEVMTxContext(msg)
 	evm.Reset(txContext, statedb)
@@ -192,7 +200,7 @@ func applyTransaction(
 	}
 
 	// Apply the transaction to the current state (included in the env).
-	result, err := ApplyMessage(evm, msg, gp)
+	result, err = ApplyMessage(evm, msg, gp)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -208,7 +216,7 @@ func applyTransaction(
 
 	// Create a new receipt for the transaction, storing the intermediate root and gas used
 	// by the tx.
-	receipt := &types.Receipt{Type: tx.Type(), PostState: root, CumulativeGasUsed: *usedGas}
+	receipt = &types.Receipt{Type: tx.Type(), PostState: root, CumulativeGasUsed: *usedGas}
 	if result.Failed() {
 		receipt.Status = types.ReceiptStatusFailed
 	} else {

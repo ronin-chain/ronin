@@ -24,6 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/holiman/uint256"
 )
 
 // Config are the configuration options for the Interpreter
@@ -49,6 +50,49 @@ type ScopeContext struct {
 	Memory   *Memory
 	Stack    *Stack
 	Contract *Contract
+}
+
+// MemoryData returns the underlying memory slice. Callers must not modify the contents
+// of the returned data.
+func (ctx *ScopeContext) MemoryData() []byte {
+	if ctx.Memory == nil {
+		return nil
+	}
+	return ctx.Memory.Data()
+}
+
+// MemoryData returns the stack data. Callers must not modify the contents
+// of the returned data.
+func (ctx *ScopeContext) StackData() []uint256.Int {
+	if ctx.Stack == nil {
+		return nil
+	}
+	return ctx.Stack.Data()
+}
+
+// Caller returns the current caller.
+func (ctx *ScopeContext) Caller() common.Address {
+	return ctx.Contract.Caller()
+}
+
+// Address returns the address where this scope of execution is taking place.
+func (ctx *ScopeContext) Address() common.Address {
+	return ctx.Contract.Address()
+}
+
+// CallValue returns the value supplied with this call.
+func (ctx *ScopeContext) CallValue() *uint256.Int {
+	bigValue, ok := uint256.FromBig(ctx.Contract.Value())
+	if !ok {
+		return nil
+	}
+	return bigValue
+}
+
+// CallInput returns the input/calldata with this call. Callers must not modify
+// the contents of the returned data.
+func (ctx *ScopeContext) CallInput() []byte {
+	return ctx.Contract.Input
 }
 
 // keccakState wraps sha3.state. In addition to the usual hash methods, it also supports
@@ -166,11 +210,13 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		pc   = uint64(0) // program counter
 		cost uint64
 		// copies used by tracer
-		pcCopy  uint64 // needed for the deferred EVMLogger
-		gasCopy uint64 // for EVMLogger to log gas remaining before execution
-		logged  bool   // deferred EVMLogger should ignore already logged steps
-		res     []byte // result of the opcode execution function
-		debug   = in.evm.Config.Tracer != nil
+		pcCopy           uint64 // needed for the deferred EVMLogger
+		gasCopy          uint64 // for EVMLogger to log gas remaining before execution
+		logged           bool   // deferred EVMLogger should ignore already logged steps
+		loggedLiveTracer bool   // deferred LiveTracer should ignore already logged steps
+		res              []byte // result of the opcode execution function
+		debug            = in.evm.Config.Tracer != nil
+		debugLiveTracer  = in.evm.Config.LiveTracer != nil
 	)
 	// Don't move this deferrred function, it's placed before the capturestate-deferred method,
 	// so that it get's executed _after_: the capturestate needs the stacks before
@@ -180,6 +226,7 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 	}()
 	contract.Input = input
 
+	// TODO: remove old tracer
 	if debug {
 		defer func() {
 			if err != nil {
@@ -188,6 +235,20 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 				} else {
 					in.cfg.Tracer.CaptureFault(pcCopy, op, gasCopy, cost, callContext, in.evm.depth, err)
 				}
+			}
+		}()
+	}
+
+	if debugLiveTracer {
+		defer func() {
+			if err == nil {
+				return
+			}
+			if !loggedLiveTracer && in.evm.Config.LiveTracer.OnOpcode != nil {
+				in.evm.Config.LiveTracer.OnOpcode(pcCopy, byte(op), gasCopy, cost, callContext, in.returnData, in.evm.depth, VMErrorFromErr(err))
+			}
+			if loggedLiveTracer && in.evm.Config.LiveTracer.OnFault != nil {
+				in.evm.Config.LiveTracer.OnFault(pcCopy, byte(op), gasCopy, cost, callContext, in.evm.depth, VMErrorFromErr(err))
 			}
 		}()
 	}
@@ -203,7 +264,7 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		}
 		if debug {
 			// Capture pre-execution values for tracing.
-			logged, pcCopy, gasCopy = false, pc, contract.Gas
+			logged, loggedLiveTracer, pcCopy, gasCopy = false, false, pc, contract.Gas
 		}
 
 		// Get the operation from the jump table and validate the stack to ensure there are
@@ -234,7 +295,7 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		}
 		// Static portion of gas
 		cost = operation.constantGas // For tracing
-		if !contract.UseGas(operation.constantGas) {
+		if !contract.UseGas(cost, in.evm.Config.LiveTracer, tracing.GasChangeIgnored) {
 			return nil, ErrOutOfGas
 		}
 
@@ -261,8 +322,19 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 			var dynamicCost uint64
 			dynamicCost, err = operation.dynamicGas(in.evm, contract, stack, mem, memorySize)
 			cost += dynamicCost // total cost, for debug tracing
-			if err != nil || !contract.UseGas(dynamicCost) {
+			if err != nil || !contract.UseGas(dynamicCost, in.evm.Config.LiveTracer, tracing.GasChangeIgnored) {
 				return nil, ErrOutOfGas
+			}
+		}
+
+		// Do tracing before memory expansion
+		if debugLiveTracer {
+			if in.evm.Config.LiveTracer.OnGasChange != nil {
+				in.evm.Config.LiveTracer.OnGasChange(gasCopy, gasCopy-cost, tracing.GasChangeCallOpCode)
+			}
+			if in.evm.Config.LiveTracer.OnOpcode != nil {
+				in.evm.Config.LiveTracer.OnOpcode(pc, byte(op), gasCopy, cost, callContext, in.returnData, in.evm.depth, VMErrorFromErr(err))
+				loggedLiveTracer = true
 			}
 		}
 		if memorySize > 0 {
