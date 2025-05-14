@@ -208,13 +208,11 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		pc   = uint64(0) // program counter
 		cost uint64
 		// copies used by tracer
-		pcCopy           uint64 // needed for the deferred EVMLogger
-		gasCopy          uint64 // for EVMLogger to log gas remaining before execution
-		logged           bool   // deferred EVMLogger should ignore already logged steps
-		loggedLiveTracer bool   // deferred LiveTracer should ignore already logged steps
-		res              []byte // result of the opcode execution function
-		debug            = in.evm.Config.Tracer != nil
-		debugLiveTracer  = in.evm.Config.LiveTracer != nil
+		pcCopy  uint64 // needed for the deferred EVMLogger
+		gasCopy uint64 // for EVMLogger to log gas remaining before execution
+		logged  bool   // deferred LiveTracer should ignore already logged steps
+		res     []byte // result of the opcode execution function
+		debug   = in.evm.Config.LiveTracer != nil
 	)
 	// Don't move this deferrred function, it's placed before the capturestate-deferred method,
 	// so that it get's executed _after_: the capturestate needs the stacks before
@@ -224,28 +222,15 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 	}()
 	contract.Input = input
 
-	// TODO: remove old tracer
 	if debug {
-		defer func() {
-			if err != nil {
-				if !logged {
-					in.cfg.Tracer.CaptureState(pcCopy, op, gasCopy, cost, callContext, in.returnData, in.evm.depth, err)
-				} else {
-					in.cfg.Tracer.CaptureFault(pcCopy, op, gasCopy, cost, callContext, in.evm.depth, err)
-				}
-			}
-		}()
-	}
-
-	if debugLiveTracer {
 		defer func() {
 			if err == nil {
 				return
 			}
-			if !loggedLiveTracer && in.evm.Config.LiveTracer.OnOpcode != nil {
+			if !logged && in.evm.Config.LiveTracer.OnOpcode != nil {
 				in.evm.Config.LiveTracer.OnOpcode(pcCopy, byte(op), gasCopy, cost, callContext, in.returnData, in.evm.depth, VMErrorFromErr(err))
 			}
-			if loggedLiveTracer && in.evm.Config.LiveTracer.OnFault != nil {
+			if logged && in.evm.Config.LiveTracer.OnFault != nil {
 				in.evm.Config.LiveTracer.OnFault(pcCopy, byte(op), gasCopy, cost, callContext, in.evm.depth, VMErrorFromErr(err))
 			}
 		}()
@@ -262,7 +247,7 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		}
 		if debug {
 			// Capture pre-execution values for tracing.
-			logged, loggedLiveTracer, pcCopy, gasCopy = false, false, pc, contract.Gas
+			logged, logged, pcCopy, gasCopy = false, false, pc, contract.Gas
 		}
 
 		// Get the operation from the jump table and validate the stack to ensure there are
@@ -326,22 +311,17 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		}
 
 		// Do tracing before memory expansion
-		if debugLiveTracer {
+		if debug {
 			if in.evm.Config.LiveTracer.OnGasChange != nil {
 				in.evm.Config.LiveTracer.OnGasChange(gasCopy, gasCopy-cost, tracing.GasChangeCallOpCode)
 			}
 			if in.evm.Config.LiveTracer.OnOpcode != nil {
 				in.evm.Config.LiveTracer.OnOpcode(pc, byte(op), gasCopy, cost, callContext, in.returnData, in.evm.depth, VMErrorFromErr(err))
-				loggedLiveTracer = true
+				logged = true
 			}
 		}
 		if memorySize > 0 {
 			mem.Resize(memorySize)
-		}
-
-		if debug {
-			in.cfg.Tracer.CaptureState(pc, op, gasCopy, cost, callContext, in.returnData, in.evm.depth, err)
-			logged = true
 		}
 
 		// execute the operation
