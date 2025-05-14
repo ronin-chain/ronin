@@ -719,3 +719,16 @@ func (evm *EVM) PublishEvent(
 func (evm *EVM) SetHook(evmHook EVMHook) {
 	evm.evmHook = evmHook
 }
+
+// GetVMContext provides context about the block being executed as well as state
+// to the tracers.
+func (evm *EVM) GetVMContext() *tracing.VMContext {
+	return &tracing.VMContext{
+		Coinbase:    evm.Context.Coinbase,
+		BlockNumber: evm.Context.BlockNumber,
+		Time:        evm.Context.Time,
+		GasPrice:    evm.TxContext.GasPrice,
+		ChainConfig: evm.ChainConfig(),
+		StateDB:     evm.StateDB,
+	}
+}
