@@ -24,6 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/consortium/generated_contracts/staking"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -224,8 +225,8 @@ func (c *ContractIntegrator) WrapUpEpoch(opts *ApplyTransactOpts) error {
 func (c *ContractIntegrator) SubmitBlockReward(opts *ApplyTransactOpts) error {
 	coinbase := opts.Header.Coinbase
 	balance := opts.State.GetBalance(consensus.SystemAddress)
-	opts.State.SetBalance(consensus.SystemAddress, big.NewInt(0))
-	opts.State.AddBalance(coinbase, balance)
+	opts.State.SetBalance(consensus.SystemAddress, big.NewInt(0), tracing.BalanceDecreaseSystemAddress)
+	opts.State.AddBalance(coinbase, balance, tracing.BalanceIncreaseRewardMineBlock)
 
 	nonce := opts.State.GetNonce(c.coinbase)
 	isVenoki := c.chainConfig.IsVenoki(opts.Header.Number)

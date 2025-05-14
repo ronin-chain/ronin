@@ -33,6 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/txpool"
 	"github.com/ethereum/go-ethereum/core/txpool/legacypool"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -713,8 +714,8 @@ func TestCommitBlobTransaction(t *testing.T) {
 	blobTxsByPrice := NewTransactionsByPriceAndNonce(signer, blobTxs, common.Big0)
 
 	w.current = newCurrent(t, signer, w.chain)
-	w.current.state.AddBalance(senderAddress1, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil))
-	w.current.state.AddBalance(senderAddress2, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil))
+	w.current.state.AddBalance(senderAddress1, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil), tracing.BalanceIncreaseSelfdestruct)
+	w.current.state.AddBalance(senderAddress2, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil), tracing.BalanceIncreaseSelfdestruct)
 
 	// Case 1: Not Cancun, blob transactions are not committed but plain transactions are committed
 	// normally without error
@@ -731,8 +732,8 @@ func TestCommitBlobTransaction(t *testing.T) {
 
 	// Case 2: Higher blob transaction tip is prioritized
 	w.current = newCurrent(t, signer, w.chain)
-	w.current.state.AddBalance(senderAddress1, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil))
-	w.current.state.AddBalance(senderAddress2, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil))
+	w.current.state.AddBalance(senderAddress1, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil), tracing.BalanceIncreaseSelfdestruct)
+	w.current.state.AddBalance(senderAddress2, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil), tracing.BalanceIncreaseSelfdestruct)
 
 	w.current.header.BlobGasUsed = new(uint64)
 	chainConfig.CancunBlock = common.Big0
@@ -795,8 +796,8 @@ func TestCommitBlobTransaction(t *testing.T) {
 
 	// Case 3: Choose the blob transaction that does not make the blob gas used exceed the limit
 	w.current = newCurrent(t, signer, w.chain)
-	w.current.state.AddBalance(senderAddress1, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil))
-	w.current.state.AddBalance(senderAddress2, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil))
+	w.current.state.AddBalance(senderAddress1, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil), tracing.BalanceIncreaseSelfdestruct)
+	w.current.state.AddBalance(senderAddress2, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil), tracing.BalanceIncreaseSelfdestruct)
 
 	w.current.header.BlobGasUsed = new(uint64)
 	*w.current.header.BlobGasUsed = 3 * params.BlobTxBlobGasPerBlob
@@ -820,7 +821,7 @@ func TestCommitBlobTransaction(t *testing.T) {
 
 	// Case 4: Blob sidecars should be discarded when commit blob transactions
 	w.current = newCurrent(t, signer, w.chain)
-	w.current.state.AddBalance(senderAddress1, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil))
+	w.current.state.AddBalance(senderAddress1, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil), tracing.BalanceIncreaseSelfdestruct)
 	w.current.header.BlobGasUsed = new(uint64)
 	chainConfig.CancunBlock = common.Big0
 	w.chainConfig = chainConfig
@@ -847,8 +848,8 @@ func TestCommitBlobTransaction(t *testing.T) {
 
 	// Case 5: correctly handle evicted pending transaction
 	w.current = newCurrent(t, signer, w.chain)
-	w.current.state.AddBalance(senderAddress1, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil))
-	w.current.state.AddBalance(senderAddress2, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil))
+	w.current.state.AddBalance(senderAddress1, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil), tracing.BalanceIncreaseSelfdestruct)
+	w.current.state.AddBalance(senderAddress2, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil), tracing.BalanceIncreaseSelfdestruct)
 	w.current.header.BlobGasUsed = new(uint64)
 	chainConfig.CancunBlock = common.Big0
 	w.chainConfig = chainConfig

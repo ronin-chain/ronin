@@ -34,6 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/txpool"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -328,7 +329,7 @@ func (c *testChain) State() (*state.StateDB, error) {
 		c.statedb, _ = state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
 		// simulate that the new head block included tx0 and tx1
 		c.statedb.SetNonce(c.address, 2)
-		c.statedb.SetBalance(c.address, new(big.Int).SetUint64(params.Ether))
+		c.statedb.SetBalance(c.address, new(big.Int).SetUint64(params.Ether), tracing.BalanceChangeUnspecified)
 		*c.trigger = false
 	}
 	return stdb, nil
@@ -348,7 +349,7 @@ func TestStateChangeDuringReset(t *testing.T) {
 	)
 
 	// setup pool with 2 transaction in it
-	statedb.SetBalance(address, new(big.Int).SetUint64(params.Ether))
+	statedb.SetBalance(address, new(big.Int).SetUint64(params.Ether), tracing.BalanceChangeUnspecified)
 	blockchain := &testChain{&testBlockChain{1000000000, statedb, new(event.Feed), 0}, address, &trigger}
 
 	tx0 := transaction(0, 100000, key)
@@ -386,7 +387,7 @@ func TestStateChangeDuringReset(t *testing.T) {
 
 func testAddBalance(pool *LegacyPool, addr common.Address, amount *big.Int) {
 	pool.mu.Lock()
-	pool.currentState.AddBalance(addr, amount)
+	pool.currentState.AddBalance(addr, amount, tracing.BalanceChangeUnspecified)
 	pool.mu.Unlock()
 }
 
@@ -547,7 +548,7 @@ func TestChainFork(t *testing.T) {
 	addr := crypto.PubkeyToAddress(key.PublicKey)
 	resetState := func() {
 		statedb, _ := state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
-		statedb.AddBalance(addr, big.NewInt(100000000000000))
+		statedb.AddBalance(addr, big.NewInt(100000000000000), tracing.BalanceChangeUnspecified)
 
 		pool.chain = &testBlockChain{1000000, statedb, new(event.Feed), 0}
 		<-pool.requestReset(nil, nil)
@@ -576,7 +577,7 @@ func TestDoubleNonce(t *testing.T) {
 	addr := crypto.PubkeyToAddress(key.PublicKey)
 	resetState := func() {
 		statedb, _ := state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
-		statedb.AddBalance(addr, big.NewInt(100000000000000))
+		statedb.AddBalance(addr, big.NewInt(100000000000000), tracing.BalanceChangeUnspecified)
 
 		pool.chain = &testBlockChain{1000000, statedb, new(event.Feed), 0}
 		<-pool.requestReset(nil, nil)
@@ -3244,7 +3245,7 @@ func BenchmarkMultiAccountBatchInsert(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		key, _ := crypto.GenerateKey()
 		account := crypto.PubkeyToAddress(key.PublicKey)
-		pool.currentState.AddBalance(account, big.NewInt(1000000))
+		pool.currentState.AddBalance(account, big.NewInt(1000000), tracing.BalanceChangeUnspecified)
 		tx := transaction(uint64(0), 100000, key)
 		batches[i] = tx
 	}
@@ -3436,14 +3437,14 @@ func TestExpiredTimeAndGasCheckSponsoredTx(t *testing.T) {
 	}
 
 	// 5. Failed when sender does not have sufficient fund for msg.value
-	statedb.SetBalance(crypto.PubkeyToAddress(payerKey.PublicKey), new(big.Int).Mul(big.NewInt(100000), big.NewInt(22000)))
+	statedb.SetBalance(crypto.PubkeyToAddress(payerKey.PublicKey), new(big.Int).Mul(big.NewInt(100000), big.NewInt(22000)), tracing.BalanceChangeUnspecified)
 	err = txpool.addRemoteSync(tx)
 	if err == nil || !errors.Is(err, core.ErrInsufficientSenderFunds) {
 		t.Fatalf("Expect error %s, get %s", core.ErrInsufficientSenderFunds, err)
 	}
 
 	// 6. Successfully add tx
-	statedb.SetBalance(crypto.PubkeyToAddress(senderKey.PublicKey), big.NewInt(10))
+	statedb.SetBalance(crypto.PubkeyToAddress(senderKey.PublicKey), big.NewInt(10), tracing.BalanceChangeUnspecified)
 	err = txpool.addRemoteSync(tx)
 	if err != nil {
 		t.Fatalf("Expect successfully add tx, get %s", err)
@@ -3477,7 +3478,7 @@ func TestExpiredTimeAndGasCheckSponsoredTx(t *testing.T) {
 	innerTx.Nonce = 3
 	innerTx.GasFeeCap = big.NewInt(params.MinimumBaseFee + 1)
 	innerTx.Value = common.Big0
-	statedb.SetBalance(crypto.PubkeyToAddress(payerKey.PublicKey), new(big.Int).Mul(innerTx.GasFeeCap, big.NewInt(22000)))
+	statedb.SetBalance(crypto.PubkeyToAddress(payerKey.PublicKey), new(big.Int).Mul(innerTx.GasFeeCap, big.NewInt(22000)), tracing.BalanceChangeUnspecified)
 	innerTx.PayerR, innerTx.PayerS, innerTx.PayerV, err = types.PayerSign(
 		payerKey,
 		mikoSigner,
@@ -3554,8 +3555,8 @@ func TestSponsoredTxInTxPoolQueue(t *testing.T) {
 		ExpiredTime: 100,
 	}
 	gasFee := new(big.Int).Mul(sponsoredTx1.GasFeeCap, new(big.Int).SetUint64(sponsoredTx1.Gas))
-	statedb.SetBalance(payerAddr, gasFee)
-	statedb.SetBalance(senderAddr, sponsoredTx1.Value)
+	statedb.SetBalance(payerAddr, gasFee, tracing.BalanceChangeUnspecified)
+	statedb.SetBalance(senderAddr, sponsoredTx1.Value, tracing.BalanceChangeUnspecified)
 
 	mikoSigner := types.NewMikoSigner(big.NewInt(2020))
 	sponsoredTx1.PayerR, sponsoredTx1.PayerS, sponsoredTx1.PayerV, err = types.PayerSign(
@@ -3604,7 +3605,7 @@ func TestSponsoredTxInTxPoolQueue(t *testing.T) {
 	}
 
 	// 1. Payer fund is insufficient, 2 txs are removed from pending and queued
-	statedb.SubBalance(payerAddr, common.Big1)
+	statedb.SubBalance(payerAddr, common.Big1, tracing.BalanceChangeUnspecified)
 	<-txpool.requestReset(nil, nil)
 	pending, queued = txpool.Stats()
 	if pending != 0 {
@@ -3615,7 +3616,7 @@ func TestSponsoredTxInTxPoolQueue(t *testing.T) {
 	}
 
 	// 2. Sender fund is insufficient, 2 txs are removed from pending and queued
-	statedb.AddBalance(payerAddr, common.Big1)
+	statedb.AddBalance(payerAddr, common.Big1, tracing.BalanceChangeUnspecified)
 	errs = txpool.AddRemotesSync([]*types.Transaction{tx1, tx2})
 	for _, err := range errs {
 		if err != nil {
@@ -3631,7 +3632,7 @@ func TestSponsoredTxInTxPoolQueue(t *testing.T) {
 		t.Fatalf("Queued txpool, expect %d get %d", 1, queued)
 	}
 
-	statedb.SubBalance(senderAddr, common.Big1)
+	statedb.SubBalance(senderAddr, common.Big1, tracing.BalanceChangeUnspecified)
 	<-txpool.requestReset(nil, nil)
 	pending, queued = txpool.Stats()
 	if pending != 0 {
@@ -3642,7 +3643,7 @@ func TestSponsoredTxInTxPoolQueue(t *testing.T) {
 	}
 
 	// 3. Payer fund is insufficient, 2 txs with the same payer in a queue
-	statedb.AddBalance(senderAddr, common.Big1)
+	statedb.AddBalance(senderAddr, common.Big1, tracing.BalanceChangeUnspecified)
 	sponsoredTx3 := types.SponsoredTx{
 		ChainID:     big.NewInt(2020),
 		Nonce:       3,
@@ -3682,7 +3683,7 @@ func TestSponsoredTxInTxPoolQueue(t *testing.T) {
 	}
 
 	gasFee = new(big.Int).Mul(sponsoredTx3.GasFeeCap, new(big.Int).SetUint64(sponsoredTx3.Gas))
-	statedb.SetBalance(payerAddr, gasFee)
+	statedb.SetBalance(payerAddr, gasFee, tracing.BalanceChangeUnspecified)
 	<-txpool.requestReset(nil, nil)
 
 	// tx2 must be removed from queue but not tx3
@@ -3691,7 +3692,7 @@ func TestSponsoredTxInTxPoolQueue(t *testing.T) {
 		t.Fatalf("Queued txpool, expect %d get %d", 1, queued)
 	}
 
-	statedb.SubBalance(payerAddr, common.Big1)
+	statedb.SubBalance(payerAddr, common.Big1, tracing.BalanceChangeUnspecified)
 	<-txpool.requestReset(nil, nil)
 	// tx3 must be removed now
 	_, queued = txpool.Stats()
@@ -3701,7 +3702,7 @@ func TestSponsoredTxInTxPoolQueue(t *testing.T) {
 
 	// 4. Expired txs are removed from pending and queued
 	gasFee = new(big.Int).Mul(sponsoredTx1.GasFeeCap, new(big.Int).SetUint64(sponsoredTx1.Gas))
-	statedb.SetBalance(payerAddr, gasFee)
+	statedb.SetBalance(payerAddr, gasFee, tracing.BalanceChangeUnspecified)
 	errs = txpool.AddRemotesSync([]*types.Transaction{tx1, tx2})
 	for _, err := range errs {
 		if err != nil {
@@ -3780,7 +3781,7 @@ func TestFeeCapCheckVenoki(t *testing.T) {
 	senderAddr := crypto.PubkeyToAddress(senderKey.PublicKey)
 
 	statedb, _ := state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
-	statedb.AddBalance(senderAddr, new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil))
+	statedb.AddBalance(senderAddr, new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil), tracing.BalanceChangeUnspecified)
 
 	blockchain := &testBlockChain{10000000, statedb, new(event.Feed), 0}
 

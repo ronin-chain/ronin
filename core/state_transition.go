@@ -25,6 +25,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	cmath "github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -376,12 +377,12 @@ func (st *StateTransition) buyGas() error {
 	//
 	// Unless the Ronin treasury address is specified, the blob fee amount will be burned.
 	if st.evm.ChainConfig().RoninTreasuryAddress != nil && blobFee != nil && blobFee.Cmp(common.Big0) == 1 {
-		st.state.AddBalance(*st.evm.ChainConfig().RoninTreasuryAddress, blobFee)
+		st.state.AddBalance(*st.evm.ChainConfig().RoninTreasuryAddress, blobFee, tracing.BalanceIncreaseGasReturn)
 	}
 
 	// Subtract the gas fee from balance of the fee payer,
 	// the msg.value is transfered to the recipient in later step.
-	st.state.SubBalance(msg.Payer, effectiveGasFee)
+	st.state.SubBalance(msg.Payer, effectiveGasFee, tracing.BalanceDecreaseGasBuy)
 	return nil
 }
 
@@ -638,9 +639,9 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		// if currentBlock is ConsortiumV2 then add balance to system address
 		newEffectiveTip := new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), effectiveTip)
 		if st.evm.ChainConfig().IsConsortiumV2(st.evm.Context.BlockNumber) {
-			st.state.AddBalance(consensus.SystemAddress, newEffectiveTip)
+			st.state.AddBalance(consensus.SystemAddress, newEffectiveTip, tracing.BalanceIncreaseRewardTransactionFee)
 		} else {
-			st.state.AddBalance(st.evm.Context.Coinbase, newEffectiveTip)
+			st.state.AddBalance(st.evm.Context.Coinbase, newEffectiveTip, tracing.BalanceIncreaseRewardTransactionFee)
 		}
 
 		// After Venoki the base fee is non-zero and the fee is transferred to treasury
@@ -648,7 +649,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 			treasuryAddress := st.evm.ChainConfig().RoninTreasuryAddress
 			if treasuryAddress != nil {
 				fee := new(big.Int).Mul(big.NewInt(int64(st.gasUsed())), st.evm.Context.BaseFee)
-				st.state.AddBalance(*treasuryAddress, fee)
+				st.state.AddBalance(*treasuryAddress, fee, tracing.BalanceIncreaseRewardTransactionFee)
 			}
 		}
 	}
@@ -740,7 +741,7 @@ func (st *StateTransition) calcRefund() uint64 {
 func (st *StateTransition) returnGas() {
 	// Return ETH for remaining gas, exchanged at the original rate.
 	remaining := new(big.Int).Mul(new(big.Int).SetUint64(st.gas), st.gasPrice)
-	st.state.AddBalance(st.msg.Payer, remaining)
+	st.state.AddBalance(st.msg.Payer, remaining, tracing.BalanceIncreaseGasReturn)
 
 	// Also return remaining gas to the block gas counter so it is
 	// available for the next transaction.

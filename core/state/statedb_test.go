@@ -34,6 +34,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/trie"
 )
@@ -48,7 +49,7 @@ func TestUpdateLeaks(t *testing.T) {
 	// Update it with some accounts
 	for i := byte(0); i < 255; i++ {
 		addr := common.BytesToAddress([]byte{i})
-		state.AddBalance(addr, big.NewInt(int64(11*i)))
+		state.AddBalance(addr, big.NewInt(int64(11*i)), tracing.BalanceChangeUnspecified)
 		state.SetNonce(addr, uint64(42*i))
 		if i%2 == 0 {
 			state.SetState(addr, common.BytesToHash([]byte{i, i, i}), common.BytesToHash([]byte{i, i, i, i}))
@@ -81,7 +82,7 @@ func TestIntermediateLeaks(t *testing.T) {
 	finalState, _ := New(common.Hash{}, NewDatabase(finalDb), nil)
 
 	modify := func(state *StateDB, addr common.Address, i, tweak byte) {
-		state.SetBalance(addr, big.NewInt(int64(11*i)+int64(tweak)))
+		state.SetBalance(addr, big.NewInt(int64(11*i)+int64(tweak)), tracing.BalanceChangeUnspecified)
 		state.SetNonce(addr, uint64(42*i+tweak))
 		if i%2 == 0 {
 			state.SetState(addr, common.Hash{i, i, i, 0}, common.Hash{})
@@ -157,7 +158,7 @@ func TestCopy(t *testing.T) {
 
 	for i := byte(0); i < 255; i++ {
 		obj := orig.GetOrNewStateObject(common.BytesToAddress([]byte{i}))
-		obj.AddBalance(big.NewInt(int64(i)))
+		obj.AddBalance(big.NewInt(int64(i)), tracing.BalanceChangeUnspecified)
 		orig.updateStateObject(obj)
 	}
 	orig.Finalise(false)
@@ -174,9 +175,9 @@ func TestCopy(t *testing.T) {
 		copyObj := copy.GetOrNewStateObject(common.BytesToAddress([]byte{i}))
 		ccopyObj := ccopy.GetOrNewStateObject(common.BytesToAddress([]byte{i}))
 
-		origObj.AddBalance(big.NewInt(2 * int64(i)))
-		copyObj.AddBalance(big.NewInt(3 * int64(i)))
-		ccopyObj.AddBalance(big.NewInt(4 * int64(i)))
+		origObj.AddBalance(big.NewInt(2*int64(i)), tracing.BalanceChangeUnspecified)
+		copyObj.AddBalance(big.NewInt(3*int64(i)), tracing.BalanceChangeUnspecified)
+		ccopyObj.AddBalance(big.NewInt(4*int64(i)), tracing.BalanceChangeUnspecified)
 
 		orig.updateStateObject(origObj)
 		copy.updateStateObject(copyObj)
@@ -223,7 +224,7 @@ func TestCopyWithDirtyJournal(t *testing.T) {
 	// Fill up the initial states
 	for i := byte(0); i < 255; i++ {
 		obj := orig.GetOrNewStateObject(common.BytesToAddress([]byte{i}))
-		obj.AddBalance(big.NewInt(int64(i)))
+		obj.AddBalance(big.NewInt(int64(i)), tracing.BalanceChangeUnspecified)
 		obj.data.Root = common.HexToHash("0xdeadbeef")
 		orig.updateStateObject(obj)
 	}
@@ -233,7 +234,7 @@ func TestCopyWithDirtyJournal(t *testing.T) {
 	// modify all in memory without finalizing
 	for i := byte(0); i < 255; i++ {
 		obj := orig.GetOrNewStateObject(common.BytesToAddress([]byte{i}))
-		obj.SubBalance(big.NewInt(int64(i)))
+		obj.SubBalance(big.NewInt(int64(i)), tracing.BalanceChangeUnspecified)
 		orig.updateStateObject(obj)
 	}
 	cpy := orig.Copy()
@@ -267,7 +268,7 @@ func TestCopyObjectState(t *testing.T) {
 	// Fill up the initial states
 	for i := byte(0); i < 5; i++ {
 		obj := orig.GetOrNewStateObject(common.BytesToAddress([]byte{i}))
-		obj.AddBalance(big.NewInt(int64(i)))
+		obj.AddBalance(big.NewInt(int64(i)), tracing.BalanceChangeUnspecified)
 		obj.data.Root = common.HexToHash("0xdeadbeef")
 		orig.updateStateObject(obj)
 	}
@@ -328,14 +329,14 @@ func newTestAction(addr common.Address, r *rand.Rand) testAction {
 		{
 			name: "SetBalance",
 			fn: func(a testAction, s *StateDB) {
-				s.SetBalance(addr, big.NewInt(a.args[0]))
+				s.SetBalance(addr, big.NewInt(a.args[0]), tracing.BalanceChangeUnspecified)
 			},
 			args: make([]int64, 1),
 		},
 		{
 			name: "AddBalance",
 			fn: func(a testAction, s *StateDB) {
-				s.AddBalance(addr, big.NewInt(a.args[0]))
+				s.AddBalance(addr, big.NewInt(a.args[0]), tracing.BalanceChangeUnspecified)
 			},
 			args: make([]int64, 1),
 		},
@@ -605,7 +606,7 @@ func TestTouchDelete(t *testing.T) {
 	s.state, _ = New(root, s.state.db, s.state.snaps)
 
 	snapshot := s.state.Snapshot()
-	s.state.AddBalance(common.Address{}, new(big.Int))
+	s.state.AddBalance(common.Address{}, new(big.Int), tracing.BalanceChangeUnspecified)
 
 	if len(s.state.journal.dirties) != 1 {
 		t.Fatal("expected one dirty state object")
@@ -621,7 +622,7 @@ func TestTouchDelete(t *testing.T) {
 func TestCopyOfCopy(t *testing.T) {
 	state, _ := New(common.Hash{}, NewDatabase(rawdb.NewMemoryDatabase()), nil)
 	addr := common.HexToAddress("aaaa")
-	state.SetBalance(addr, big.NewInt(42))
+	state.SetBalance(addr, big.NewInt(42), tracing.BalanceChangeUnspecified)
 
 	if got := state.Copy().GetBalance(addr).Uint64(); got != 42 {
 		t.Fatalf("1st copy fail, expected 42, got %v", got)
@@ -644,9 +645,9 @@ func TestCopyCommitCopy(t *testing.T) {
 	skey := common.HexToHash("aaa")
 	sval := common.HexToHash("bbb")
 
-	state.SetBalance(addr, big.NewInt(42)) // Change the account trie
-	state.SetCode(addr, []byte("hello"))   // Change an external metadata
-	state.SetState(addr, skey, sval)       // Change the storage trie
+	state.SetBalance(addr, big.NewInt(42), tracing.BalanceChangeUnspecified) // Change the account trie
+	state.SetCode(addr, []byte("hello"))                                     // Change an external metadata
+	state.SetState(addr, skey, sval)                                         // Change the storage trie
 
 	if balance := state.GetBalance(addr); balance.Cmp(big.NewInt(42)) != 0 {
 		t.Fatalf("initial balance mismatch: have %v, want %v", balance, 42)
@@ -718,9 +719,9 @@ func TestCopyCopyCommitCopy(t *testing.T) {
 	skey := common.HexToHash("aaa")
 	sval := common.HexToHash("bbb")
 
-	state.SetBalance(addr, big.NewInt(42)) // Change the account trie
-	state.SetCode(addr, []byte("hello"))   // Change an external metadata
-	state.SetState(addr, skey, sval)       // Change the storage trie
+	state.SetBalance(addr, big.NewInt(42), tracing.BalanceChangeUnspecified) // Change the account trie
+	state.SetCode(addr, []byte("hello"))                                     // Change an external metadata
+	state.SetState(addr, skey, sval)                                         // Change the storage trie
 
 	if balance := state.GetBalance(addr); balance.Cmp(big.NewInt(42)) != 0 {
 		t.Fatalf("initial balance mismatch: have %v, want %v", balance, 42)
@@ -789,9 +790,9 @@ func TestCommitCopy(t *testing.T) {
 	skey1, skey2 := common.HexToHash("a1"), common.HexToHash("a2")
 	sval1, sval2 := common.HexToHash("b1"), common.HexToHash("b2")
 
-	state.SetBalance(addr, big.NewInt(42)) // Change the account trie
-	state.SetCode(addr, []byte("hello"))   // Change an external metadata
-	state.SetState(addr, skey1, sval1)     // Change the storage trie
+	state.SetBalance(addr, big.NewInt(42), tracing.BalanceChangeUnspecified) // Change the account trie
+	state.SetCode(addr, []byte("hello"))                                     // Change an external metadata
+	state.SetState(addr, skey1, sval1)                                       // Change the storage trie
 
 	if balance := state.GetBalance(addr); balance.Cmp(big.NewInt(42)) != 0 {
 		t.Fatalf("initial balance mismatch: have %v, want %v", balance, 42)
@@ -855,7 +856,7 @@ func TestDeleteCreateRevert(t *testing.T) {
 	state, _ := New(common.Hash{}, NewDatabase(rawdb.NewMemoryDatabase()), nil)
 
 	addr := common.BytesToAddress([]byte("so"))
-	state.SetBalance(addr, big.NewInt(1))
+	state.SetBalance(addr, big.NewInt(1), tracing.BalanceChangeUnspecified)
 
 	root, _ := state.Commit(0, false)
 	state, _ = New(root, state.db, state.snaps)
@@ -865,7 +866,7 @@ func TestDeleteCreateRevert(t *testing.T) {
 	state.Finalise(true)
 
 	id := state.Snapshot()
-	state.SetBalance(addr, big.NewInt(2))
+	state.SetBalance(addr, big.NewInt(2), tracing.BalanceChangeUnspecified)
 	state.RevertToSnapshot(id)
 
 	// Commit the entire state and make sure we don't crash and have the correct state
@@ -881,7 +882,7 @@ func TestDeleteResetBalance(t *testing.T) {
 	state, _ := New(common.Hash{}, NewDatabase(rawdb.NewMemoryDatabase()), nil)
 
 	addr := common.BytesToAddress([]byte("so"))
-	state.SetBalance(addr, big.NewInt(1))
+	state.SetBalance(addr, big.NewInt(1), tracing.BalanceChangeUnspecified)
 	state.SetNonce(addr, 10)
 
 	root, _ := state.Commit(0, false)
@@ -916,7 +917,6 @@ func TestDeleteResetBalance(t *testing.T) {
 // the Commit operation fails with an error
 // If we are missing trie nodes, we should not continue writing to the trie
 func TestMissingTrieNodes(t *testing.T) {
-
 	// Create an initial state with a few accounts
 	memDb := rawdb.NewMemoryDatabase()
 	db := NewDatabase(memDb)
@@ -924,10 +924,10 @@ func TestMissingTrieNodes(t *testing.T) {
 	state, _ := New(common.Hash{}, db, nil)
 	addr := common.BytesToAddress([]byte("so"))
 	{
-		state.SetBalance(addr, big.NewInt(1))
+		state.SetBalance(addr, big.NewInt(1), tracing.BalanceChangeUnspecified)
 		state.SetCode(addr, []byte{1, 2, 3})
 		a2 := common.BytesToAddress([]byte("another"))
-		state.SetBalance(a2, big.NewInt(100))
+		state.SetBalance(a2, big.NewInt(100), tracing.BalanceChangeUnspecified)
 		state.SetCode(a2, []byte{1, 2, 4})
 		root, _ = state.Commit(0, false)
 		t.Logf("root: %x", root)
@@ -952,7 +952,7 @@ func TestMissingTrieNodes(t *testing.T) {
 		t.Errorf("expected %d, got %d", exp, got)
 	}
 	// Modify the state
-	state.SetBalance(addr, big.NewInt(2))
+	state.SetBalance(addr, big.NewInt(2), tracing.BalanceChangeUnspecified)
 	root, err := state.Commit(0, false)
 	if err == nil {
 		t.Fatalf("expected error, got root :%x", root)
@@ -977,7 +977,7 @@ func TestStateDBAccessList(t *testing.T) {
 		t.Helper()
 		// convert to common.Address form
 		var addresses []common.Address
-		var addressMap = make(map[common.Address]struct{})
+		addressMap := make(map[common.Address]struct{})
 		for _, astring := range astrings {
 			address := addr(astring)
 			addresses = append(addresses, address)
@@ -1000,10 +1000,10 @@ func TestStateDBAccessList(t *testing.T) {
 		if !state.AddressInAccessList(addr(addrString)) {
 			t.Fatalf("scope missing address/slots %v", addrString)
 		}
-		var address = addr(addrString)
+		address := addr(addrString)
 		// convert to common.Hash form
 		var slots []common.Hash
-		var slotMap = make(map[common.Hash]struct{})
+		slotMap := make(map[common.Hash]struct{})
 		for _, slotString := range slotStrings {
 			s := slot(slotString)
 			slots = append(slots, s)
