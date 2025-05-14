@@ -128,6 +128,37 @@ func flushAlloc(ga *types.GenesisAlloc, db ethdb.Database, triedb *trie.Database
 	return nil
 }
 
+func getGenesisState(db ethdb.Database, blockhash common.Hash) (alloc types.GenesisAlloc, err error) {
+	blob := rawdb.ReadGenesisStateSpec(db, blockhash)
+	if len(blob) != 0 {
+		if err := alloc.UnmarshalJSON(blob); err != nil {
+			return nil, err
+		}
+
+		return alloc, nil
+	}
+
+	// Genesis allocation is missing and there are several possibilities:
+	// the node is legacy which doesn't persist the genesis allocation or
+	// the persisted allocation is just lost.
+	// - supported networks(mainnet, testnets), recover with defined allocations
+	// - private network, can't recover
+	var genesis *Genesis
+	switch blockhash {
+	case params.MainnetGenesisHash:
+		genesis = DefaultGenesisBlock()
+	case params.GoerliGenesisHash:
+		genesis = DefaultGoerliGenesisBlock()
+	case params.SepoliaGenesisHash:
+		genesis = DefaultSepoliaGenesisBlock()
+	}
+	if genesis != nil {
+		return genesis.Alloc, nil
+	}
+
+	return nil, nil
+}
+
 // field type overrides for gencodec
 type genesisSpecMarshaling struct {
 	Nonce      math.HexOrDecimal64
