@@ -42,12 +42,11 @@ type OpContext interface {
 	Address() common.Address
 	CallValue() *uint256.Int
 	CallInput() []byte
-	ContractCode() []byte
 }
 
 // StateDB gives tracers access to the whole state.
 type StateDB interface {
-	GetBalance(common.Address) *uint256.Int
+	GetBalance(common.Address) *big.Int
 	GetNonce(common.Address) uint64
 	GetCode(common.Address) []byte
 	GetCodeHash(common.Address) common.Hash
@@ -62,8 +61,9 @@ type VMContext struct {
 	Coinbase    common.Address
 	BlockNumber *big.Int
 	Time        uint64
-	Random      *common.Hash
-	BaseFee     *big.Int
+	// Effective tx gas price
+	GasPrice    *big.Int
+	ChainConfig *params.ChainConfig
 	StateDB     StateDB
 }
 
