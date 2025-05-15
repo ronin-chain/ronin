@@ -19,6 +19,7 @@ package native
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"math/big"
 	"sync/atomic"
 
@@ -123,7 +124,8 @@ type callTracer2Config struct {
 // newCallTracer returns a native go tracer which tracks
 // call frames of a tx, and implements vm.EVMLogger.
 func newCallTracer2(ctx *tracers.Context, cfg json.RawMessage) (*tracers.Tracer, error) {
-	t, err := newCallTracerObject(ctx, cfg)
+	fmt.Printf("newCallTracer2: %s\n", cfg)
+	t, err := newCallTracer2Object(ctx, cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +155,7 @@ func newCallTracer2Object(ctx *tracers.Context, cfg json.RawMessage) (*callTrace
 }
 
 // OnEnter is called when EVM enters a new scope (via call, create or selfdestruct).
-func (t *callTracer2) OnEnter(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
+func (t *callTracer2) OnEnter(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int, order uint64) {
 	t.depth = depth
 	if t.config.OnlyTopCall && depth > 0 {
 		return
@@ -165,8 +167,8 @@ func (t *callTracer2) OnEnter(depth int, typ byte, from common.Address, to commo
 
 	toCopy := to
 	call := callFrame2{
-		Type: vm.OpCode(typ),
-		// Order: t.env.Context.Counter,
+		Type:  vm.OpCode(typ),
+		Order: order,
 		From:  from,
 		To:    &toCopy,
 		Input: common.CopyBytes(input),

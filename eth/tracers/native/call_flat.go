@@ -152,8 +152,8 @@ func newFlatCallTracer(ctx *tracers.Context, cfg json.RawMessage) (*tracers.Trac
 }
 
 // OnEnter is called when EVM enters a new scope (via call, create or selfdestruct).
-func (t *flatCallTracer) OnEnter(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
-	t.tracer.OnEnter(depth, typ, from, to, input, gas, value)
+func (t *flatCallTracer) OnEnter(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int, order uint64) {
+	t.tracer.OnEnter(depth, typ, from, to, input, gas, value, order)
 
 	if depth == 0 {
 		return

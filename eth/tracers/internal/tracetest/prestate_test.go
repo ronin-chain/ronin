@@ -18,7 +18,6 @@ package tracetest
 
 import (
 	"encoding/json"
-	"fmt"
 	"math/big"
 	"os"
 	"path/filepath"
@@ -124,7 +123,6 @@ func testPrestateDiffTracer(tracerName string, dirPath string, scheme string, t 
 				t.Fatalf("failed to prepare transaction for tracing: %v", err)
 			}
 			evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Tracer: tracer.Hooks})
-			fmt.Printf("evm.Context: %+v\n", evm.Context)
 			statedb.SetLogger(tracer.Hooks)
 			tracer.OnTxStart(evm.GetVMContext(), tx, msg.Payer)
 			vmRet, err := core.ApplyMessage(evm, msg, new(core.GasPool).AddGas(tx.Gas()))

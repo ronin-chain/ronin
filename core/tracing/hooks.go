@@ -93,7 +93,7 @@ type (
 	// Take note that EnterHook, when in the context of a live tracer, can be invoked
 	// outside of the `OnTxStart` and `OnTxEnd` hooks when dealing with system calls,
 	// see [OnSystemCallStartHook] and [OnSystemCallEndHook] for more information.
-	EnterHook = func(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int)
+	EnterHook = func(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int, order uint64)
 
 	// ExitHook is invoked when the processing of a message ends.
 	// `revert` is true when there was an error during the execution.

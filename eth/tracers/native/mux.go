@@ -101,10 +101,10 @@ func (t *muxTracer) OnGasChange(old, new uint64, reason tracing.GasChangeReason)
 	}
 }
 
-func (t *muxTracer) OnEnter(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
+func (t *muxTracer) OnEnter(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int, order uint64) {
 	for _, t := range t.tracers {
 		if t.OnEnter != nil {
-			t.OnEnter(depth, typ, from, to, input, gas, value)
+			t.OnEnter(depth, typ, from, to, input, gas, value, order)
 		}
 	}
 }

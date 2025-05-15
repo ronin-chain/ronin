@@ -357,7 +357,7 @@ func (t *mdLogger) OnTxStart(env *tracing.VMContext, tx *types.Transaction, from
 	t.env = env
 }
 
-func (t *mdLogger) OnEnter(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
+func (t *mdLogger) OnEnter(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int, _ uint64) {
 	if depth != 0 {
 		return
 	}
