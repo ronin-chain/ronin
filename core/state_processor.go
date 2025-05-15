@@ -123,7 +123,7 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 			return nil, nil, nil, 0, fmt.Errorf("could not apply tx %d [%v]: %w", i, tx.Hash().Hex(), err)
 		}
 		statedb.SetTxContext(tx.Hash(), i)
-		receipt, _, err := applyTransaction(msg, p.config, p.bc, nil, gp, statedb, blockNumber, blockHash, tx, usedGas, vmenv, bloomProcessors)
+		receipt, _, err := ApplyMessageWithEVM(msg, p.config, gp, statedb, blockNumber, blockHash, tx, usedGas, vmenv, bloomProcessors)
 		if err != nil {
 			return nil, nil, nil, 0, fmt.Errorf("could not apply tx %d [%v]: %w", i, tx.Hash().Hex(), err)
 		}
@@ -143,11 +143,9 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 	return receipts, allLogs, *blockContext.InternalTransactions, *usedGas, nil
 }
 
-func applyTransaction(
+func ApplyMessageWithEVM(
 	msg *Message,
 	config *params.ChainConfig,
-	bc ChainContext,
-	author *common.Address,
 	gp *GasPool,
 	statedb *state.StateDB,
 	blockNumber *big.Int,
@@ -157,7 +155,7 @@ func applyTransaction(
 	receiptProcessor ReceiptProcessor,
 ) (receipt *types.Receipt, result *ExecutionResult, err error) {
 	if evm.Config.LiveTracer != nil && evm.Config.LiveTracer.OnTxStart != nil {
-		evm.Config.LiveTracer.OnTxStart(evm.GetVMContext(), tx, msg.From)
+		evm.Config.LiveTracer.OnTxStart(evm.GetVMContext(), tx, msg.Payer)
 		if evm.Config.LiveTracer.OnTxEnd != nil {
 			defer func() {
 				evm.Config.LiveTracer.OnTxEnd(receipt, err)
@@ -252,5 +250,5 @@ func ApplyTransaction(
 	// Create a new context to be used in the EVM environment
 	blockContext := NewEVMBlockContext(header, bc, author, publishEvents...)
 	vmenv := vm.NewEVM(blockContext, vm.TxContext{}, statedb, config, cfg)
-	return applyTransaction(msg, config, bc, author, gp, statedb, header.Number, header.Hash(), tx, usedGas, vmenv, receiptProcessors)
+	return ApplyMessageWithEVM(msg, config, gp, statedb, header.Number, header.Hash(), tx, usedGas, vmenv, receiptProcessors)
 }
