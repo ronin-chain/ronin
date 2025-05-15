@@ -94,8 +94,8 @@ func stateTestCmd(ctx *cli.Context) error {
 	}
 	// Iterate over all the tests, run them and aggregate the results
 	cfg := vm.Config{
-		LiveTracer: tracer,
-		Debug:      ctx.Bool(DebugFlag.Name) || ctx.Bool(MachineFlag.Name),
+		Tracer: tracer,
+		Debug:  ctx.Bool(DebugFlag.Name) || ctx.Bool(MachineFlag.Name),
 	}
 	results := make([]StatetestResult, 0, len(tests))
 	for key, test := range tests {

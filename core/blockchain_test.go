@@ -2931,8 +2931,8 @@ func testDeleteRecreateSlots(t *testing.T, scheme string) {
 	db.Close()
 	diskdb := rawdb.NewMemoryDatabase()
 	chain, err := NewBlockChain(diskdb, DefaultCacheConfigWithScheme(scheme), gspec, nil, engine, vm.Config{
-		Debug:      true,
-		LiveTracer: logger.NewJSONLogger(nil, os.Stdout),
+		Debug:  true,
+		Tracer: logger.NewJSONLogger(nil, os.Stdout),
 	}, nil, nil)
 	if err != nil {
 		t.Fatalf("failed to create tester chain: %v", err)
@@ -3018,8 +3018,8 @@ func testDeleteRecreateAccount(t *testing.T, scheme string) {
 	diskdb := rawdb.NewMemoryDatabase()
 	gspec.MustCommit(diskdb, trie.NewDatabase(diskdb, nil))
 	chain, err := NewBlockChain(diskdb, DefaultCacheConfigWithScheme(scheme), gspec, nil, engine, vm.Config{
-		Debug:      true,
-		LiveTracer: logger.NewJSONLogger(nil, os.Stdout),
+		Debug:  true,
+		Tracer: logger.NewJSONLogger(nil, os.Stdout),
 	}, nil, nil)
 	if err != nil {
 		t.Fatalf("failed to create tester chain: %v", err)
@@ -4125,7 +4125,7 @@ func testEIP3651(t *testing.T, scheme string) {
 
 		b.AddTx(tx)
 	})
-	chain, err := NewBlockChain(db, DefaultCacheConfigWithScheme(scheme), gspec, nil, engine, vm.Config{LiveTracer: logger.NewMarkdownLogger(&logger.Config{}, os.Stderr).Hooks()}, nil, nil)
+	chain, err := NewBlockChain(db, DefaultCacheConfigWithScheme(scheme), gspec, nil, engine, vm.Config{Tracer: logger.NewMarkdownLogger(&logger.Config{}, os.Stderr).Hooks()}, nil, nil)
 	if err != nil {
 		t.Fatalf("failed to create tester chain: %v", err)
 	}

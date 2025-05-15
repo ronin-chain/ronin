@@ -351,8 +351,8 @@ func (st *StateTransition) buyGas() error {
 		return err
 	}
 
-	if st.evm.Config.LiveTracer != nil && st.evm.Config.LiveTracer.OnGasChange != nil {
-		st.evm.Config.LiveTracer.OnGasChange(0, st.msg.GasLimit, tracing.GasChangeTxInitialBalance)
+	if st.evm.Config.Tracer != nil && st.evm.Config.Tracer.OnGasChange != nil {
+		st.evm.Config.Tracer.OnGasChange(0, st.msg.GasLimit, tracing.GasChangeTxInitialBalance)
 	}
 	st.gas += msg.GasLimit
 
@@ -516,7 +516,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		if st.gas < gas {
 			return nil, fmt.Errorf("%w: have %d, want %d", ErrIntrinsicGas, st.gas, gas)
 		}
-		if t := st.evm.Config.LiveTracer; t != nil && t.OnGasChange != nil {
+		if t := st.evm.Config.Tracer; t != nil && t.OnGasChange != nil {
 			t.OnGasChange(st.gas, st.gas-gas, tracing.GasChangeTxIntrinsicGas)
 		}
 		st.gas -= gas
@@ -597,8 +597,8 @@ func (st *StateTransition) refundGas(refundQuotient uint64) uint64 {
 		refund = st.state.GetRefund()
 	}
 
-	if st.evm.Config.LiveTracer != nil && st.evm.Config.LiveTracer.OnGasChange != nil && refund > 0 {
-		st.evm.Config.LiveTracer.OnGasChange(st.gas, st.gas+refund, tracing.GasChangeTxRefunds)
+	if st.evm.Config.Tracer != nil && st.evm.Config.Tracer.OnGasChange != nil && refund > 0 {
+		st.evm.Config.Tracer.OnGasChange(st.gas, st.gas+refund, tracing.GasChangeTxRefunds)
 	}
 	st.gas += refund
 
@@ -606,8 +606,8 @@ func (st *StateTransition) refundGas(refundQuotient uint64) uint64 {
 	remaining := new(big.Int).Mul(new(big.Int).SetUint64(st.gas), st.gasPrice)
 	st.state.AddBalance(st.msg.Payer, remaining, tracing.BalanceIncreaseGasReturn)
 
-	if st.evm.Config.LiveTracer != nil && st.evm.Config.LiveTracer.OnGasChange != nil && st.gas > 0 {
-		st.evm.Config.LiveTracer.OnGasChange(st.gas, 0, tracing.GasChangeTxLeftOverReturned)
+	if st.evm.Config.Tracer != nil && st.evm.Config.Tracer.OnGasChange != nil && st.gas > 0 {
+		st.evm.Config.Tracer.OnGasChange(st.gas, 0, tracing.GasChangeTxLeftOverReturned)
 	}
 
 	// Also return remaining gas to the block gas counter so it is

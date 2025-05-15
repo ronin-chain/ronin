@@ -229,8 +229,8 @@ func runCmd(ctx *cli.Context) error {
 		Coinbase:    genesisConfig.Coinbase,
 		BlockNumber: new(big.Int).SetUint64(genesisConfig.Number),
 		EVMConfig: vm.Config{
-			LiveTracer: tracer,
-			Debug:      ctx.Bool(DebugFlag.Name) || ctx.Bool(MachineFlag.Name),
+			Tracer: tracer,
+			Debug:  ctx.Bool(DebugFlag.Name) || ctx.Bool(MachineFlag.Name),
 		},
 	}
 

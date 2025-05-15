@@ -154,11 +154,11 @@ func ApplyMessageWithEVM(
 	usedGas *uint64, evm *vm.EVM,
 	receiptProcessor ReceiptProcessor,
 ) (receipt *types.Receipt, result *ExecutionResult, err error) {
-	if evm.Config.LiveTracer != nil && evm.Config.LiveTracer.OnTxStart != nil {
-		evm.Config.LiveTracer.OnTxStart(evm.GetVMContext(), tx, msg.Payer)
-		if evm.Config.LiveTracer.OnTxEnd != nil {
+	if evm.Config.Tracer != nil && evm.Config.Tracer.OnTxStart != nil {
+		evm.Config.Tracer.OnTxStart(evm.GetVMContext(), tx, msg.Payer)
+		if evm.Config.Tracer.OnTxEnd != nil {
 			defer func() {
-				evm.Config.LiveTracer.OnTxEnd(receipt, err)
+				evm.Config.Tracer.OnTxEnd(receipt, err)
 			}()
 		}
 	}

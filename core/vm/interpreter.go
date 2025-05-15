@@ -30,9 +30,7 @@ import (
 // Config are the configuration options for the Interpreter
 type Config struct {
 	Debug                   bool           // Enables debugging
-	Tracer                  EVMLogger      // Opcode logger
-	LiveTracer              *tracing.Hooks // Live tracer
-	FullCallTracing         bool           // Emit trace error
+	Tracer                  *tracing.Hooks // Live tracer
 	NoRecursion             bool           // Disables call, callcode, delegate call and create
 	NoBaseFee               bool           // Forces the EIP-1559 baseFee to 0 (needed for 0 price calls)
 	EnablePreimageRecording bool           // Enables recording of SHA3/keccak preimages
@@ -210,9 +208,9 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		// copies used by tracer
 		pcCopy  uint64 // needed for the deferred EVMLogger
 		gasCopy uint64 // for EVMLogger to log gas remaining before execution
-		logged  bool   // deferred LiveTracer should ignore already logged steps
+		logged  bool   // deferred Tracer should ignore already logged steps
 		res     []byte // result of the opcode execution function
-		debug   = in.evm.Config.LiveTracer != nil
+		debug   = in.evm.Config.Tracer != nil
 	)
 	// Don't move this deferrred function, it's placed before the capturestate-deferred method,
 	// so that it get's executed _after_: the capturestate needs the stacks before
@@ -227,11 +225,11 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 			if err == nil {
 				return
 			}
-			if !logged && in.evm.Config.LiveTracer.OnOpcode != nil {
-				in.evm.Config.LiveTracer.OnOpcode(pcCopy, byte(op), gasCopy, cost, callContext, in.returnData, in.evm.depth, VMErrorFromErr(err))
+			if !logged && in.evm.Config.Tracer.OnOpcode != nil {
+				in.evm.Config.Tracer.OnOpcode(pcCopy, byte(op), gasCopy, cost, callContext, in.returnData, in.evm.depth, VMErrorFromErr(err))
 			}
-			if logged && in.evm.Config.LiveTracer.OnFault != nil {
-				in.evm.Config.LiveTracer.OnFault(pcCopy, byte(op), gasCopy, cost, callContext, in.evm.depth, VMErrorFromErr(err))
+			if logged && in.evm.Config.Tracer.OnFault != nil {
+				in.evm.Config.Tracer.OnFault(pcCopy, byte(op), gasCopy, cost, callContext, in.evm.depth, VMErrorFromErr(err))
 			}
 		}()
 	}
@@ -278,7 +276,7 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		}
 		// Static portion of gas
 		cost = operation.constantGas // For tracing
-		if !contract.UseGas(cost, in.evm.Config.LiveTracer, tracing.GasChangeIgnored) {
+		if !contract.UseGas(cost, in.evm.Config.Tracer, tracing.GasChangeIgnored) {
 			return nil, ErrOutOfGas
 		}
 
@@ -305,18 +303,18 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 			var dynamicCost uint64
 			dynamicCost, err = operation.dynamicGas(in.evm, contract, stack, mem, memorySize)
 			cost += dynamicCost // total cost, for debug tracing
-			if err != nil || !contract.UseGas(dynamicCost, in.evm.Config.LiveTracer, tracing.GasChangeIgnored) {
+			if err != nil || !contract.UseGas(dynamicCost, in.evm.Config.Tracer, tracing.GasChangeIgnored) {
 				return nil, ErrOutOfGas
 			}
 		}
 
 		// Do tracing before memory expansion
 		if debug {
-			if in.evm.Config.LiveTracer.OnGasChange != nil {
-				in.evm.Config.LiveTracer.OnGasChange(gasCopy, gasCopy-cost, tracing.GasChangeCallOpCode)
+			if in.evm.Config.Tracer.OnGasChange != nil {
+				in.evm.Config.Tracer.OnGasChange(gasCopy, gasCopy-cost, tracing.GasChangeCallOpCode)
 			}
-			if in.evm.Config.LiveTracer.OnOpcode != nil {
-				in.evm.Config.LiveTracer.OnOpcode(pc, byte(op), gasCopy, cost, callContext, in.returnData, in.evm.depth, VMErrorFromErr(err))
+			if in.evm.Config.Tracer.OnOpcode != nil {
+				in.evm.Config.Tracer.OnOpcode(pc, byte(op), gasCopy, cost, callContext, in.returnData, in.evm.depth, VMErrorFromErr(err))
 				logged = true
 			}
 		}

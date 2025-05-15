@@ -156,7 +156,7 @@ type callTracer2Test struct {
 // 			if err != nil {
 // 				t.Fatalf("failed to create call tracer: %v", err)
 // 			}
-// 			evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Debug: true, LiveTracer: tracer.Hooks})
+// 			evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Debug: true, Tracer: tracer.Hooks})
 // 			msg, err := core.TransactionToMessage(tx, signer, nil)
 // 			if err != nil {
 // 				t.Fatalf("failed to prepare transaction for tracing: %v", err)
@@ -263,7 +263,7 @@ type callTracer2Test struct {
 // 		if err != nil {
 // 			b.Fatalf("failed to create call tracer: %v", err)
 // 		}
-// 		evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Debug: true, LiveTracer: tracer.Hooks})
+// 		evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Debug: true, Tracer: tracer.Hooks})
 // 		snap := statedb.Snapshot()
 // 		st := core.NewStateTransition(evm, msg, new(core.GasPool).AddGas(tx.Gas()))
 // 		if _, err = st.TransitionDb(); err != nil {
@@ -331,7 +331,7 @@ type callTracer2Test struct {
 // 	if err != nil {
 // 		t.Fatalf("failed to create call tracer: %v", err)
 // 	}
-// 	evm := vm.NewEVM(context, txContext, statedb, params.MainnetChainConfig, vm.Config{Debug: true, LiveTracer: tracer.Hooks})
+// 	evm := vm.NewEVM(context, txContext, statedb, params.MainnetChainConfig, vm.Config{Debug: true, Tracer: tracer.Hooks})
 // 	msg, err := core.TransactionToMessage(tx, signer, nil)
 // 	if err != nil {
 // 		t.Fatalf("failed to prepare transaction for tracing: %v", err)

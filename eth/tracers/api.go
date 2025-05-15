@@ -946,19 +946,19 @@ func (api *API) standardTraceBlockToFile(ctx context.Context, block *types.Block
 			// Swap out the noop logger to the standard tracer
 			writer = bufio.NewWriter(dump)
 			vmConf = vm.Config{
-				LiveTracer:              logger.NewJSONLogger(&logConfig, writer),
+				Tracer:                  logger.NewJSONLogger(&logConfig, writer),
 				EnablePreimageRecording: true,
 			}
 		}
 		// Execute the transaction and flush any traces to disk
 		vmenv := vm.NewEVM(vmctx, txContext, statedb, chainConfig, vmConf)
 		statedb.SetTxContext(tx.Hash(), i)
-		vmConf.LiveTracer.OnTxStart(vmenv.GetVMContext(), tx, msg.Payer)
+		vmConf.Tracer.OnTxStart(vmenv.GetVMContext(), tx, msg.Payer)
 		if consortium.HandleSystemTransaction(api.backend.Engine(), statedb, msg, block) {
 			vmenv.Config.IsSystemTransaction = true
 		}
 		vmRet, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.GasLimit))
-		vmConf.LiveTracer.OnTxEnd(&types.Receipt{GasUsed: vmRet.UsedGas}, err)
+		vmConf.Tracer.OnTxEnd(&types.Receipt{GasUsed: vmRet.UsedGas}, err)
 		if writer != nil {
 			writer.Flush()
 		}
@@ -1137,7 +1137,7 @@ func (api *API) traceTx(
 	}
 
 	// Run the transaction with tracing enabled.
-	vmenv := vm.NewEVM(vmctx, txContext, statedb, api.backend.ChainConfig(), vm.Config{LiveTracer: tracer.Hooks, NoBaseFee: true, FullCallTracing: config.FullCallTracing})
+	vmenv := vm.NewEVM(vmctx, txContext, statedb, api.backend.ChainConfig(), vm.Config{Tracer: tracer.Hooks, NoBaseFee: true})
 
 	// Define a meaningful timeout of a single transaction trace
 	if config.Timeout != nil {
