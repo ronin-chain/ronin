@@ -19,7 +19,6 @@ package native
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"math/big"
 	"sync/atomic"
 
@@ -124,7 +123,6 @@ type callTracer2Config struct {
 // newCallTracer returns a native go tracer which tracks
 // call frames of a tx, and implements vm.EVMLogger.
 func newCallTracer2(ctx *tracers.Context, cfg json.RawMessage) (*tracers.Tracer, error) {
-	fmt.Printf("newCallTracer2: %s\n", cfg)
 	t, err := newCallTracer2Object(ctx, cfg)
 	if err != nil {
 		return nil, err
