@@ -39,6 +39,7 @@ import (
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/core/vm/runtime"
@@ -122,7 +123,7 @@ func runCmd(ctx *cli.Context) error {
 	}
 
 	var (
-		tracer        vm.EVMLogger
+		tracer        *tracing.Hooks
 		debugLogger   *logger.StructLogger
 		statedb       *state.StateDB
 		chainConfig   *params.ChainConfig
@@ -134,7 +135,7 @@ func runCmd(ctx *cli.Context) error {
 		tracer = logger.NewJSONLogger(logconfig, os.Stdout)
 	} else if ctx.Bool(DebugFlag.Name) {
 		debugLogger = logger.NewStructLogger(logconfig)
-		tracer = debugLogger
+		tracer = debugLogger.Hooks()
 	} else {
 		debugLogger = logger.NewStructLogger(logconfig)
 	}

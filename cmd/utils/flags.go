@@ -2436,7 +2436,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chai
 			if err != nil {
 				Fatalf("Failed to create tracer %q: %v", name, err)
 			}
-			vmcfg.LiveTracer = t
+			vmcfg.Tracer = t
 		}
 	}
 	// TODO(rjl493456442) disable snapshot generation/wiping if the chain is read only.

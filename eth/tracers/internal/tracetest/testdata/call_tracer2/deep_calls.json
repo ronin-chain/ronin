@@ -115,8 +115,8 @@
     "to": "0xc212e03b9e060e36facad5fd8f4435412ca22e6b",
     "input": "0x51a34eb80000000000000000000000000000000000000000000000280faf689c35ac0000",
     "output": "0x",
-    "gas": "0x37b38",
-    "gasUsed": "0x12bb3",
+    "gas": "0x3d090",
+    "gasUsed": "0x1810b",
     "value": "0x0",
     "calls": [
       {

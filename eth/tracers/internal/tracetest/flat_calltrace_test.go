@@ -108,17 +108,18 @@ func flatCallTracerTestRunner(tracerName string, filename string, dirPath string
 	if err != nil {
 		return fmt.Errorf("failed to create call tracer: %v", err)
 	}
-	evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Tracer: tracer})
+	evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Tracer: tracer.Hooks})
 
 	msg, err := core.TransactionToMessage(tx, signer, nil)
 	if err != nil {
 		return fmt.Errorf("failed to prepare transaction for tracing: %v", err)
 	}
-	st := core.NewStateTransition(evm, msg, new(core.GasPool).AddGas(tx.Gas()))
-
-	if _, err = st.TransitionDb(); err != nil {
+	tracer.OnTxStart(evm.GetVMContext(), tx, msg.Payer)
+	vmRet, err := core.ApplyMessage(evm, msg, new(core.GasPool).AddGas(tx.Gas()))
+	if err != nil {
 		return fmt.Errorf("failed to execute transaction: %v", err)
 	}
+	tracer.OnTxEnd(&types.Receipt{GasUsed: vmRet.UsedGas}, nil)
 
 	// Retrieve the trace result and compare against the etalon
 	res, err := tracer.GetResult()
