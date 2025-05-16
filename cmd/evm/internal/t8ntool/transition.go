@@ -21,12 +21,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"math/big"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/eth/tracers"
 	"github.com/ethereum/go-ethereum/eth/tracers/logger"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -91,10 +94,9 @@ func Transition(ctx *cli.Context) error {
 	log.Root().SetHandler(glogger)
 
 	var (
-		err    error
-		tracer vm.EVMLogger
+		err error
 	)
-	var getTracer func(txIndex int, txHash common.Hash) (vm.EVMLogger, error)
+	var getTracer = func(txIndex int, txHash common.Hash) (*tracers.Tracer, io.WriteCloser, error) { return nil, nil, nil }
 
 	baseDir, err := createBasedir(ctx)
 	if err != nil {
@@ -127,20 +129,19 @@ func Transition(ctx *cli.Context) error {
 				prevFile.Close()
 			}
 		}()
-		getTracer = func(txIndex int, txHash common.Hash) (vm.EVMLogger, error) {
-			if prevFile != nil {
-				prevFile.Close()
-			}
-			traceFile, err := os.Create(path.Join(baseDir, fmt.Sprintf("trace-%d-%v.jsonl", txIndex, txHash.String())))
+		getTracer = func(txIndex int, txHash common.Hash) (*tracers.Tracer, io.WriteCloser, error) {
+			traceFile, err := os.Create(filepath.Join(baseDir, fmt.Sprintf("trace-%d-%v.jsonl", txIndex, txHash.String())))
 			if err != nil {
-				return nil, NewError(ErrorIO, fmt.Errorf("failed creating trace-file: %v", err))
+				return nil, nil, NewError(ErrorIO, fmt.Errorf("failed creating trace-file: %v", err))
 			}
-			prevFile = traceFile
-			return logger.NewJSONLogger(logConfig, traceFile), nil
-		}
-	} else {
-		getTracer = func(txIndex int, txHash common.Hash) (tracer vm.EVMLogger, err error) {
-			return nil, nil
+			logger := logger.NewJSONLogger(logConfig, traceFile)
+			tracer := &tracers.Tracer{
+				Hooks: logger,
+				// jsonLogger streams out result to file.
+				GetResult: func() (json.RawMessage, error) { return nil, nil },
+				Stop:      func(err error) {},
+			}
+			return tracer, traceFile, nil
 		}
 	}
 	// We need to load three things: alloc, env and transactions. May be either in
@@ -179,10 +180,7 @@ func Transition(ctx *cli.Context) error {
 	}
 	prestate.Env = *inputData.Env
 
-	vmConfig := vm.Config{
-		Tracer: tracer,
-		Debug:  (tracer != nil),
-	}
+	vmConfig := vm.Config{}
 	// Construct the chainconfig
 	var chainConfig *params.ChainConfig
 	if cConf, extraEips, err := tests.GetChainConfig(ctx.String(ForknameFlag.Name)); err != nil {
