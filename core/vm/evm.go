@@ -378,27 +378,6 @@ func (evm *EVM) DelegateCall(caller ContractRef, addr common.Address, input []by
 	}
 	snapshot := evm.StateDB.Snapshot()
 
-	// Invoke tracer hooks that signal entering/exiting a call frame
-	if evm.Config.Tracer != nil {
-		// NOTE: caller must, at all times be a contract. It should never happen
-		// that caller is something other than a Contract.
-		parent := caller.(*Contract)
-		// DELEGATECALL inherits value from parent call
-		evm.captureBegin(evm.depth, DELEGATECALL, caller.Address(), addr, input, gas, parent.value)
-		defer func(startGas uint64) {
-			evm.captureEnd(evm.depth, startGas, leftOverGas, ret, err)
-		}(gas)
-	}
-
-	if evm.Config.NoRecursion && evm.depth > 0 {
-		return nil, gas, nil
-	}
-	// Fail if we're trying to execute above the call depth limit
-	if evm.depth > int(params.CallCreateDepth) {
-		return nil, gas, ErrDepth
-	}
-	snapshot := evm.StateDB.Snapshot()
-
 	// It is allowed to call precompiles, even via delegatecall
 	if p, isPrecompile := evm.precompile(caller, addr); isPrecompile {
 		ret, gas, err = RunPrecompiledContract(p, input, gas, evm.Config.Tracer)
