@@ -28,6 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/state/snapshot"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/tests"
@@ -68,7 +69,7 @@ func stateTestCmd(ctx *cli.Context) error {
 		EnableReturnData: !ctx.Bool(DisableReturnDataFlag.Name),
 	}
 	var (
-		tracer   vm.EVMLogger
+		tracer   *tracing.Hooks
 		debugger *logger.StructLogger
 	)
 	switch {
@@ -77,7 +78,7 @@ func stateTestCmd(ctx *cli.Context) error {
 
 	case ctx.Bool(DebugFlag.Name):
 		debugger = logger.NewStructLogger(config)
-		tracer = debugger
+		tracer = debugger.Hooks()
 
 	default:
 		debugger = logger.NewStructLogger(config)

@@ -1658,7 +1658,7 @@ func AccessList(ctx context.Context, b Backend, blockNrOrHash rpc.BlockNumberOrH
 
 		// Apply the transaction with the access list tracer
 		tracer := logger.NewAccessListTracer(accessList, addressesToExclude)
-		config := vm.Config{Tracer: tracer, Debug: true, NoBaseFee: true}
+		config := vm.Config{Tracer: tracer.Hooks(), Debug: true, NoBaseFee: true}
 		vmenv, _, err := b.GetEVM(ctx, msg, statedb, header, &config, nil)
 
 		// Lower the basefee to 0 to avoid breaking EVM
