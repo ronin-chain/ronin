@@ -201,8 +201,8 @@ func Call(address common.Address, input []byte, cfg *Config) ([]byte, uint64, er
 	// - prepare accessList(post-berlin)
 	// - reset transient storage(eip 1153)
 	statedb.Prepare(rules, cfg.Origin, cfg.Coinbase, &address, vm.ActivePrecompiles(rules), nil)
-	if cfg.EVMConfig.LiveTracer != nil && cfg.EVMConfig.LiveTracer.OnTxStart != nil {
-		cfg.EVMConfig.LiveTracer.OnTxStart(vmenv.GetVMContext(), types.NewTx(&types.LegacyTx{To: &address, Data: input, Value: cfg.Value, Gas: cfg.GasLimit}), cfg.Origin)
+	if cfg.EVMConfig.Tracer != nil && cfg.EVMConfig.Tracer.OnTxStart != nil {
+		cfg.EVMConfig.Tracer.OnTxStart(vmenv.GetVMContext(), types.NewTx(&types.LegacyTx{To: &address, Data: input, Value: cfg.Value, Gas: cfg.GasLimit}), cfg.Origin)
 	}
 
 	// Call the code with the given configuration.

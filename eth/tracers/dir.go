@@ -45,8 +45,10 @@ type Tracer struct {
 	Stop func(err error)
 }
 
-type ctorFn func(*Context, json.RawMessage, *params.ChainConfig) (*Tracer, error)
-type jsCtorFn func(string, *Context, json.RawMessage, *params.ChainConfig) (*Tracer, error)
+type (
+	ctorFn   func(*Context, json.RawMessage, *params.ChainConfig) (*Tracer, error)
+	jsCtorFn func(string, *Context, json.RawMessage, *params.ChainConfig) (*Tracer, error)
+)
 
 type elem struct {
 	ctor ctorFn
