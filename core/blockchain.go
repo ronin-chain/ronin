@@ -327,6 +327,7 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, genesis *Genesis
 		futureBlocks:              futureBlocks,
 		engine:                    engine,
 		vmConfig:                  vmConfig,
+		logger:                    vmConfig.Tracer,
 		shouldStoreInternalTxs:    rawdb.ReadStoreInternalTransactionsEnabled(db),
 
 		blobSidecarsCache: blobSidecarsCache,
@@ -2030,7 +2031,10 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool, sidecars
 				throwaway, _ := state.New(parent.Root, bc.stateCache, bc.snaps)
 
 				go func(start time.Time, followup *types.Block, throwaway *state.StateDB, interrupt *uint32) {
-					bc.prefetcher.Prefetch(followup, throwaway, bc.vmConfig, &followupInterrupt)
+					// Disable tracing for prefetcher executions.
+					vmCfg := bc.vmConfig
+					vmCfg.Tracer = nil
+					bc.prefetcher.Prefetch(followup, throwaway, vmCfg, &followupInterrupt)
 
 					blockPrefetchExecuteTimer.Update(time.Since(start))
 					if atomic.LoadUint32(interrupt) == 1 {
