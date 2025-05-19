@@ -68,11 +68,11 @@ func TestStateProcessorErrors(t *testing.T) {
 		key1, _ = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		key2, _ = crypto.HexToECDSA("0202020202020202020202020202020202020202020202020202002020202020")
 	)
-	var makeTx = func(key *ecdsa.PrivateKey, nonce uint64, to common.Address, amount *big.Int, gasLimit uint64, gasPrice *big.Int, data []byte) *types.Transaction {
+	makeTx := func(key *ecdsa.PrivateKey, nonce uint64, to common.Address, amount *big.Int, gasLimit uint64, gasPrice *big.Int, data []byte) *types.Transaction {
 		tx, _ := types.SignTx(types.NewTransaction(nonce, to, amount, gasLimit, gasPrice, data), signer, key)
 		return tx
 	}
-	var mkDynamicTx = func(nonce uint64, to common.Address, gasLimit uint64, gasTipCap, gasFeeCap *big.Int) *types.Transaction {
+	mkDynamicTx := func(nonce uint64, to common.Address, gasLimit uint64, gasTipCap, gasFeeCap *big.Int) *types.Transaction {
 		tx, _ := types.SignTx(types.NewTx(&types.DynamicFeeTx{
 			Nonce:     nonce,
 			GasTipCap: gasTipCap,
@@ -83,7 +83,7 @@ func TestStateProcessorErrors(t *testing.T) {
 		}), signer, key1)
 		return tx
 	}
-	var mkDynamicCreationTx = func(nonce uint64, gasLimit uint64, gasTipCap, gasFeeCap *big.Int, data []byte) *types.Transaction {
+	mkDynamicCreationTx := func(nonce uint64, gasLimit uint64, gasTipCap, gasFeeCap *big.Int, data []byte) *types.Transaction {
 		tx, _ := types.SignTx(types.NewTx(&types.DynamicFeeTx{
 			Nonce:     nonce,
 			GasTipCap: gasTipCap,
@@ -94,13 +94,13 @@ func TestStateProcessorErrors(t *testing.T) {
 		}), signer, key1)
 		return tx
 	}
-	var mkSetCodeTx = func(nonce uint64, to common.Address, gasLimit uint64, gasTipCap, gasFeeCap *big.Int, authlist []types.SetCodeAuthorization) *types.Transaction {
+	mkSetCodeTx := func(nonce uint64, to *common.Address, gasLimit uint64, gasTipCap, gasFeeCap *big.Int, authlist []types.SetCodeAuthorization) *types.Transaction {
 		tx, err := types.SignTx(types.NewTx(&types.SetCodeTx{
 			Nonce:     nonce,
 			GasTipCap: uint256.MustFromBig(gasTipCap),
 			GasFeeCap: uint256.MustFromBig(gasFeeCap),
 			Gas:       gasLimit,
-			To:        to,
+			To:        *to,
 			Value:     new(uint256.Int),
 			AuthList:  authlist,
 		}), signer, key1)
@@ -226,9 +226,15 @@ func TestStateProcessorErrors(t *testing.T) {
 			},
 			{ // ErrEmptyAuthList
 				txs: []*types.Transaction{
-					mkSetCodeTx(0, common.Address{}, params.TxGas, big.NewInt(params.InitialBaseFee), big.NewInt(params.InitialBaseFee), nil),
+					mkSetCodeTx(0, &common.Address{}, params.TxGas, big.NewInt(params.InitialBaseFee), big.NewInt(params.InitialBaseFee), nil),
 				},
 				want: "could not apply tx 0 [0xc18d10f4c809dbdfa1a074c3300de9bc4b7f16a20f0ec667f6f67312b71b956a]: EIP-7702 transaction with empty auth list (sender 0x71562b71999873DB5b286dF957af199Ec94617F7)",
+			},
+			{ // ErrSetCodeTxCreate
+				txs: []*types.Transaction{
+					mkSetCodeTx(0, nil, params.TxGas, big.NewInt(params.InitialBaseFee), big.NewInt(params.InitialBaseFee), []types.SetCodeAuthorization{}),
+				},
+				want: "could not apply tx 0 [0x48bc299b83fdb345c57478f239e89814bb3063eb4e4b49f3b6057a69255c16bd]: EIP-7702 transaction with empty auth list (sender 0x71562b71999873DB5b286dF957af199Ec94617F7)",
 			},
 		} {
 			block := GenerateBadBlock(genesis, ethash.NewFaker(), tt.txs, gspec.Config)
@@ -510,8 +516,8 @@ func mkBlobTx(nonce uint64, to common.Address, gasLimit uint64, gasTipCap, gasFe
 }
 
 func TestBlobTxStateTransition(t *testing.T) {
-	var roninTreasuryAddress = &common.Address{0x11}
-	var testBlobTxGasExecution = func(funds *big.Int, nBlobs int) (*state.StateDB, common.Address, error) {
+	roninTreasuryAddress := &common.Address{0x11}
+	testBlobTxGasExecution := func(funds *big.Int, nBlobs int) (*state.StateDB, common.Address, error) {
 		var (
 			gendb  = rawdb.NewMemoryDatabase()
 			key, _ = crypto.GenerateKey()
