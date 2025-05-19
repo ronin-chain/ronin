@@ -25,14 +25,12 @@ func init() {
 type supplyInfoIssuance struct {
 	GenesisAlloc *big.Int `json:"genesisAlloc,omitempty"`
 	Reward       *big.Int `json:"reward,omitempty"`
-	Withdrawals  *big.Int `json:"withdrawals,omitempty"`
 }
 
 //go:generate go run github.com/fjl/gencodec -type supplyInfoIssuance -field-override supplyInfoIssuanceMarshaling -out gen_supplyinfoissuance.go
 type supplyInfoIssuanceMarshaling struct {
 	GenesisAlloc *hexutil.Big
 	Reward       *hexutil.Big
-	Withdrawals  *hexutil.Big
 }
 
 type supplyInfoBurn struct {
@@ -114,7 +112,6 @@ func newSupplyInfo() supplyInfo {
 		Issuance: &supplyInfoIssuance{
 			GenesisAlloc: big.NewInt(0),
 			Reward:       big.NewInt(0),
-			Withdrawals:  big.NewInt(0),
 		},
 		Burn: &supplyInfoBurn{
 			EIP1559: big.NewInt(0),
@@ -182,8 +179,6 @@ func (s *supply) OnBalanceChange(a common.Address, prevBalance, newBalance *big.
 	case tracing.BalanceIncreaseRewardMineUncle:
 	case tracing.BalanceIncreaseRewardMineBlock:
 		s.delta.Issuance.Reward.Add(s.delta.Issuance.Reward, diff)
-	case tracing.BalanceIncreaseWithdrawal:
-		s.delta.Issuance.Withdrawals.Add(s.delta.Issuance.Withdrawals, diff)
 	case tracing.BalanceDecreaseSelfdestructBurn:
 		// BalanceDecreaseSelfdestructBurn is non-reversible as it happens
 		// at the end of the transaction.
@@ -276,11 +271,7 @@ func (s *supply) write(data any) {
 		supply.Issuance.Reward = nil
 	}
 
-	if supply.Issuance.Withdrawals.Sign() == 0 {
-		supply.Issuance.Withdrawals = nil
-	}
-
-	if supply.Issuance.GenesisAlloc == nil && supply.Issuance.Reward == nil && supply.Issuance.Withdrawals == nil {
+	if supply.Issuance.GenesisAlloc == nil && supply.Issuance.Reward == nil {
 		supply.Issuance = nil
 	}
 

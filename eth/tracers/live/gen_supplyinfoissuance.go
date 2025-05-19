@@ -16,12 +16,10 @@ func (s supplyInfoIssuance) MarshalJSON() ([]byte, error) {
 	type supplyInfoIssuance struct {
 		GenesisAlloc *hexutil.Big `json:"genesisAlloc,omitempty"`
 		Reward       *hexutil.Big `json:"reward,omitempty"`
-		Withdrawals  *hexutil.Big `json:"withdrawals,omitempty"`
 	}
 	var enc supplyInfoIssuance
 	enc.GenesisAlloc = (*hexutil.Big)(s.GenesisAlloc)
 	enc.Reward = (*hexutil.Big)(s.Reward)
-	enc.Withdrawals = (*hexutil.Big)(s.Withdrawals)
 	return json.Marshal(&enc)
 }
 
@@ -30,7 +28,6 @@ func (s *supplyInfoIssuance) UnmarshalJSON(input []byte) error {
 	type supplyInfoIssuance struct {
 		GenesisAlloc *hexutil.Big `json:"genesisAlloc,omitempty"`
 		Reward       *hexutil.Big `json:"reward,omitempty"`
-		Withdrawals  *hexutil.Big `json:"withdrawals,omitempty"`
 	}
 	var dec supplyInfoIssuance
 	if err := json.Unmarshal(input, &dec); err != nil {
@@ -41,9 +38,6 @@ func (s *supplyInfoIssuance) UnmarshalJSON(input []byte) error {
 	}
 	if dec.Reward != nil {
 		s.Reward = (*big.Int)(dec.Reward)
-	}
-	if dec.Withdrawals != nil {
-		s.Withdrawals = (*big.Int)(dec.Withdrawals)
 	}
 	return nil
 }

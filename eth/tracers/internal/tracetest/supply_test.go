@@ -202,8 +202,6 @@ func TestSupplyEip1559Burn(t *testing.T) {
 // Because Contract B is removed only at the end of the transaction
 // the ether sent in between is burnt before Cancun hard fork.
 func TestSupplySelfdestruct(t *testing.T) {
-	t.Skip("skipping test for now, it does not work as expected")
-
 	var (
 		config = *params.TestChainConfig
 
@@ -242,8 +240,6 @@ func TestSupplySelfdestruct(t *testing.T) {
 	signer := types.LatestSigner(gspec.Config)
 
 	testBlockGenerationFunc := func(b *core.BlockGen) {
-		b.SetDifficulty(new(big.Int))
-
 		txdata := &types.LegacyTx{
 			Nonce:    0,
 			To:       &aa,
@@ -283,9 +279,11 @@ func TestSupplySelfdestruct(t *testing.T) {
 	head := preCancunChain.CurrentBlock()
 	// Check live trace output
 	expected := supplyInfo{
+		Issuance: &supplyInfoIssuance{
+			Reward: (*hexutil.Big)(new(big.Int).Mul(common.Big2, big.NewInt(params.Ether))),
+		},
 		Burn: &supplyInfoBurn{
-			EIP1559: (*hexutil.Big)(big.NewInt(55289500000000)),
-			Misc:    (*hexutil.Big)(big.NewInt(5000000000)),
+			Misc: (*hexutil.Big)(big.NewInt(5000000000)),
 		},
 		Number:     1,
 		Hash:       head.Hash(),
@@ -323,8 +321,8 @@ func TestSupplySelfdestruct(t *testing.T) {
 	// Check live trace output
 	head = postCancunChain.CurrentBlock()
 	expected = supplyInfo{
-		Burn: &supplyInfoBurn{
-			EIP1559: (*hexutil.Big)(big.NewInt(55289500000000)),
+		Issuance: &supplyInfoIssuance{
+			Reward: (*hexutil.Big)(new(big.Int).Mul(common.Big2, big.NewInt(params.Ether))),
 		},
 		Number:     1,
 		Hash:       head.Hash(),
@@ -344,8 +342,6 @@ func TestSupplySelfdestruct(t *testing.T) {
 //   - Contract D calls C and reverts (Burn amount of C
 //     has to be reverted as well).
 func TestSupplySelfdestructItselfAndRevert(t *testing.T) {
-	t.Skip("skipping test for now, it does not work as expected")
-
 	var (
 		config = *params.TestChainConfig
 
@@ -421,12 +417,13 @@ func TestSupplySelfdestructItselfAndRevert(t *testing.T) {
 	)
 
 	gspec.Config.TerminalTotalDifficulty = big.NewInt(0)
+	gspec.Config.CancunBlock = nil
+	gspec.Config.ShanghaiBlock = nil
+	gspec.Config.VenokiBlock = nil
 
 	signer := types.LatestSigner(gspec.Config)
 
 	testBlockGenerationFunc := func(b *core.BlockGen) {
-		b.SetDifficulty(new(big.Int))
-
 		txdata := &types.LegacyTx{
 			Nonce:    0,
 			To:       &aa,
@@ -470,9 +467,11 @@ func TestSupplySelfdestructItselfAndRevert(t *testing.T) {
 	block := chain.GetBlockByNumber(1)
 
 	expected := supplyInfo{
+		Issuance: &supplyInfoIssuance{
+			Reward: (*hexutil.Big)(new(big.Int).Mul(common.Big2, big.NewInt(params.Ether))),
+		},
 		Burn: &supplyInfoBurn{
-			EIP1559: (*hexutil.Big)(new(big.Int).Mul(block.BaseFee(), big.NewInt(int64(block.GasUsed())))),
-			Misc:    (*hexutil.Big)(eth5), // 5ETH burned from contract B
+			Misc: (*hexutil.Big)(eth5), // 5ETH burned from contract B
 		},
 		Number:     1,
 		Hash:       block.Hash(),
@@ -506,6 +505,7 @@ func testSupplyTracer(t *testing.T, genesis *core.Genesis, gen func(*core.BlockG
 
 	_, blocks, _ := core.GenerateChainWithGenesis(genesis, engine, 1, func(i int, b *core.BlockGen) {
 		b.SetCoinbase(common.Address{1})
+		b.SetDifficulty(big.NewInt(7))
 		gen(b)
 	})
 
