@@ -143,10 +143,8 @@ func newCallTracer2(ctx *tracers.Context, cfg json.RawMessage, chainConfig *para
 
 func newCallTracer2Object(ctx *tracers.Context, cfg json.RawMessage) (*callTracer2, error) {
 	var config callTracer2Config
-	if cfg != nil {
-		if err := json.Unmarshal(cfg, &config); err != nil {
-			return nil, err
-		}
+	if err := json.Unmarshal(cfg, &config); err != nil {
+		return nil, err
 	}
 	// First callframe contains tx context info
 	// and is populated on start and end.
