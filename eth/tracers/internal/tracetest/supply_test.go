@@ -118,7 +118,7 @@ func TestSupplyRewards(t *testing.T) {
 			Reward: (*hexutil.Big)(new(big.Int).Mul(common.Big2, big.NewInt(params.Ether))),
 		},
 		Number:     1,
-		Hash:       common.HexToHash("0x0aecb5db8274db4c5323445070b77c9b3ca196f6233016f4eb881220534d0f4b"),
+		Hash:       common.HexToHash("0x3bb05ce32f14bce1e2334b59295eaa574cc09698b6442532a35c7b56e2403e5a"),
 		ParentHash: common.HexToHash("0xadeda0a83e337b6c073e3f0e9a17531a04009b397a9588c093b628f21b8bc5a3"),
 	}
 
