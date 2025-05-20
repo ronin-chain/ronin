@@ -589,14 +589,11 @@ func TestSort(t *testing.T) {
 
 // TestConsortiumValidatorSorting_Run sorts 21 validators successfully
 func TestConsortiumValidatorSorting_Run(t *testing.T) {
-	var (
-		statedb, _ = state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
-	)
+	statedb, _ := state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
 
 	smcAbi := *unmarshalledABIs[SortValidator]
 
 	input, err := smcAbi.Pack(sortValidatorsMethod, addressesTest, weightsTest)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -610,7 +607,7 @@ func TestConsortiumValidatorSorting_Run(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	//println(common.Bytes2Hex(output))
+	// println(common.Bytes2Hex(output))
 
 	res, err := smcAbi.Methods[sortValidatorsMethod].Outputs.Unpack(output)
 	if err != nil {
@@ -621,7 +618,7 @@ func TestConsortiumValidatorSorting_Run(t *testing.T) {
 		t.Fatal(fmt.Sprintf("expected len %d, got %v", 21, len(sortedValidators)))
 	}
 	for i, addr := range sortedValidators {
-		//println(addr.Hex())
+		// println(addr.Hex())
 		if expectedValidators[i].Hex() != addr.Hex() {
 			t.Fatal(fmt.Sprintf("mismatched addr at %d, expected:%s got:%s", i, expectedValidators[i].Hex(), addr.Hex()))
 		}
@@ -630,9 +627,7 @@ func TestConsortiumValidatorSorting_Run(t *testing.T) {
 
 // TestConsortiumValidatorSorting_Run2 simulates a call from a user who trigger system contract to call `sort` precompiled contract
 func TestConsortiumValidatorSorting_Run2(t *testing.T) {
-	var (
-		statedb, _ = state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
-	)
+	statedb, _ := state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
 	smcAbi, err := abi.JSON(strings.NewReader(wrapupAbi))
 	if err != nil {
 		t.Fatal(err)
@@ -748,6 +743,7 @@ func TestConsortiumVerifyHeaders_verify(t *testing.T) {
 		},
 		test: true,
 	}
+	c.evm.SetPrecompiles(activePrecompiledContracts(c.evm.chainRules))
 	if !c.verify(header1.Coinbase, types.FromHeader(header1, big1, false), types.FromHeader(header2, big1, false)) {
 		t.Fatal("expected true, got false")
 	}
@@ -963,6 +959,7 @@ func TestConsortiumVerifyHeaders_malleability(t *testing.T) {
 	}
 
 	c := &consortiumVerifyHeaders{evm: &EVM{chainConfig: &params.ChainConfig{ChainID: big1}}, test: true}
+	c.evm.SetPrecompiles(activePrecompiledContracts(c.evm.chainRules))
 	if c.verify(header1.Coinbase, types.FromHeader(header1, big1, false), types.FromHeader(header2, big1, false)) {
 		t.Fatal("expected false, got true")
 	}
@@ -970,9 +967,7 @@ func TestConsortiumVerifyHeaders_malleability(t *testing.T) {
 
 // TestConsortiumVerifyHeaders_Run2 deploys smart contract and call precompiled contracts via this contract
 func TestConsortiumVerifyHeaders_Run2(t *testing.T) {
-	var (
-		statedb, _ = state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
-	)
+	statedb, _ := state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
 	smcAbi, err := abi.JSON(strings.NewReader(verifyHeadersTestAbi))
 	if err != nil {
 		t.Fatal(err)
@@ -1422,7 +1417,6 @@ func TestConsortiumPickValidatorSet_Run(t *testing.T) {
 	}
 
 	input, err := smcAbi.Pack(pickValidatorSetMethod, candidates, weights, isTrustedOrganizations, maxValidatorNumber, maxPrioritizedValidatorNumber)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1487,7 +1481,6 @@ func TestConsortiumPickValidatorSet_Run2(t *testing.T) {
 	}
 
 	input, err := smcAbi.Pack(pickValidatorSetMethod, candidates, weights, isTrustedOrganizations, maxValidatorNumber, maxPrioritizedValidatorNumber)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1583,7 +1576,6 @@ func TestConsortiumPickValidatorSet_Run3(t *testing.T) {
 	}
 
 	input, err := smcAbi.Pack(pickValidatorSetMethod, candidates, weights, isTrustedOrganizations, maxValidatorNumber, maxPrioritizedValidatorNumber)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1680,7 +1672,6 @@ func TestConsortiumPickValidatorSet_Run4(t *testing.T) {
 	}
 
 	input, err := smcAbi.Pack(pickValidatorSetMethod, candidates, weights, isTrustedOrganizations, maxValidatorNumber, maxPrioritizedValidatorNumber)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1938,6 +1929,8 @@ func newEVM(caller common.Address, statedb StateDB) (*EVM, error) {
 		chainRules:  params.Rules{IsIstanbul: true, IsEIP150: true, IsConsortiumV2: true},
 	}
 	evm.chainConfig.ConsortiumV2Block = common.Big1
+	evm.SetPrecompiles(activePrecompiledContracts(evm.chainRules))
+
 	evm.interpreter = NewEVMInterpreter(evm, Config{NoBaseFee: true})
 	_, contract, _, err := evm.Create(AccountRef(caller), common.FromHex(testSortCode), math.MaxUint64/2, big0)
 	if err != nil {
@@ -2348,6 +2341,7 @@ func Test_consortiumVerifyHeaders_getSigner(t *testing.T) {
 				},
 				test: true,
 			}
+			c.evm.SetPrecompiles(activePrecompiledContracts(c.evm.chainRules))
 			copy(tt.args.blockHeader.Extra[:], extraData)
 			blockHeader := types.FromHeader(tt.args.blockHeader, tt.args.chainId, tt.args.isVenoki)
 			header := blockHeader.ToHeader()
