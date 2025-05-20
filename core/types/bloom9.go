@@ -117,6 +117,21 @@ func CreateBloom(receipts Receipts) Bloom {
 	return bin
 }
 
+// CreateReceiptBloom creates a bloom filter for a receipt
+func CreateReceiptBloom(receipt *Receipt) Bloom {
+	var (
+		bin Bloom
+		buf = make([]byte, 6)
+	)
+	for _, log := range receipt.Logs {
+		bin.add(log.Address.Bytes(), buf)
+		for _, b := range log.Topics {
+			bin.add(b[:], buf)
+		}
+	}
+	return bin
+}
+
 // MergeBloom assumes all receipts contain calculated bloom filters and
 // merge them to create the final bloom filter instead of recalculating
 // like CreateBloom

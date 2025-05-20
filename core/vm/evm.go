@@ -71,31 +71,7 @@ func (evm *EVM) precompile(caller ContractRef, addr common.Address) (Precompiled
 		}
 	}
 
-	var precompiles map[common.Address]PrecompiledContract
-	switch {
-	case evm.chainRules.IsCancun:
-		precompiles = PrecompiledContractsCancun
-	case evm.chainRules.IsBerlin:
-		precompiles = PrecompiledContractsBerlin
-	case evm.chainRules.IsMiko:
-		precompiles = PrecompiledContractsConsortiumMiko
-	case evm.chainRules.IsLastConsortiumV1Block, evm.chainRules.IsConsortiumV2:
-		precompiles = PrecompiledContractsConsortium
-	case evm.chainRules.IsIstanbul:
-		precompiles = PrecompiledContractsIstanbul
-	case evm.chainRules.IsByzantium:
-		precompiles = PrecompiledContractsByzantium
-	default:
-		precompiles = PrecompiledContractsHomestead
-	}
-
-	p, ok := precompiles[addr]
-	if ok {
-		if pWithInit, hasInit := p.(PrecompiledContractWithInit); hasInit {
-			pWithInit.Init(caller, evm)
-		}
-	}
-
+	p, ok := evm.precompiles[addr]
 	return p, ok
 }
 
@@ -176,6 +152,8 @@ type EVM struct {
 	// applied in opCall*.
 	callGasTemp uint64
 
+	precompiles PrecompiledContracts
+
 	evmHook EVMHook
 }
 
@@ -195,6 +173,7 @@ func NewEVM(blockCtx BlockContext, txCtx TxContext, statedb StateDB, chainConfig
 		chainConfig: chainConfig,
 		chainRules:  chainConfig.Rules(blockCtx.BlockNumber),
 	}
+	evm.precompiles = activePrecompiledContracts(evm.chainRules)
 	evm.interpreter = NewEVMInterpreter(evm, config)
 	return evm
 }
@@ -220,6 +199,13 @@ func (evm *EVM) Cancelled() bool {
 // Interpreter returns the current interpreter
 func (evm *EVM) Interpreter() *EVMInterpreter {
 	return evm.interpreter
+}
+
+// SetPrecompiles sets the precompiled contracts for the EVM.
+// This method is only used through RPC calls.
+// It is not thread-safe.
+func (evm *EVM) SetPrecompiles(precompiles PrecompiledContracts) {
+	evm.precompiles = precompiles
 }
 
 // Call executes the contract associated with the addr with the given input as
@@ -323,7 +309,7 @@ func (evm *EVM) CallCode(caller ContractRef, addr common.Address, input []byte, 
 	if !evm.Context.CanTransfer(evm.StateDB, caller.Address(), value) {
 		return nil, gas, ErrInsufficientBalance
 	}
-	var snapshot = evm.StateDB.Snapshot()
+	snapshot := evm.StateDB.Snapshot()
 
 	// It is allowed to call precompiles, even via delegatecall
 	if p, isPrecompile := evm.precompile(caller, addr); isPrecompile {
@@ -374,7 +360,7 @@ func (evm *EVM) DelegateCall(caller ContractRef, addr common.Address, input []by
 	if evm.depth > int(params.CallCreateDepth) {
 		return nil, gas, ErrDepth
 	}
-	var snapshot = evm.StateDB.Snapshot()
+	snapshot := evm.StateDB.Snapshot()
 
 	// It is allowed to call precompiles, even via delegatecall
 	if p, isPrecompile := evm.precompile(caller, addr); isPrecompile {
@@ -423,7 +409,7 @@ func (evm *EVM) StaticCall(caller ContractRef, addr common.Address, input []byte
 	// after all empty accounts were deleted, so this is not required. However, if we omit this,
 	// then certain tests start failing; stRevertTest/RevertPrecompiledTouchExactOOG.json.
 	// We could change this, but for now it's left for legacy reasons
-	var snapshot = evm.StateDB.Snapshot()
+	snapshot := evm.StateDB.Snapshot()
 
 	// We do an AddBalance of zero here, just in order to trigger a touch.
 	// This doesn't matter on Mainnet, where all empties are gone at the time of Byzantium,
