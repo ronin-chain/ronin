@@ -62,9 +62,8 @@ type VMContext struct {
 	BlockNumber *big.Int
 	Time        uint64
 	// Effective tx gas price
-	GasPrice    *big.Int
-	ChainConfig *params.ChainConfig
-	StateDB     StateDB
+	GasPrice *big.Int
+	StateDB  StateDB
 }
 
 // BlockEvent is emitted upon tracing an incoming block.

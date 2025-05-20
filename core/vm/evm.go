@@ -740,7 +740,6 @@ func (evm *EVM) GetVMContext() *tracing.VMContext {
 		BlockNumber: evm.Context.BlockNumber,
 		Time:        evm.Context.Time,
 		GasPrice:    evm.TxContext.GasPrice,
-		ChainConfig: evm.ChainConfig(),
 		StateDB:     evm.StateDB,
 	}
 }
