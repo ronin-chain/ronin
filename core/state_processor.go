@@ -225,7 +225,19 @@ func ApplyMessageWithEVM(
 
 	// Create a new receipt for the transaction, storing the intermediate root and gas used
 	// by the tx.
-	receipt = &types.Receipt{Type: tx.Type(), PostState: root, CumulativeGasUsed: *usedGas}
+	receipt = MakeReceipt(evm, result, statedb, blockNumber, blockHash, tx, *usedGas, root)
+
+	// create the bloom filter
+	receiptProcessor.Apply(receipt)
+
+	return receipt, result, err
+}
+
+// MakeReceipt generates the receipt object for a transaction given its execution result.
+func MakeReceipt(evm *vm.EVM, result *ExecutionResult, statedb *state.StateDB, blockNumber *big.Int, blockHash common.Hash, tx *types.Transaction, usedGas uint64, root []byte) *types.Receipt {
+	// Create a new receipt for the transaction, storing the intermediate root and gas used
+	// by the tx.
+	receipt := &types.Receipt{Type: tx.Type(), PostState: root, CumulativeGasUsed: usedGas}
 	if result.Failed() {
 		receipt.Status = types.ReceiptStatusFailed
 	} else {
@@ -240,19 +252,17 @@ func ApplyMessageWithEVM(
 	}
 
 	// If the transaction created a contract, store the creation address in the receipt.
-	if msg.To == nil {
+	if tx.To() == nil {
 		receipt.ContractAddress = crypto.CreateAddress(evm.TxContext.Origin, tx.Nonce())
 	}
 
 	// Set the receipt logs and create the bloom filter.
 	receipt.Logs = statedb.GetLogs(tx.Hash(), blockNumber.Uint64(), blockHash, evm.Context.Time)
+	receipt.Bloom = types.CreateReceiptBloom(receipt)
 	receipt.BlockHash = blockHash
 	receipt.BlockNumber = blockNumber
 	receipt.TransactionIndex = uint(statedb.TxIndex())
-	// create the bloom filter
-	receiptProcessor.Apply(receipt)
-
-	return receipt, result, err
+	return receipt
 }
 
 // ApplyTransaction attempts to apply a transaction to the given state database
