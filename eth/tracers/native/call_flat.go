@@ -29,6 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/eth/tracers"
+	"github.com/ethereum/go-ethereum/params"
 )
 
 //go:generate go run github.com/fjl/gencodec -type flatCallAction -field-override flatCallActionMarshaling -out gen_flatcallaction_json.go
@@ -114,6 +115,7 @@ type flatCallTracer struct {
 	config            flatCallTracerConfig
 	ctx               *tracers.Context // Holds tracer context data
 	reason            error            // Textual reason for the interruption
+	chainConfig       *params.ChainConfig
 	activePrecompiles []common.Address // Updated on tx start based on given rules
 }
 
@@ -123,22 +125,20 @@ type flatCallTracerConfig struct {
 }
 
 // newFlatCallTracer returns a new flatCallTracer.
-func newFlatCallTracer(ctx *tracers.Context, cfg json.RawMessage) (*tracers.Tracer, error) {
+func newFlatCallTracer(ctx *tracers.Context, cfg json.RawMessage, chainConfig *params.ChainConfig) (*tracers.Tracer, error) {
 	var config flatCallTracerConfig
-	if cfg != nil {
-		if err := json.Unmarshal(cfg, &config); err != nil {
-			return nil, err
-		}
+	if err := json.Unmarshal(cfg, &config); err != nil {
+		return nil, err
 	}
 
 	// Create inner call tracer with default configuration, don't forward
 	// the OnlyTopCall or WithLog to inner for now
-	t, err := newCallTracerObject(ctx, nil)
+	t, err := newCallTracerObject(ctx, json.RawMessage("{}"))
 	if err != nil {
 		return nil, err
 	}
 
-	ft := &flatCallTracer{tracer: t, ctx: ctx, config: config}
+	ft := &flatCallTracer{tracer: t, ctx: ctx, config: config, chainConfig: chainConfig}
 	return &tracers.Tracer{
 		Hooks: &tracing.Hooks{
 			OnTxStart: ft.OnTxStart,
@@ -195,7 +195,7 @@ func (t *flatCallTracer) OnExit(depth int, output []byte, gasUsed uint64, err er
 func (t *flatCallTracer) OnTxStart(env *tracing.VMContext, tx *types.Transaction, from common.Address) {
 	t.tracer.OnTxStart(env, tx, from)
 	// Update list of precompiles based on current block
-	rules := env.ChainConfig.Rules(env.BlockNumber)
+	rules := t.chainConfig.Rules(env.BlockNumber)
 	t.activePrecompiles = vm.ActivePrecompiles(rules)
 }
 

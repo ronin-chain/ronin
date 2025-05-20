@@ -166,7 +166,7 @@ func testCallTracer2(tracerName string, dirPath string, scheme string, t *testin
 				triedb, _, statedb = tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false, scheme)
 			)
 			defer triedb.Close()
-			tracer, err := tracers.DefaultDirectory.New(tracerName, new(tracers.Context), test.TracerConfig)
+			tracer, err := tracers.DefaultDirectory.New(tracerName, new(tracers.Context), test.TracerConfig, test.Genesis.Config)
 			if err != nil {
 				t.Fatalf("failed to create call tracer: %v", err)
 			}
@@ -276,7 +276,7 @@ func benchTracer2(tracerName string, test *callTracer2Test, b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		tracer, err := tracers.DefaultDirectory.New(tracerName, new(tracers.Context), test.TracerConfig)
+		tracer, err := tracers.DefaultDirectory.New(tracerName, new(tracers.Context), test.TracerConfig, test.Genesis.Config)
 		if err != nil {
 			b.Fatalf("failed to create call tracer: %v", err)
 		}
@@ -343,8 +343,9 @@ func TestZeroValueToNotExitCall2(t *testing.T) {
 	}
 	triedb, _, statedb := tests.MakePreState(rawdb.NewMemoryDatabase(), alloc, false, rawdb.HashScheme)
 	defer triedb.Close()
+	chainConfig := params.MainnetChainConfig
 	// Create the tracer, the EVM environment and run it
-	tracer, err := tracers.DefaultDirectory.New("callTracer2", new(tracers.Context), nil)
+	tracer, err := tracers.DefaultDirectory.New("callTracer2", new(tracers.Context), nil, chainConfig)
 	if err != nil {
 		t.Fatalf("failed to create call tracer: %v", err)
 	}
@@ -352,7 +353,7 @@ func TestZeroValueToNotExitCall2(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to prepare transaction for tracing: %v", err)
 	}
-	evm := vm.NewEVM(context, txContext, statedb, params.MainnetChainConfig, vm.Config{Debug: true, Tracer: tracer.Hooks})
+	evm := vm.NewEVM(context, txContext, statedb, chainConfig, vm.Config{Debug: true, Tracer: tracer.Hooks})
 	statedb.SetLogger(tracer.Hooks)
 	tracer.OnTxStart(evm.GetVMContext(), tx, msg.Payer)
 	vmRet, err := core.ApplyMessage(evm, msg, new(core.GasPool).AddGas(tx.Gas()))
