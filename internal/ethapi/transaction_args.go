@@ -235,10 +235,6 @@ func (args *TransactionArgs) setDefaults(ctx context.Context, b Backend) error {
 // core evm. This method is used in calls and traces that do not require a real
 // live transaction.
 func (args *TransactionArgs) ToMessage(globalGasCap uint64, baseFee *big.Int) (*core.Message, error) {
-	// Reject invalid combinations of pre- and post-1559 fee styles
-	if args.GasPrice != nil && (args.MaxFeePerGas != nil || args.MaxPriorityFeePerGas != nil) {
-		return nil, errors.New("both gasPrice and (maxFeePerGas or maxPriorityFeePerGas) specified")
-	}
 	// Set sender address or use zero address if none specified.
 	addr := args.from()
 
