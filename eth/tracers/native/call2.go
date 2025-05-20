@@ -29,6 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/eth/tracers"
+	"github.com/ethereum/go-ethereum/params"
 )
 
 //go:generate go run github.com/fjl/gencodec -type callFrame2 -field-override callFrame2Marshaling -out gen_callframe2_json.go
@@ -122,7 +123,7 @@ type callTracer2Config struct {
 
 // newCallTracer returns a native go tracer which tracks
 // call frames of a tx, and implements vm.EVMLogger.
-func newCallTracer2(ctx *tracers.Context, cfg json.RawMessage) (*tracers.Tracer, error) {
+func newCallTracer2(ctx *tracers.Context, cfg json.RawMessage, chainConfig *params.ChainConfig) (*tracers.Tracer, error) {
 	t, err := newCallTracer2Object(ctx, cfg)
 	if err != nil {
 		return nil, err
@@ -142,10 +143,8 @@ func newCallTracer2(ctx *tracers.Context, cfg json.RawMessage) (*tracers.Tracer,
 
 func newCallTracer2Object(ctx *tracers.Context, cfg json.RawMessage) (*callTracer2, error) {
 	var config callTracer2Config
-	if cfg != nil {
-		if err := json.Unmarshal(cfg, &config); err != nil {
-			return nil, err
-		}
+	if err := json.Unmarshal(cfg, &config); err != nil {
+		return nil, err
 	}
 	// First callframe contains tx context info
 	// and is populated on start and end.

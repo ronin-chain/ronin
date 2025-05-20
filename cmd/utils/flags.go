@@ -650,6 +650,7 @@ var (
 	VMTraceConfigFlag = &cli.StringFlag{
 		Name:     "vmtrace.config",
 		Usage:    "Tracer configuration (JSON)",
+		Value:    "{}",
 		Category: flags.VMCategory,
 	}
 	RPCGlobalGasCapFlag = &cli.Uint64Flag{
@@ -2147,13 +2148,8 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	// VM tracing config.
 	if ctx.IsSet(VMTraceFlag.Name) {
 		if name := ctx.String(VMTraceFlag.Name); name != "" {
-			var config string
-			if ctx.IsSet(VMTraceConfigFlag.Name) {
-				config = ctx.String(VMTraceConfigFlag.Name)
-			}
-
 			cfg.VMTrace = name
-			cfg.VMTraceConfig = config
+			cfg.VMTraceConfig = ctx.String(VMTraceConfigFlag.Name)
 		}
 	}
 	if ctx.IsSet(DisableTxBroadcastFromFlag.Name) {
@@ -2428,10 +2424,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chai
 	vmcfg := vm.Config{EnablePreimageRecording: ctx.Bool(VMEnableDebugFlag.Name)}
 	if ctx.IsSet(VMTraceFlag.Name) {
 		if name := ctx.String(VMTraceFlag.Name); name != "" {
-			var config json.RawMessage
-			if ctx.IsSet(VMTraceConfigFlag.Name) {
-				config = json.RawMessage(ctx.String(VMTraceConfigFlag.Name))
-			}
+			config := json.RawMessage(ctx.String(VMTraceConfigFlag.Name))
 			t, err := tracers.LiveDirectory.New(name, config)
 			if err != nil {
 				Fatalf("Failed to create tracer %q: %v", name, err)
