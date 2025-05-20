@@ -28,12 +28,11 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
-
-	"github.com/ethereum/go-ethereum/common"
 )
 
 // precompiledTest defines the input/output pairs for precompiled contract tests.
@@ -211,7 +210,7 @@ func benchmarkPrecompiled(addr string, test precompiledTest, bench *testing.B) {
 		// Keep it as uint64, multiply 100 to get two digit float later
 		mgasps := (100 * 1000 * gasUsed) / elapsed
 		bench.ReportMetric(float64(mgasps)/100, "mgas/s")
-		//Check if it is correct
+		// Check if it is correct
 		if err != nil {
 			bench.Error(err)
 			return
@@ -343,33 +342,43 @@ func benchJson(name, addr string, b *testing.B) {
 func TestPrecompiledBLS12381G1Add(t *testing.T) {
 	testJson("blsG1Add", common.Bytes2Hex([]byte{11}), t)
 }
+
 func TestPrecompiledBLS12381G1Mul(t *testing.T) {
 	testJson("blsG1Mul", common.Bytes2Hex([]byte{12}), t)
 }
+
 func TestPrecompiledBLS12381G1MultiExp(t *testing.T) {
 	testJson("blsG1MultiExp", common.Bytes2Hex([]byte{12}), t)
 }
+
 func TestPrecompiledBLS12381G2Add(t *testing.T) {
 	testJson("blsG2Add", common.Bytes2Hex([]byte{13}), t)
 }
+
 func TestPrecompiledBLS12381G2Mul(t *testing.T) {
 	testJson("blsG2Mul", common.Bytes2Hex([]byte{14}), t)
 }
+
 func TestPrecompiledBLS12381G2MultiExp(t *testing.T) {
 	testJson("blsG2MultiExp", common.Bytes2Hex([]byte{14}), t)
 }
+
 func TestPrecompiledBLS12381Pairing(t *testing.T) {
 	testJson("blsPairing", common.Bytes2Hex([]byte{15}), t)
 }
+
 func TestPrecompiledBLS12381MapG1(t *testing.T) {
 	testJson("blsMapG1", common.Bytes2Hex([]byte{16}), t)
 }
+
 func TestPrecompiledBLS12381MapG2(t *testing.T) {
 	testJson("blsMapG2", common.Bytes2Hex([]byte{17}), t)
 }
+
 func TestPrecompiledPointEvaluation(t *testing.T) {
 	testJson("pointEvaluation", common.Bytes2Hex([]byte{10}), t)
 }
+
 func TestPrecompiledConsortiumLog(t *testing.T) {
 	glogger := log.NewGlogHandler(log.StreamHandler(os.Stderr, log.TerminalFormat(false)))
 	glogger.Verbosity(log.LvlInfo)
@@ -399,21 +408,35 @@ func TestPrecompiledConsortiumLog(t *testing.T) {
 func BenchmarkPrecompiledBLS12381G1Add(b *testing.B) {
 	benchJson("blsG1Add", common.Bytes2Hex([]byte{11}), b)
 }
+
+func BenchmarkPrecompiledBLS12381G1Mul(b *testing.B) {
+	benchJson("blsG1Mul", common.Bytes2Hex([]byte{12}), b)
+}
+
 func BenchmarkPrecompiledBLS12381G1MultiExp(b *testing.B) {
 	benchJson("blsG1MultiExp", common.Bytes2Hex([]byte{12}), b)
 }
+
 func BenchmarkPrecompiledBLS12381G2Add(b *testing.B) {
-	benchJson("blsG2Add", common.Bytes2Hex([]byte{13}), b)
+	benchJson("blsG2Add", common.Bytes2Hex([]byte{14}), b)
 }
+
+func BenchmarkPrecompiledBLS12381G2Mul(b *testing.B) {
+	benchJson("blsG2Mul", common.Bytes2Hex([]byte{15}), b)
+}
+
 func BenchmarkPrecompiledBLS12381G2MultiExp(b *testing.B) {
 	benchJson("blsG2MultiExp", common.Bytes2Hex([]byte{14}), b)
 }
+
 func BenchmarkPrecompiledBLS12381Pairing(b *testing.B) {
 	benchJson("blsPairing", common.Bytes2Hex([]byte{15}), b)
 }
+
 func BenchmarkPrecompiledBLS12381MapG1(b *testing.B) {
 	benchJson("blsMapG1", common.Bytes2Hex([]byte{16}), b)
 }
+
 func BenchmarkPrecompiledBLS12381MapG2(b *testing.B) {
 	benchJson("blsMapG2", common.Bytes2Hex([]byte{17}), b)
 }
@@ -422,27 +445,35 @@ func BenchmarkPrecompiledBLS12381MapG2(b *testing.B) {
 func TestPrecompiledBLS12381G1AddFail(t *testing.T) {
 	testJsonFail("blsG1Add", common.Bytes2Hex([]byte{11}), t)
 }
+
 func TestPrecompiledBLS12381G1MulFail(t *testing.T) {
 	testJsonFail("blsG1Mul", common.Bytes2Hex([]byte{12}), t)
 }
+
 func TestPrecompiledBLS12381G1MultiExpFail(t *testing.T) {
 	testJsonFail("blsG1MultiExp", common.Bytes2Hex([]byte{12}), t)
 }
+
 func TestPrecompiledBLS12381G2AddFail(t *testing.T) {
 	testJsonFail("blsG2Add", common.Bytes2Hex([]byte{13}), t)
 }
+
 func TestPrecompiledBLS12381G2MulFail(t *testing.T) {
 	testJsonFail("blsG2Mul", common.Bytes2Hex([]byte{14}), t)
 }
+
 func TestPrecompiledBLS12381G2MultiExpFail(t *testing.T) {
 	testJsonFail("blsG2MultiExp", common.Bytes2Hex([]byte{14}), t)
 }
+
 func TestPrecompiledBLS12381PairingFail(t *testing.T) {
 	testJsonFail("blsPairing", common.Bytes2Hex([]byte{15}), t)
 }
+
 func TestPrecompiledBLS12381MapG1Fail(t *testing.T) {
 	testJsonFail("blsMapG1", common.Bytes2Hex([]byte{16}), t)
 }
+
 func TestPrecompiledBLS12381MapG2Fail(t *testing.T) {
 	testJsonFail("blsMapG2", common.Bytes2Hex([]byte{17}), t)
 }
@@ -513,6 +544,7 @@ func TestIstanbulPrecompile(t *testing.T) {
 			IsIstanbul: true,
 		},
 	}
+	evm.SetPrecompiles(activePrecompiledContracts(evm.chainRules))
 	caller := AccountRef(common.Address{0x1})
 	precompiledContract, ok := evm.precompile(caller, common.BytesToAddress([]byte{6}))
 	if !ok {
@@ -552,6 +584,7 @@ func TestConsortiumPrecompileQuery(t *testing.T) {
 			IsMiko: true,
 		},
 	}
+	evm.SetPrecompiles(activePrecompiledContracts(evm.chainRules))
 	caller := AccountRef(common.Address{0x1})
 	precompiledContract, ok := evm.precompile(caller, common.BytesToAddress([]byte{106}))
 	if !ok {
@@ -605,6 +638,7 @@ func TestConsortiumPrecompileQuery(t *testing.T) {
 	}
 
 	evm.chainRules.IsCancun = true
+	evm.precompiles = activePrecompiledContracts(evm.chainRules)
 	precompiledContract, ok = evm.precompile(caller, common.BytesToAddress([]byte{10}))
 	if !ok {
 		t.Fatal("Failed to get point evaluation contract after Cancun")
@@ -638,6 +672,7 @@ func BenchmarkConsortiumPrecompileQuery(b *testing.B) {
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
+		evm.SetPrecompiles(activePrecompiledContracts(evm.chainRules))
 		evm.precompile(nil, common.BytesToAddress([]byte{106}))
 	}
 }
