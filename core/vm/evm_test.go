@@ -11,8 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 )
 
-type TestOpEvent struct {
-}
+type TestOpEvent struct{}
 
 func (tx *TestOpEvent) Publish(
 	opcode OpCode,
@@ -64,6 +63,7 @@ func TestPublishEvents(t *testing.T) {
 	}
 
 	evm := &EVM{Context: ctx}
+	evm.SetPrecompiles(activePrecompiledContracts(evm.chainRules))
 	evm.PublishEvent(CALL, 1, common.Address{}, common.Address{}, big.NewInt(0), []byte(""), []byte(""), nil)
 	if len(*evm.Context.InternalTransactions) != 1 || (*evm.Context.InternalTransactions)[0].Type != "test" {
 		t.Error("Failed to publish opcode event")
