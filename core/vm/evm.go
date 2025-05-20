@@ -72,6 +72,11 @@ func (evm *EVM) precompile(caller ContractRef, addr common.Address) (Precompiled
 	}
 
 	p, ok := evm.precompiles[addr]
+	if ok {
+		if pWithInit, hasInit := p.(PrecompiledContractWithInit); hasInit {
+			pWithInit.Init(caller, evm)
+		}
+	}
 	return p, ok
 }
 
