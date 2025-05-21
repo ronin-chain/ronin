@@ -681,6 +681,16 @@ func (pool *LegacyPool) validateTx(tx *types.Transaction) error {
 // **executable** transaction, e.g. disallow stacked and gapped transactions
 // from the account.
 func (pool *LegacyPool) checkDelegationLimit(tx *types.Transaction) error {
+	if tx.Type() == types.SponsoredTxType {
+		payer, err := types.Payer(pool.signer, tx)
+		if err != nil {
+			return err
+		}
+		if pool.currentState.GetCodeHash(payer) != types.EmptyCodeHash || pool.all.hasAuth(payer) {
+			return txpool.ErrInflightTxLimitReached
+		}
+	}
+
 	from, _ := types.Sender(pool.signer, tx) // validated
 
 	// Short circuit if the sender has neither delegation nor pending delegation.
@@ -709,17 +719,6 @@ func (pool *LegacyPool) validateAuth(tx *types.Transaction) error {
 	// pending authorization.
 	if err := pool.checkDelegationLimit(tx); err != nil {
 		return err
-	}
-	// Allow at most one in-flight tx for delegated accounts or those with a
-	// pending authorization in case of sponsor tx.
-	if tx.Type() == types.SponsoredTxType {
-		payer, err := types.Payer(pool.signer, tx)
-		if err != nil {
-			return err
-		}
-		if pool.currentState.GetCodeHash(payer) != types.EmptyCodeHash || pool.all.hasAuth(payer) {
-			return txpool.ErrInflightTxLimitReached
-		}
 	}
 	// Authorities cannot conflict with any pending or queued transactions.
 	// nor with addresses that have already been reserved.
