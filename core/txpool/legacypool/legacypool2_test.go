@@ -88,7 +88,7 @@ func TestTransactionFutureAttack(t *testing.T) {
 	pool.Init(
 		testTxPoolConfig.PriceLimit,
 		blockchain.CurrentBlock().Header(),
-		func(addr common.Address, reserve bool) error { return nil },
+		newReserver(),
 	)
 	fillPool(t, pool)
 	pending, _ := pool.Stats()

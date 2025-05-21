@@ -163,6 +163,10 @@ func setupPool() (*LegacyPool, *ecdsa.PrivateKey) {
 	return setupPoolWithConfig(params.TestChainConfig)
 }
 
+func newReserver() *txpool.Reserver {
+	return txpool.NewReservationTracker().NewHandle(42)
+}
+
 func setupPoolWithConfig(config *params.ChainConfig) (*LegacyPool, *ecdsa.PrivateKey) {
 	statedb, _ := state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
 	blockchain := &testBlockChain{10000000, statedb, new(event.Feed), 0}
@@ -172,7 +176,7 @@ func setupPoolWithConfig(config *params.ChainConfig) (*LegacyPool, *ecdsa.Privat
 	pool.Init(
 		testTxPoolConfig.PriceLimit,
 		blockchain.CurrentBlock().Header(),
-		func(addr common.Address, reserve bool) error { return nil },
+		newReserver(),
 	)
 
 	// wait for the pool to initialize
@@ -323,7 +327,7 @@ func TestStateChangeDuringReset(t *testing.T) {
 	pool.Init(
 		testTxPoolConfig.PriceLimit,
 		blockchain.CurrentBlock().Header(),
-		func(addr common.Address, reserve bool) error { return nil },
+		newReserver(),
 	)
 
 	nonce := pool.Nonce(address)
@@ -961,7 +965,7 @@ func testQueueGlobalLimiting(t *testing.T, nolocals bool) {
 	pool.Init(
 		testTxPoolConfig.PriceLimit,
 		blockchain.CurrentBlock().Header(),
-		func(addr common.Address, reserve bool) error { return nil },
+		newReserver(),
 	)
 
 	// Create a number of test accounts and fund them (last one will be the local)
@@ -1058,7 +1062,7 @@ func testQueueTimeLimiting(t *testing.T, nolocals bool) {
 	pool.Init(
 		testTxPoolConfig.PriceLimit,
 		blockchain.CurrentBlock().Header(),
-		func(addr common.Address, reserve bool) error { return nil },
+		newReserver(),
 	)
 
 	// Create two test accounts to ensure remotes expire but locals do not
@@ -1247,7 +1251,7 @@ func TestPendingGlobalLimiting(t *testing.T) {
 	pool.Init(
 		testTxPoolConfig.PriceLimit,
 		blockchain.CurrentBlock().Header(),
-		func(addr common.Address, reserve bool) error { return nil },
+		newReserver(),
 	)
 
 	// Create a number of test accounts and fund them
@@ -1355,7 +1359,7 @@ func TestCapClearsFromAll(t *testing.T) {
 	pool.Init(
 		testTxPoolConfig.PriceLimit,
 		blockchain.CurrentBlock().Header(),
-		func(addr common.Address, reserve bool) error { return nil },
+		newReserver(),
 	)
 
 	// Create a number of test accounts and fund them
@@ -1392,7 +1396,7 @@ func TestPendingMinimumAllowance(t *testing.T) {
 	pool.Init(
 		testTxPoolConfig.PriceLimit,
 		blockchain.CurrentBlock().Header(),
-		func(addr common.Address, reserve bool) error { return nil },
+		newReserver(),
 	)
 
 	// Create a number of test accounts and fund them
@@ -1557,7 +1561,7 @@ func TestMinGasPriceEnforced(t *testing.T) {
 	txPoolConfig := DefaultConfig
 	txPoolConfig.NoLocals = true
 	pool := New(txPoolConfig, params.TestChainConfig, blockchain)
-	pool.Init(txPoolConfig.PriceLimit, blockchain.CurrentBlock().Header(), func(addr common.Address, reserve bool) error { return nil })
+	pool.Init(txPoolConfig.PriceLimit, blockchain.CurrentBlock().Header(), newReserver())
 	defer pool.Close()
 
 	key, _ := crypto.GenerateKey()
@@ -1806,7 +1810,7 @@ func TestUnderpricing(t *testing.T) {
 	pool.Init(
 		testTxPoolConfig.PriceLimit,
 		blockchain.CurrentBlock().Header(),
-		func(addr common.Address, reserve bool) error { return nil },
+		newReserver(),
 	)
 
 	// Keep track of transaction events to ensure all executables get announced
@@ -1925,7 +1929,7 @@ func TestStableUnderpricing(t *testing.T) {
 	pool.Init(
 		testTxPoolConfig.PriceLimit,
 		blockchain.CurrentBlock().Header(),
-		func(addr common.Address, reserve bool) error { return nil },
+		newReserver(),
 	)
 
 	// Keep track of transaction events to ensure all executables get announced
@@ -2427,7 +2431,7 @@ func testJournaling(t *testing.T, nolocals bool) {
 	pool.Init(
 		testTxPoolConfig.PriceLimit,
 		blockchain.CurrentBlock().Header(),
-		func(addr common.Address, reserve bool) error { return nil },
+		newReserver(),
 	)
 
 	// Create two test accounts to ensure remotes expire but locals do not
@@ -2469,7 +2473,7 @@ func testJournaling(t *testing.T, nolocals bool) {
 	pool.Init(
 		testTxPoolConfig.PriceLimit,
 		blockchain.CurrentBlock().Header(),
-		func(addr common.Address, reserve bool) error { return nil },
+		newReserver(),
 	)
 
 	pending, queued = pool.Stats()
@@ -2500,7 +2504,7 @@ func testJournaling(t *testing.T, nolocals bool) {
 	pool.Init(
 		testTxPoolConfig.PriceLimit,
 		blockchain.CurrentBlock().Header(),
-		func(addr common.Address, reserve bool) error { return nil },
+		newReserver(),
 	)
 
 	pending, queued = pool.Stats()
@@ -2611,7 +2615,7 @@ func TestSetCodeTransactions(t *testing.T) {
 
 	pool := New(testTxPoolConfig, &chainConfig, blockchain)
 	defer pool.Close()
-	pool.Init(testTxPoolConfig.PriceLimit, blockchain.CurrentBlock().Header(), func(addr common.Address, reserve bool) error { return nil })
+	pool.Init(testTxPoolConfig.PriceLimit, blockchain.CurrentBlock().Header(), newReserver())
 
 	// Create the test accounts
 	var (
@@ -2651,12 +2655,12 @@ func TestSetCodeTransactions(t *testing.T) {
 				if err := pool.addRemoteSync(pricedTransaction(0, 100000, big.NewInt(1), keyA)); err != nil {
 					t.Fatalf("%s: failed to add remote transaction: %v", name, err)
 				}
-				if err := pool.addRemoteSync(pricedTransaction(1, 100000, big.NewInt(1), keyA)); !errors.Is(err, ErrInflightTxLimitReached) {
-					t.Fatalf("%s: error mismatch: want %v, have %v", name, ErrInflightTxLimitReached, err)
+				if err := pool.addRemoteSync(pricedTransaction(1, 100000, big.NewInt(1), keyA)); !errors.Is(err, txpool.ErrInflightTxLimitReached) {
+					t.Fatalf("%s: error mismatch: want %v, have %v", name, txpool.ErrInflightTxLimitReached, err)
 				}
 				// Check gapped transaction again.
-				if err := pool.addRemoteSync(pricedTransaction(2, 100000, big.NewInt(1), keyA)); !errors.Is(err, ErrInflightTxLimitReached) {
-					t.Fatalf("%s: error mismatch: want %v, have %v", name, ErrInflightTxLimitReached, err)
+				if err := pool.addRemoteSync(pricedTransaction(2, 100000, big.NewInt(1), keyA)); !errors.Is(err, txpool.ErrInflightTxLimitReached) {
+					t.Fatalf("%s: error mismatch: want %v, have %v", name, txpool.ErrInflightTxLimitReached, err)
 				}
 				// Replace by fee.
 				if err := pool.addRemoteSync(pricedTransaction(0, 100000, big.NewInt(10), keyA)); err != nil {
@@ -2690,8 +2694,8 @@ func TestSetCodeTransactions(t *testing.T) {
 					t.Fatalf("%s: failed to add with pending delegatio: %v", name, err)
 				}
 				// Also check gapped transaction is rejected.
-				if err := pool.addRemoteSync(pricedTransaction(1, 100000, big.NewInt(1), keyC)); !errors.Is(err, ErrInflightTxLimitReached) {
-					t.Fatalf("%s: error mismatch: want %v, have %v", name, ErrInflightTxLimitReached, err)
+				if err := pool.addRemoteSync(pricedTransaction(1, 100000, big.NewInt(1), keyC)); !errors.Is(err, txpool.ErrInflightTxLimitReached) {
+					t.Fatalf("%s: error mismatch: want %v, have %v", name, txpool.ErrInflightTxLimitReached, err)
 				}
 			},
 		},
@@ -2766,7 +2770,7 @@ func TestSetCodeTransactions(t *testing.T) {
 				if err := pool.addRemoteSync(pricedTransaction(0, 100000, big.NewInt(1000), keyC)); err != nil {
 					t.Fatalf("%s: failed to added single pooled for account with pending delegation: %v", name, err)
 				}
-				if err, want := pool.addRemoteSync(pricedTransaction(1, 100000, big.NewInt(1000), keyC)), ErrInflightTxLimitReached; !errors.Is(err, want) {
+				if err, want := pool.addRemoteSync(pricedTransaction(1, 100000, big.NewInt(1000), keyC)), txpool.ErrInflightTxLimitReached; !errors.Is(err, want) {
 					t.Fatalf("%s: error mismatch: want %v, have %v", name, want, err)
 				}
 			},
@@ -2842,7 +2846,7 @@ func TestSetCodeTransactionsReorg(t *testing.T) {
 
 	pool := New(testTxPoolConfig, &chainConfig, blockchain)
 	defer pool.Close()
-	pool.Init(testTxPoolConfig.PriceLimit, blockchain.CurrentBlock().Header(), func(addr common.Address, reserve bool) error { return nil })
+	pool.Init(testTxPoolConfig.PriceLimit, blockchain.CurrentBlock().Header(), newReserver())
 	// Create the test accounts
 	var (
 		keyA, _ = crypto.GenerateKey()
@@ -2875,8 +2879,8 @@ func TestSetCodeTransactionsReorg(t *testing.T) {
 		t.Fatalf("failed to add with remote setcode transaction: %v", err)
 	}
 	// Try to add a transactions in
-	if err := pool.addRemoteSync(pricedTransaction(2, 100000, big.NewInt(1000), keyA)); !errors.Is(err, ErrInflightTxLimitReached) {
-		t.Fatalf("unexpected error %v, expecting %v", err, ErrInflightTxLimitReached)
+	if err := pool.addRemoteSync(pricedTransaction(2, 100000, big.NewInt(1000), keyA)); !errors.Is(err, txpool.ErrInflightTxLimitReached) {
+		t.Fatalf("unexpected error %v, expecting %v", err, txpool.ErrInflightTxLimitReached)
 	}
 	// Simulate the chain moving
 	blockchain.statedb.SetNonce(addrA, 2)
@@ -3211,7 +3215,7 @@ func TestExpiredTimeAndGasCheckSponsoredTx(t *testing.T) {
 	txpool.Init(
 		testTxPoolConfig.PriceLimit,
 		blockchain.CurrentBlock().Header(),
-		func(addr common.Address, reserve bool) error { return nil },
+		newReserver(),
 	)
 
 	senderKey, err := crypto.GenerateKey()
@@ -3408,7 +3412,7 @@ func TestSponsoredTxInTxPoolQueue(t *testing.T) {
 	txpool.Init(
 		testTxPoolConfig.PriceLimit,
 		blockchain.CurrentBlock().Header(),
-		func(addr common.Address, reserve bool) error { return nil },
+		newReserver(),
 	)
 
 	senderKey, err := crypto.GenerateKey()
@@ -3679,7 +3683,7 @@ func TestFeeCapCheckVenoki(t *testing.T) {
 	pool.Init(
 		1,
 		blockchain.CurrentBlock().Header(),
-		func(addr common.Address, reserve bool) error { return nil },
+		newReserver(),
 	)
 
 	// 1. fee cap restrict the max tip to 0, lower than pool's required tip
