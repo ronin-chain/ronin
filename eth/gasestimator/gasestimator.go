@@ -219,15 +219,11 @@ func run(ctx context.Context, call *core.Message, opts *Options) (*core.Executio
 		dirtyState = opts.State.Copy()
 	)
 
-	// TODO(kuro): Check if this fee logic is needed.
 	// Lower the basefee to 0 to avoid breaking EVM
 	// invariants (basefee < feecap).
-	// if msgContext.GasPrice.Sign() == 0 {
-	// 	evmContext.BaseFee = new(big.Int)
-	// }
-	// if msgContext.BlobFeeCap != nil && msgContext.BlobFeeCap.BitLen() == 0 {
-	// 	evmContext.BlobBaseFee = new(big.Int)
-	// }
+	if msgContext.GasPrice.Sign() == 0 {
+		evmContext.BaseFee = new(big.Int)
+	}
 	evm := vm.NewEVM(evmContext, msgContext, dirtyState, opts.Config, vm.Config{NoBaseFee: true})
 
 	// Monitor the outer context and interrupt the EVM upon cancellation. To avoid
