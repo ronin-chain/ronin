@@ -1006,7 +1006,6 @@ type BlockOverrides struct {
 	FeeRecipient  *common.Address
 	PrevRandao    *common.Hash
 	BaseFeePerGas *hexutil.Big
-	// TODO: Support BlobBaseFee
 }
 
 // Apply overrides the given header fields into the given block context.
@@ -1809,7 +1808,6 @@ func AccessList(ctx context.Context, b Backend, blockNrOrHash rpc.BlockNumberOrH
 			return nil, 0, nil, err
 		}
 
-		// TODO(kuro): ensure this fee logic is correct
 		// Lower the basefee to 0 to avoid breaking EVM
 		// invariants (basefee < feecap).
 		if msg.GasPrice.Sign() == 0 {

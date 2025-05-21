@@ -247,11 +247,6 @@ func (sim *simulator) processBlock(ctx context.Context, block *simBlock, header,
 	}
 	blockContext := core.NewEVMBlockContext(header, sim.newSimulatedChainContext(ctx, headers), nil)
 
-	// TODO(kuro): support blob base fee override when Ronin add blob base fee to block header
-	// if block.BlockOverrides.BlobBaseFee != nil {
-	// 	blockContext.BlobBaseFee = block.BlockOverrides.BlobBaseFee.ToInt()
-	// }
-
 	precompiles := sim.activePrecompiles(sim.base)
 	// State overrides are applied prior to execution of a block
 	if err := block.StateOverrides.Apply(sim.state, precompiles); err != nil {
