@@ -2896,7 +2896,7 @@ func testDeleteRecreateSlots(t *testing.T, scheme string) {
 
 	chainConfig := *params.TestChainConfig
 	chainConfig.CancunBlock = nil
-	chainConfig.PragueBlock = nil
+	chainConfig.KotaroBlock = nil
 	gspec := &Genesis{
 		Config: &chainConfig,
 		Alloc: GenesisAlloc{
@@ -2990,7 +2990,7 @@ func testDeleteRecreateAccount(t *testing.T, scheme string) {
 
 	chainConfig := *params.TestChainConfig
 	chainConfig.CancunBlock = nil
-	chainConfig.PragueBlock = nil
+	chainConfig.KotaroBlock = nil
 	gspec := &Genesis{
 		Config: &chainConfig,
 		Alloc: GenesisAlloc{
@@ -3118,7 +3118,7 @@ func testDeleteRecreateSlotsAcrossManyBlocks(t *testing.T, scheme string) {
 	t.Logf("Destination address: %x\n", aa)
 	chainConfig := *params.TestChainConfig
 	chainConfig.CancunBlock = nil
-	chainConfig.PragueBlock = nil
+	chainConfig.KotaroBlock = nil
 	gspec := &Genesis{
 		Config: &chainConfig,
 		Alloc: GenesisAlloc{

@@ -478,7 +478,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 			return nil, fmt.Errorf("%w: have %d, want %d", ErrIntrinsicGas, st.gas, gas)
 		}
 		// Gas limit suffices for the floor data cost (EIP-7623)
-		if rules.IsPrague {
+		if rules.IsKotaro {
 			floorDataGas, err = FloorDataGas(msg.Data())
 			if err != nil {
 				return nil, err
@@ -543,7 +543,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	if !st.evm.Config.IsSystemTransaction {
 		// Compute refund counter, capped to a refund quotient.
 		st.gas += st.calcRefund()
-		if rules.IsPrague {
+		if rules.IsKotaro {
 			// After EIP-7623: Data-heavy transactions pay the floor gas.
 			if st.gasUsed() < floorDataGas {
 				st.gas = st.initialGas - floorDataGas
@@ -584,7 +584,6 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		ReturnData: ret,
 	}, nil
 }
-
 
 // validateAuthorization validates an EIP-7702 authorization against the state.
 func (st *StateTransition) validateAuthorization(auth *types.SetCodeAuthorization) (authority common.Address, err error) {

@@ -2602,7 +2602,7 @@ func TestSetCodeTransactions(t *testing.T) {
 	chainConfig.EIP155Block = common.Big0
 	chainConfig.MikoBlock = common.Big0
 	chainConfig.VenokiBlock = nil // ignore Venoki ValidateTransaction()
-	chainConfig.PragueBlock = common.Big0
+	chainConfig.KotaroBlock = common.Big0
 	chainConfig.ChainID = params.TestChainConfig.ChainID
 
 	// Create the pool to test the status retrievals with
@@ -2833,7 +2833,7 @@ func TestSetCodeTransactionsReorg(t *testing.T) {
 	chainConfig.EIP155Block = common.Big0
 	chainConfig.MikoBlock = common.Big0
 	chainConfig.VenokiBlock = nil // ignore Venoki ValidateTransaction()
-	chainConfig.PragueBlock = common.Big0
+	chainConfig.KotaroBlock = common.Big0
 	chainConfig.ChainID = params.TestChainConfig.ChainID
 
 	// Create the pool to test the status retrievals with

@@ -251,7 +251,7 @@ var Forks = map[string]*params.ChainConfig{
 		ShanghaiBlock:       big.NewInt(0),
 		CancunBlock:         big.NewInt(0),
 		VenokiBlock:         big.NewInt(0),
-		PragueBlock:         big.NewInt(0),
+		KotaroBlock:         big.NewInt(0),
 	},
 }
 

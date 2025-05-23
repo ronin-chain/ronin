@@ -99,7 +99,7 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 	isSystemTxsSection := false
 
 	// EIP-2935: Store the parent block hash in the history storage contract
-	if p.config.IsPrague(block.Number()) {
+	if p.config.IsKotaro(block.Number()) {
 		ProcessParentBlockHash(block.ParentHash(), vmenv)
 	}
 

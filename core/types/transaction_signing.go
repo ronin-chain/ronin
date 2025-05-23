@@ -43,7 +43,7 @@ type sigCache struct {
 func MakeSigner(config *params.ChainConfig, blockNumber *big.Int) Signer {
 	var signer Signer
 	switch {
-	case config.IsPrague(blockNumber):
+	case config.IsKotaro(blockNumber):
 		signer = NewPragueSigner(config.ChainID)
 	case config.IsCancun(blockNumber):
 		signer = NewCancunSigner(config.ChainID)
@@ -72,7 +72,7 @@ func MakeSigner(config *params.ChainConfig, blockNumber *big.Int) Signer {
 // have the current block number available, use MakeSigner instead.
 func LatestSigner(config *params.ChainConfig) Signer {
 	if config.ChainID != nil {
-		if config.PragueBlock != nil {
+		if config.KotaroBlock != nil {
 			return NewPragueSigner(config.ChainID)
 		}
 		if config.CancunBlock != nil {

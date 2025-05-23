@@ -416,7 +416,7 @@ func (api *API) traceChain(start, end *types.Block, config *TraceConfig, closed 
 				break
 			}
 			// Insert parent hash in history contract.
-			if api.backend.ChainConfig().IsPrague(next.Number()) {
+			if api.backend.ChainConfig().IsKotaro(next.Number()) {
 				context := core.NewEVMBlockContext(next.Header(), api.chainContext(ctx), nil)
 				vmenv := vm.NewEVM(context, vm.TxContext{}, statedb, api.backend.ChainConfig(), vm.Config{})
 				core.ProcessParentBlockHash(next.ParentHash(), vmenv)
@@ -580,7 +580,7 @@ func (api *API) IntermediateRoots(ctx context.Context, hash common.Hash, config 
 		vmctx              = core.NewEVMBlockContext(block.Header(), api.chainContext(ctx), nil)
 		deleteEmptyObjects = chainConfig.IsEIP158(block.Number())
 	)
-	if chainConfig.IsPrague(block.Number()) {
+	if chainConfig.IsKotaro(block.Number()) {
 		vevm := vm.NewEVM(vmctx, vm.TxContext{}, statedb, chainConfig, vm.Config{})
 		core.ProcessParentBlockHash(block.ParentHash(), vevm)
 	}
@@ -664,7 +664,7 @@ func (api *API) traceBlock(ctx context.Context, block *types.Block, config *Trac
 		signer    = types.MakeSigner(api.backend.ChainConfig(), block.Number())
 		results   = make([]*txTraceResult, len(txs))
 	)
-	if api.backend.ChainConfig().IsPrague(block.Number()) {
+	if api.backend.ChainConfig().IsKotaro(block.Number()) {
 		vmenv := vm.NewEVM(blockCtx, vm.TxContext{}, statedb, api.backend.ChainConfig(), vm.Config{})
 		core.ProcessParentBlockHash(block.ParentHash(), vmenv)
 	}
@@ -934,7 +934,7 @@ func (api *API) standardTraceBlockToFile(ctx context.Context, block *types.Block
 		// Note: This copies the config, to not screw up the main config
 		chainConfig, canon = overrideConfig(chainConfig, config.Overrides)
 	}
-	if chainConfig.IsPrague(block.Number()) {
+	if chainConfig.IsKotaro(block.Number()) {
 		vmenv := vm.NewEVM(vmctx, vm.TxContext{}, statedb, chainConfig, vm.Config{})
 		core.ProcessParentBlockHash(block.ParentHash(), vmenv)
 	}

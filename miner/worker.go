@@ -1201,7 +1201,7 @@ func (w *worker) commitNewWork(interrupt *int32, noempty bool, timestamp int64) 
 	}
 
 	// EIP-2935: Store the parent block hash in the history storage contract
-	if w.chainConfig.IsPrague(env.header.Number) {
+	if w.chainConfig.IsKotaro(env.header.Number) {
 		vmctx := core.NewEVMBlockContext(env.header, w.chain, &w.coinbase)
 		vevm := vm.NewEVM(vmctx, vm.TxContext{}, env.state, w.chainConfig, vm.Config{})
 		core.ProcessParentBlockHash(env.header.ParentHash, vevm)

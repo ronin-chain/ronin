@@ -11548,21 +11548,21 @@ index 43bffb559..b0d9f2291 100644
  	chainConfigFmt += "Engine: %v, Blacklist Contract: %v, Fenix Validator Contract: %v, ConsortiumV2: %v, ConsortiumV2.RoninValidatorSet: %v, "
  	chainConfigFmt += "ConsortiumV2.SlashIndicator: %v, ConsortiumV2.StakingContract: %v, Puffy: %v, Buba: %v, Olek: %v, Shillin: %v, Antenna: %v, "
  	chainConfigFmt += "ConsortiumV2.ProfileContract: %v, ConsortiumV2.FinalityTracking: %v, whiteListDeployerContractV2Address: %v, roninTreasuryAddress: %v, "
--	chainConfigFmt += "Miko: %v, Tripp: %v, TrippPeriod: %v, Aaron: %v, Shanghai: %v, Cancun: %v, Venoki: %v, Prague: %v}"
-+	chainConfigFmt += "Miko: %v, Tripp: %v, TrippPeriod: %v, Aaron: %v, Shanghai: %v, Cancun: %v, Venoki: %v, Prague: %v, Shadow: %v}"
+-	chainConfigFmt += "Miko: %v, Tripp: %v, TrippPeriod: %v, Aaron: %v, Shanghai: %v, Cancun: %v, Venoki: %v, Kotaro: %v}"
++	chainConfigFmt += "Miko: %v, Tripp: %v, TrippPeriod: %v, Aaron: %v, Shanghai: %v, Cancun: %v, Venoki: %v, Kotaro: %v, Shadow: %v}"
  
  	return fmt.Sprintf(chainConfigFmt,
  		c.ChainID,
 @@ -791,6 +793,7 @@ func (c *ChainConfig) String() string {
  		c.CancunBlock,
  		c.VenokiBlock,
- 		c.PragueBlock,
+ 		c.KotaroBlock,
 +		c.ShadowForkBlock,
  	)
  }
  
-@@ -958,6 +961,11 @@ func (c *ChainConfig) IsPrague(num *big.Int) bool {
- 	return isForked(c.PragueBlock, num)
+@@ -958,6 +961,11 @@ func (c *ChainConfig) IsKotaro(num *big.Int) bool {
+ 	return isForked(c.KotaroBlock, num)
  }
  
 +// IsShadow returns whether the num is equals to or larger than the shadow fork block.
@@ -11580,6 +11580,6 @@ index 43bffb559..b0d9f2291 100644
 +	if isForkIncompatible(c.ShadowForkBlock, newcfg.ShadowForkBlock, head) {
 +		return newCompatError("Shadow fork block", c.ShadowForkBlock, newcfg.ShadowForkBlock)
 +	}
- 	if isForkIncompatible(c.PragueBlock, newcfg.PragueBlock, head) {
- 		return newCompatError("Prague fork block", c.PragueBlock, newcfg.PragueBlock)
+ 	if isForkIncompatible(c.KotaroBlock, newcfg.KotaroBlock, head) {
+ 		return newCompatError("Kotaro fork block", c.KotaroBlock, newcfg.KotaroBlock)
  	}

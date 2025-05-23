@@ -64,7 +64,7 @@ func TestStateProcessorErrors(t *testing.T) {
 			TerminalTotalDifficulty: big.NewInt(0),
 			ShanghaiBlock:           big.NewInt(0),
 			CancunBlock:             big.NewInt(0),
-			PragueBlock:             big.NewInt(0),
+			KotaroBlock:             big.NewInt(0),
 		}
 		signer  = types.LatestSigner(config)
 		key1, _ = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
@@ -669,7 +669,7 @@ func TestProcessParentBlockHash(t *testing.T) {
 			ShanghaiBlock:       big.NewInt(0),
 			CancunBlock:         big.NewInt(0),
 			VenokiBlock:         big.NewInt(0),
-			PragueBlock:         big.NewInt(0),
+			KotaroBlock:         big.NewInt(0),
 			Ethash:              new(params.EthashConfig),
 		}
 		hashA    = common.Hash{0x01}
