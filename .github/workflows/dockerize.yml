@@ -1,0 +1,16 @@
+name: Dockerize
+
+on:
+  push:
+    branches:
+      - sync-public
+  pull_request:
+    branches:
+      - sync-public
+
+jobs:
+  docker:
+    uses: axieinfinity/workflows-samples/.github/workflows/docker-build-submodule.yml@main
+    with:
+      image_repository: us-docker.pkg.dev/axs-infra-ops-8686/skymavis/ronin
+    secrets: inherit
