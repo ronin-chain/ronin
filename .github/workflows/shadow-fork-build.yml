@@ -7,6 +7,11 @@ on:
     tags:
       - v*.*.*-rc*
 
+  # Test build for shadow fork
+  pull_request:
+    branches:
+      - main
+
 env:
   REGISTRY: ghcr.io
   IMAGE_REPOSITORY: ronin-chain/ronin
