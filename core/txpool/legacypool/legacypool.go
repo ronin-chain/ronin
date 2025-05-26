@@ -682,10 +682,7 @@ func (pool *LegacyPool) validateTx(tx *types.Transaction) error {
 // from the account.
 func (pool *LegacyPool) checkDelegationLimit(tx *types.Transaction) error {
 	if tx.Type() == types.SponsoredTxType {
-		payer, err := types.Payer(pool.signer, tx)
-		if err != nil {
-			return err
-		}
+		payer, _ := types.Payer(pool.signer, tx) // already validated
 		if pool.currentState.GetCodeHash(payer) != types.EmptyCodeHash || pool.all.hasAuth(payer) {
 			return txpool.ErrInflightTxLimitReached
 		}
