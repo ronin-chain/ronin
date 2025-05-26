@@ -44,7 +44,7 @@ const (
 	maxSimulateBlocks = 256
 
 	// timestampIncrement is the default increment between block timestamps.
-	timestampIncrement = 12
+	timestampIncrement = 3
 )
 
 // simBlock is a batch of calls to be simulated sequentially.
