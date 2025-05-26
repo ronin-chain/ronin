@@ -18,6 +18,7 @@ package types
 
 import (
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
 )
 
@@ -37,4 +38,16 @@ var (
 
 	// EmptyUncleHash is the known hash of the empty uncle set.
 	EmptyUncleHash = rlpHash([]*Header(nil)) // 1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347
+
+	// EmptyCodeHash is the known hash of the empty EVM bytecode.
+	EmptyCodeHash = crypto.Keccak256Hash(nil) // c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470
+
+	// EmptyTxsHash is the known hash of the empty transaction set.
+	EmptyTxsHash = common.HexToHash("56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421")
+
+	// EmptyReceiptsHash is the known hash of the empty receipt set.
+	EmptyReceiptsHash = common.HexToHash("56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421")
+
+	// EmptyVerkleHash is the known hash of an empty verkle trie.
+	EmptyVerkleHash = common.Hash{}
 )
