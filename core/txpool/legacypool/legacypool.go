@@ -1818,13 +1818,13 @@ func (pool *LegacyPool) Clear() {
 	// The transaction addition may attempt to reserve the sender addr which
 	// can't happen until Clear releases the reservation lock.  Clear cannot
 	// acquire the subpool lock until the transaction addition is completed.
-	for _, tx := range pool.all.locals {
-		senderAddr, _ := types.Sender(pool.signer, tx)
-		_ = pool.reserver.Release(senderAddr)
+	for addr := range pool.pending {
+		if _, ok := pool.queue[addr]; !ok {
+			pool.reserver.Release(addr)
+		}
 	}
-	for _, tx := range pool.all.remotes {
-		senderAddr, _ := types.Sender(pool.signer, tx)
-		_ = pool.reserver.Release(senderAddr)
+	for addr := range pool.queue {
+		pool.reserver.Release(addr)
 	}
 	pool.all = newLookup()
 	pool.priced = newPricedList(pool.all)
