@@ -83,19 +83,18 @@ type simBlockResult struct {
 }
 
 func (r *simBlockResult) MarshalJSON() ([]byte, error) {
-	blockData, err := RPCMarshalBlock(r.Block, true, r.fullTx, r.chainConfig)
-	if err != nil {
-		return nil, err
-	}
-
+	blockData := RPCMarshalBlock(r.Block, true, r.fullTx, r.chainConfig)
 	blockData["calls"] = r.Calls
+
 	// Set tx sender if user requested full tx objects.
-	if raw, ok := blockData["transactions"].([]any); ok {
-		for _, tx := range raw {
-			if tx, ok := tx.(*RPCTransaction); ok {
-				tx.From = r.senders[tx.Hash]
-			} else {
-				return nil, errors.New("simulated transaction result has invalid type")
+	if r.fullTx {
+		if raw, ok := blockData["transactions"].([]any); ok {
+			for _, tx := range raw {
+				if tx, ok := tx.(*RPCTransaction); ok {
+					tx.From = r.senders[tx.Hash]
+				} else {
+					return nil, errors.New("simulated transaction result has invalid type")
+				}
 			}
 		}
 	}
@@ -187,6 +186,7 @@ func (sim *simulator) execute(ctx context.Context, blocks []simBlock) ([]*simBlo
 		cancel  context.CancelFunc
 		timeout = sim.b.RPCEVMTimeout()
 	)
+	timeout = 0
 	if timeout > 0 {
 		ctx, cancel = context.WithTimeout(ctx, timeout)
 	} else {
@@ -269,12 +269,13 @@ func (sim *simulator) processBlock(ctx context.Context, block *simBlock, header,
 		senders = make(map[common.Hash]common.Address)
 	)
 	tracingStateDB := vm.StateDB(sim.state)
-	// TODO(kuro): enable this when merge https://github.com/ethereum/go-ethereum/pull/30569
-	// if hooks := tracer.Hooks(); hooks != nil {
-	// 	tracingStateDB = state.NewHookedState(sim.state, hooks)
-	// }
+	if hooks := tracer.Hooks(); hooks != nil {
+		sim.state.SetLogger(hooks)
+		// TODO(kuro): enable this when merge https://github.com/ethereum/go-ethereum/pull/30569
+		// tracingStateDB = state.NewHookedState(sim.state, hooks)
+	}
 
-	evm := vm.NewEVM(blockContext, vm.TxContext{}, tracingStateDB, sim.chainConfig, *vmConfig)
+	evm := vm.NewEVM(blockContext, vm.TxContext{GasPrice: big.NewInt(0)}, tracingStateDB, sim.chainConfig, *vmConfig)
 	// It is possible to override precompiles with EVM bytecode, or
 	// move them to another address.
 	if precompiles != nil {
@@ -306,6 +307,8 @@ func (sim *simulator) processBlock(ctx context.Context, block *simBlock, header,
 		if err != nil {
 			return nil, nil, nil, err
 		}
+
+		evm.TxContext = core.NewEVMTxContext(msg)
 		result, err := applyMessageWithEVM(ctx, evm, msg, timeout, sim.gp)
 		if err != nil {
 			txErr := txValidationError(err)
