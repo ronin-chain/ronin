@@ -81,7 +81,9 @@ func hashAlloc(ga *types.GenesisAlloc) (common.Hash, error) {
 		return common.Hash{}, err
 	}
 	for addr, account := range *ga {
-		statedb.AddBalance(addr, account.Balance, tracing.BalanceIncreaseGenesisBalance)
+		if account.Balance != nil {
+			statedb.AddBalance(addr, account.Balance, tracing.BalanceIncreaseGenesisBalance)
+		}
 		statedb.SetCode(addr, account.Code)
 		statedb.SetNonce(addr, account.Nonce)
 		for key, value := range account.Storage {
