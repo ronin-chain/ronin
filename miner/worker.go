@@ -858,7 +858,7 @@ func (w *worker) updateSnapshot() {
 	w.snapshotState = w.current.state.Copy()
 }
 
-func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Address, receiptProcessor core.ReceiptProcessor) ([]*types.Log, error) {
+func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Address) ([]*types.Log, error) {
 	txType := tx.Type()
 	if txType == types.BlobTxType {
 		if tx.BlobTxSidecar() == nil {
@@ -881,7 +881,6 @@ func (w *worker) commitTransaction(tx *types.Transaction, coinbase common.Addres
 		tx,
 		&w.current.header.GasUsed,
 		*w.chain.GetVMConfig(),
-		receiptProcessor,
 	)
 	if err != nil {
 		w.current.state.RevertToSnapshot(snap)
@@ -950,9 +949,6 @@ func (w *worker) commitTransactions(plainTxs, blobTxs *TransactionsByPriceAndNon
 		duration := time.Until(time.Unix(int64(w.current.header.Time), 0)) - w.config.BlockProduceLeftOver
 		timer = time.NewTimer(duration)
 	}
-
-	bloomProcessor := core.NewAsyncReceiptBloomGenerator(plainTxs.Size() + blobTxs.Size())
-	defer bloomProcessor.Close()
 
 Loop:
 	for {
@@ -1061,7 +1057,7 @@ Loop:
 		// Start executing the transaction
 		w.current.state.SetTxContext(tx.Hash(), w.current.tcount)
 
-		logs, err := w.commitTransaction(tx, coinbase, bloomProcessor)
+		logs, err := w.commitTransaction(tx, coinbase)
 		switch {
 		case errors.Is(err, core.ErrGasLimitReached):
 			// Pop the current out-of-gas transaction without shifting in the next from the account
