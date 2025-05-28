@@ -224,6 +224,9 @@ func run(ctx context.Context, call *core.Message, opts *Options) (*core.Executio
 	if msgContext.GasPrice.Sign() == 0 {
 		evmContext.BaseFee = new(big.Int)
 	}
+	if call.BlobGasFeeCap != nil && call.BlobGasFeeCap.BitLen() == 0 {
+		evmContext.BlobBaseFee = new(big.Int)
+	}
 	evm := vm.NewEVM(evmContext, msgContext, dirtyState, opts.Config, vm.Config{NoBaseFee: true})
 
 	// Monitor the outer context and interrupt the EVM upon cancellation. To avoid
