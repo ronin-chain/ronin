@@ -304,6 +304,7 @@ func (sim *simulator) processBlock(ctx context.Context, block *simBlock, header,
 		sim.state.SetTxContext(txHash, i)
 		// EoA check is always skipped, even in validation mode.
 		msg, err := call.ToMessage(sim.base.GasLimit, header.BaseFee)
+		msg.SkipAccountChecks = !sim.validate
 		if err != nil {
 			return nil, nil, nil, err
 		}
