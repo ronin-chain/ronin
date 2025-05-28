@@ -234,7 +234,7 @@ func (args *TransactionArgs) setDefaults(ctx context.Context, b Backend) error {
 // ToMessage converts the transaction arguments to the Message type used by the
 // core evm. This method is used in calls and traces that do not require a real
 // live transaction.
-func (args *TransactionArgs) ToMessage(globalGasCap uint64, baseFee *big.Int) (*core.Message, error) {
+func (args *TransactionArgs) ToMessage(globalGasCap uint64, baseFee *big.Int) *core.Message {
 	// Set sender address or use zero address if none specified.
 	addr := args.from()
 
@@ -317,7 +317,7 @@ func (args *TransactionArgs) ToMessage(globalGasCap uint64, baseFee *big.Int) (*
 		args.BlobHashes,
 		args.AuthorizationList,
 	)
-	return msg, nil
+	return msg
 }
 
 // toTransaction converts the arguments to a transaction.
