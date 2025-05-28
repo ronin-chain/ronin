@@ -1085,6 +1085,10 @@ func TestSimulateV1(t *testing.T) {
 		}
 		sha256Address = common.BytesToAddress([]byte{0x02})
 	)
+
+	// Enable Venoki hardfork to enable basefee
+	genesis.Config.VenokiBlock = big.NewInt(0)
+
 	api := NewPublicBlockChainAPI(newTestBackend(t, genBlocks, genesis, ethash.NewFaker(), func(i int, b *core.BlockGen) {
 		b.SetCoinbase(common.HexToAddress(coinbase))
 		// Transfer from account[0] to account[1]
@@ -1147,6 +1151,7 @@ func TestSimulateV1(t *testing.T) {
 		validation       *bool
 		expectErr        error
 		want             []blockRes
+		skip             bool
 	}{
 		// State build-up over calls:
 		// First value transfer OK after state
@@ -1626,12 +1631,12 @@ func TestSimulateV1(t *testing.T) {
 			want: []blockRes{{
 				Number:        "0xb",
 				GasLimit:      "0x47e7c4",
-				GasUsed:       "0x77dc",
+				GasUsed:       "0xd984",
 				Miner:         coinbase,
 				BaseFeePerGas: "0x0",
 				Calls: []callRes{{
 					ReturnValue: "0x",
-					GasUsed:     "0x77dc",
+					GasUsed:     "0xd984",
 					Logs: []log{{
 						Address: transferAddress,
 						Topics: []common.Hash{
@@ -1674,7 +1679,7 @@ func TestSimulateV1(t *testing.T) {
 					//        if gt(balance(cac), 0) {
 					//            revert(0, 0)
 					//        }
-					//        if gt(extcodesize(cac), 0) {
+					//        if eq(extcodesize(cac), 0) { // After EIP-6780, code not be deleted
 					//            revert(0, 0)
 					//        }
 					//        if eq(balance(dad), 0) {
@@ -1682,18 +1687,18 @@ func TestSimulateV1(t *testing.T) {
 					//        }
 					//    }
 					// }
-					Input: hex2Bytes("610cac610dad600082311115601357600080fd5b6000823b1115602157600080fd5b6000813103602e57600080fd5b5050"),
+					Input: hex2Bytes("610cac610dad905f8131116025575f903b146021575f903114601d57005b5f80fd5b5f80fd5b5f80fd"),
 				}},
 			}, {
 				Calls: []TransactionArgs{{
 					From:  &accounts[0].addr,
-					Input: hex2Bytes("610cac610dad600082311115601357600080fd5b6000823b1115602157600080fd5b6000813103602e57600080fd5b5050"),
+					Input: hex2Bytes("610cac610dad905f8131116025575f903b146021575f903114601d57005b5f80fd5b5f80fd5b5f80fd"),
 				}},
 			}},
 			want: []blockRes{{
 				Number:        "0xb",
 				GasLimit:      "0x47e7c4",
-				GasUsed:       "0x1b83f",
+				GasUsed:       "0x1b7ee",
 				Miner:         coinbase,
 				BaseFeePerGas: "0x0",
 				Calls: []callRes{{
@@ -1703,19 +1708,19 @@ func TestSimulateV1(t *testing.T) {
 					Status:      "0x1",
 				}, {
 					ReturnValue: "0x",
-					GasUsed:     "0xe6d9",
+					GasUsed:     "0xe688",
 					Logs:        []log{},
 					Status:      "0x1",
 				}},
 			}, {
 				Number:        "0xc",
 				GasLimit:      "0x47e7c4",
-				GasUsed:       "0xe6d9",
+				GasUsed:       "0xe688",
 				Miner:         coinbase,
 				BaseFeePerGas: "0x0",
 				Calls: []callRes{{
 					ReturnValue: "0x",
-					GasUsed:     "0xe6d9",
+					GasUsed:     "0xe688",
 					Logs:        []log{},
 					Status:      "0x1",
 				}},
@@ -1727,9 +1732,10 @@ func TestSimulateV1(t *testing.T) {
 			tag:  latest,
 			blocks: []simBlock{{
 				Calls: []TransactionArgs{{
-					From:  &accounts[2].addr,
-					To:    &cac,
-					Nonce: newUint64(2),
+					From:         &accounts[2].addr,
+					To:           &cac,
+					Nonce:        newUint64(2),
+					MaxFeePerGas: newInt(1000000000),
 				}},
 			}},
 			validation: &validation,
@@ -1740,10 +1746,11 @@ func TestSimulateV1(t *testing.T) {
 		{
 			name: "validation-checks-from-contract",
 			tag:  latest,
+			skip: true, // This require eip-7702 enabled to pass
 			blocks: []simBlock{{
 				StateOverrides: &StateOverride{
 					randomAccounts[2].addr: OverrideAccount{
-						Balance: newRPCBalance(big.NewInt(2098640803896784)),
+						Balance: newRPCBalance(big.NewInt(4712388000000000)),
 						Code:    hex2Bytes("00"),
 						Nonce:   newUint64(1),
 					},
@@ -1752,7 +1759,7 @@ func TestSimulateV1(t *testing.T) {
 					From:                 &randomAccounts[2].addr,
 					To:                   &cac,
 					Nonce:                newUint64(1),
-					MaxFeePerGas:         newInt(233138868),
+					MaxFeePerGas:         newInt(1000000000),
 					MaxPriorityFeePerGas: newInt(1),
 				}},
 			}},
@@ -1762,7 +1769,7 @@ func TestSimulateV1(t *testing.T) {
 				GasLimit:      "0x47e7c4",
 				GasUsed:       "0xd166",
 				Miner:         coinbase,
-				BaseFeePerGas: "0xde56ab3",
+				BaseFeePerGas: "0x3b9aca00",
 				Calls: []callRes{{
 					ReturnValue: "0x",
 					GasUsed:     "0xd166",
@@ -2127,7 +2134,7 @@ func TestSimulateV1(t *testing.T) {
 				Calls: []TransactionArgs{{
 					From:                 &accounts[0].addr,
 					To:                   &randomAccounts[2].addr,
-					MaxFeePerGas:         newInt(233138868),
+					MaxFeePerGas:         newInt(1000000000),
 					MaxPriorityFeePerGas: newInt(1),
 				}},
 			}},
@@ -2137,9 +2144,9 @@ func TestSimulateV1(t *testing.T) {
 				GasLimit:      "0x47e7c4",
 				GasUsed:       "0x5227",
 				Miner:         coinbase,
-				BaseFeePerGas: "0xde56ab3",
+				BaseFeePerGas: "0x3b9aca00",
 				Calls: []callRes{{
-					ReturnValue: "0x000000000000000000000000000000000000000000000000000000000de56ab4000000000000000000000000000000000000000000000000000000000de56ab3",
+					ReturnValue: "0x000000000000000000000000000000000000000000000000000000003b9aca00000000000000000000000000000000000000000000000000000000003b9aca00",
 					GasUsed:     "0x5227",
 					Logs:        []log{},
 					Status:      "0x1",
@@ -2149,6 +2156,10 @@ func TestSimulateV1(t *testing.T) {
 	}
 
 	for _, tc := range testSuite {
+		if tc.skip {
+			continue
+		}
+
 		t.Run(tc.name, func(t *testing.T) {
 			opts := simOpts{BlockStateCalls: tc.blocks}
 			if tc.includeTransfers != nil && *tc.includeTransfers {

@@ -297,7 +297,26 @@ func (args *TransactionArgs) ToMessage(globalGasCap uint64, baseFee *big.Int) (*
 	if args.BlobHashes != nil && args.BlobFeeCap == nil {
 		args.BlobFeeCap = new(hexutil.Big)
 	}
-	msg := core.NewMessage(addr, args.To, 0, value, gas, gasPrice, gasFeeCap, gasTipCap, data, accessList, true, (*big.Int)(args.BlobFeeCap), args.BlobHashes, args.AuthorizationList)
+	var nonce uint64
+	if args.Nonce != nil {
+		nonce = uint64(*args.Nonce)
+	}
+	msg := core.NewMessage(
+		addr,
+		args.To,
+		nonce,
+		value,
+		gas,
+		gasPrice,
+		gasFeeCap,
+		gasTipCap,
+		data,
+		accessList,
+		true,
+		(*big.Int)(args.BlobFeeCap),
+		args.BlobHashes,
+		args.AuthorizationList,
+	)
 	return msg, nil
 }
 
