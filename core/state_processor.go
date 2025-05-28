@@ -227,9 +227,6 @@ func ApplyMessageWithEVM(
 	// by the tx.
 	receipt = MakeReceipt(evm, result, statedb, blockNumber, blockHash, tx, *usedGas, root)
 
-	// create the bloom filter
-	receiptProcessor.Apply(receipt)
-
 	return receipt, result, err
 }
 
