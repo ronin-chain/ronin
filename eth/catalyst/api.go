@@ -81,7 +81,7 @@ type blockExecutionEnv struct {
 func (env *blockExecutionEnv) commitTransaction(tx *types.Transaction, coinbase common.Address) error {
 	vmconfig := *env.chain.GetVMConfig()
 	snap := env.state.Snapshot()
-	receipt, _, err := core.ApplyTransaction(env.chain.Config(), env.chain, &coinbase, env.gasPool, env.state, env.header, tx, &env.header.GasUsed, vmconfig, core.NewReceiptBloomGenerator())
+	receipt, _, err := core.ApplyTransaction(env.chain.Config(), env.chain, &coinbase, env.gasPool, env.state, env.header, tx, &env.header.GasUsed, vmconfig)
 	if err != nil {
 		env.state.RevertToSnapshot(snap)
 		return err
@@ -228,7 +228,7 @@ func (api *consensusAPI) AssembleBlock(params assembleBlockParams) (*executableD
 }
 
 func encodeTransactions(txs []*types.Transaction) [][]byte {
-	var enc = make([][]byte, len(txs))
+	enc := make([][]byte, len(txs))
 	for i, tx := range txs {
 		enc[i], _ = tx.MarshalBinary()
 	}
@@ -236,7 +236,7 @@ func encodeTransactions(txs []*types.Transaction) [][]byte {
 }
 
 func decodeTransactions(enc [][]byte) ([]*types.Transaction, error) {
-	var txs = make([]*types.Transaction, len(enc))
+	txs := make([]*types.Transaction, len(enc))
 	for i, encTx := range enc {
 		var tx types.Transaction
 		if err := tx.UnmarshalBinary(encTx); err != nil {

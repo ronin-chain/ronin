@@ -91,9 +91,6 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 
 	posa, isPoSA := p.engine.(consensus.PoSA)
 
-	bloomProcessors := NewAsyncReceiptBloomGenerator(txNum)
-	defer bloomProcessors.Close()
-
 	// Iterate over and process the individual transactions
 	// System transactions should be placed at the end of a block
 	isMiko := p.config.IsMiko(blockNumber)
@@ -129,7 +126,7 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 			return nil, nil, nil, 0, fmt.Errorf("could not apply tx %d [%v]: %w", i, tx.Hash().Hex(), err)
 		}
 		statedb.SetTxContext(tx.Hash(), i)
-		receipt, _, err := ApplyMessageWithEVM(msg, p.config, gp, statedb, blockNumber, blockHash, tx, usedGas, vmenv, bloomProcessors)
+		receipt, _, err := ApplyMessageWithEVM(msg, p.config, gp, statedb, blockNumber, blockHash, tx, usedGas, vmenv)
 		if err != nil {
 			return nil, nil, nil, 0, fmt.Errorf("could not apply tx %d [%v]: %w", i, tx.Hash().Hex(), err)
 		}
@@ -181,7 +178,6 @@ func ApplyMessageWithEVM(
 	blockHash common.Hash,
 	tx *types.Transaction,
 	usedGas *uint64, evm *vm.EVM,
-	receiptProcessor ReceiptProcessor,
 ) (receipt *types.Receipt, result *ExecutionResult, err error) {
 	if evm.Config.Tracer != nil && evm.Config.Tracer.OnTxStart != nil {
 		evm.Config.Tracer.OnTxStart(evm.GetVMContext(), tx, msg.Payer)
@@ -276,7 +272,6 @@ func ApplyTransaction(
 	tx *types.Transaction,
 	usedGas *uint64,
 	cfg vm.Config,
-	receiptProcessors ReceiptProcessor,
 	publishEvents ...*vm.PublishEvent,
 ) (*types.Receipt, *ExecutionResult, error) {
 	msg, err := TransactionToMessage(tx, types.MakeSigner(config, header.Number), header.BaseFee)
@@ -286,7 +281,7 @@ func ApplyTransaction(
 	// Create a new context to be used in the EVM environment
 	blockContext := NewEVMBlockContext(header, bc, author, publishEvents...)
 	vmenv := vm.NewEVM(blockContext, vm.TxContext{}, statedb, config, cfg)
-	return ApplyMessageWithEVM(msg, config, gp, statedb, header.Number, header.Hash(), tx, usedGas, vmenv, receiptProcessors)
+	return ApplyMessageWithEVM(msg, config, gp, statedb, header.Number, header.Hash(), tx, usedGas, vmenv)
 }
 
 func onSystemCallStart(tracer *tracing.Hooks, ctx *tracing.VMContext) {

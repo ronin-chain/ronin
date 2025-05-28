@@ -1202,9 +1202,7 @@ func (api *API) traceTx(
 	if consortium.HandleSystemTransaction(api.backend.Engine(), statedb, message, block) {
 		vmenv.Config.IsSystemTransaction = true
 	}
-	// _, err = core.ApplyMessageWithEVM(vmenv, message, new(core.GasPool).AddGas(message.GasLimit))
-	// bloomProcessors := NewReceiptBloomGenerator(txNum)
-	_, _, err = core.ApplyMessageWithEVM(message, api.backend.ChainConfig(), new(core.GasPool).AddGas(message.GasLimit), statedb, vmctx.BlockNumber, txctx.BlockHash, tx, &usedGas, vmenv, core.NewReceiptBloomGenerator())
+	_, _, err = core.ApplyMessageWithEVM(message, api.backend.ChainConfig(), new(core.GasPool).AddGas(message.GasLimit), statedb, vmctx.BlockNumber, txctx.BlockHash, tx, &usedGas, vmenv)
 	if err != nil {
 		return nil, fmt.Errorf("tracing failed: %w", err)
 	}
