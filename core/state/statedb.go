@@ -548,13 +548,13 @@ func (s *StateDB) SelfDestruct(addr common.Address) bool {
 	s.journal.append(selfDestructChange{
 		account:     &addr,
 		prev:        stateObject.selfDestructed,
-		prevbalance: new(big.Int).Set(stateObject.Balance()),
+		prevbalance: prev,
 	})
 	if s.logger != nil && s.logger.OnBalanceChange != nil && prev.Sign() > 0 {
 		s.logger.OnBalanceChange(addr, prev, n, tracing.BalanceDecreaseSelfdestruct)
 	}
 	stateObject.markSelfdestructed()
-	stateObject.data.Balance = new(big.Int)
+	stateObject.data.Balance = n
 
 	return true
 }
