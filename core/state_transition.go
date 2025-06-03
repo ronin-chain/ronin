@@ -519,7 +519,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		if msg.SetCodeAuthorizations() != nil {
 			for _, auth := range msg.SetCodeAuthorizations() {
 				// Note errors are ignored, we simply skip invalid authorizations here.
-				st.applyAuthorization(&auth)
+				_ = st.applyAuthorization(&auth)
 			}
 		}
 

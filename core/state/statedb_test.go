@@ -857,16 +857,15 @@ func TestDeleteCreateRevert(t *testing.T) {
 }
 
 func TestDeleteResetBalance(t *testing.T) {
-	// Create an initial state with a single contract
 	state, _ := New(common.Hash{}, NewDatabase(rawdb.NewMemoryDatabase()), nil)
 
 	addr := common.BytesToAddress([]byte("so"))
 	state.SetBalance(addr, big.NewInt(1))
+	state.SetNonce(addr, 10)
 
 	root, _ := state.Commit(0, false)
 	state, _ = New(root, state.db, state.snaps)
 
-	// Simulate self-destructing in one transaction, then create-reverting in another
 	state.SelfDestruct(addr)
 	state.Finalise(true)
 
@@ -883,6 +882,12 @@ func TestDeleteResetBalance(t *testing.T) {
 	}
 	if dirtyAccounts[0].Balance.Sign() != 0 {
 		t.Fatalf("expect dirty account balance is zero, got: %s", dirtyAccounts[0].Balance.String())
+	}
+	if dirtyAccounts[0].CodeHash != state.GetCodeHash(addr) {
+		t.Fatalf("expect dirty account code hash: %x, got: %x", state.GetCodeHash(addr), dirtyAccounts[0].CodeHash)
+	}
+	if dirtyAccounts[0].Nonce != 10 {
+		t.Fatalf("expect dirty account nonce: 10, got: %x", dirtyAccounts[0].Nonce)
 	}
 }
 
