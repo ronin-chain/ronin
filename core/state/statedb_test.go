@@ -856,6 +856,36 @@ func TestDeleteCreateRevert(t *testing.T) {
 	}
 }
 
+func TestDeleteResetBalance(t *testing.T) {
+	// Create an initial state with a single contract
+	state, _ := New(common.Hash{}, NewDatabase(rawdb.NewMemoryDatabase()), nil)
+
+	addr := common.BytesToAddress([]byte("so"))
+	state.SetBalance(addr, big.NewInt(1))
+
+	root, _ := state.Commit(0, false)
+	state, _ = New(root, state.db, state.snaps)
+
+	// Simulate self-destructing in one transaction, then create-reverting in another
+	state.SelfDestruct(addr)
+	state.Finalise(true)
+
+	if state.GetBalance(addr).Sign() != 0 {
+		t.Fatalf("expected zero balance after self destruct, got root :%s", state.GetBalance(addr).String())
+	}
+
+	dirtyAccounts := state.DirtyAccounts(common.Hash{}, 0)
+	if len(dirtyAccounts) != 1 {
+		t.Fatalf("expect one element in dirty accounts, got :%d", len(dirtyAccounts))
+	}
+	if addr != dirtyAccounts[0].Address {
+		t.Fatalf("expect dirty account address :%x, got: %x", addr, dirtyAccounts[0].Address)
+	}
+	if dirtyAccounts[0].Balance.Sign() != 0 {
+		t.Fatalf("expect dirty account balance is zero, got: %s", dirtyAccounts[0].Balance.String())
+	}
+}
+
 // TestMissingTrieNodes tests that if the StateDB fails to load parts of the trie,
 // the Commit operation fails with an error
 // If we are missing trie nodes, we should not continue writing to the trie
