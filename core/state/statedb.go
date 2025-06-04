@@ -1385,7 +1385,6 @@ func (s *StateDB) DirtyAccounts(hash common.Hash, number uint64) []*types.DirtyS
 			selfDestruct bool
 			dirtyCode    bool
 			nonce        uint64
-			balance      *big.Int
 			root         common.Hash
 		)
 		if op.isDelete() {
@@ -1395,13 +1394,11 @@ func (s *StateDB) DirtyAccounts(hash common.Hash, number uint64) []*types.DirtyS
 				continue
 			}
 			nonce = prevState.Nonce
-			balance = new(big.Int) // balances after destruct always be zero
 			root = prevState.Root
 			selfDestruct = true
 		} else {
 			stateAcc := s.stateObjects[addr].data
 			nonce = stateAcc.Nonce
-			balance = stateAcc.Balance
 			root = stateAcc.Root
 			dirtyCode = s.stateObjects[addr].dirtyCode
 		}
@@ -1409,7 +1406,7 @@ func (s *StateDB) DirtyAccounts(hash common.Hash, number uint64) []*types.DirtyS
 		dirtyAccounts = append(dirtyAccounts, &types.DirtyStateAccount{
 			Address:     addr,
 			Nonce:       nonce,
-			Balance:     balance,
+			Balance:     s.GetBalance(addr),
 			Root:        root,
 			CodeHash:    s.GetCodeHash(addr),
 			BlockNumber: number,
