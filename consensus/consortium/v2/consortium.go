@@ -54,6 +54,8 @@ const (
 	assemblingFinalityVoteDuration         = 1 * time.Second
 	MaxValidatorCandidates                 = 64 // Maximum number of validator candidates.
 	dayInSeconds                           = uint64(86400)
+
+	defaultTurnLength uint8 = 4 // Default consecutive number of blocks a validator receives priority for block production
 )
 
 // Consortium delegated proof-of-stake protocol constants.
@@ -864,7 +866,7 @@ func backOffTime(header *types.Header, snapshot *Snapshot, chainConfig *params.C
 
 	initialDelay := time.Second
 	if chainConfig.IsOlek(new(big.Int).SetUint64(snapshot.Number + 1)) {
-		inturnValidator := snapshot.supposeValidator()
+		inturnValidator := snapshot.inturnValidator()
 		pos, _ := snapshot.sealableValidators(inturnValidator)
 		if pos == unSealableValidator {
 			initialDelay = 0
@@ -1145,7 +1147,7 @@ func (c *Consortium) processSystemTransactions(chain consensus.ChainHeaderReader
 	}
 
 	if header.Difficulty.Cmp(diffInTurn) != 0 {
-		spoiledVal := snap.supposeValidator()
+		spoiledVal := snap.inturnValidator()
 		signedRecently := false
 		if c.chainConfig.IsOlek(header.Number) {
 			signedRecently = snap.IsRecentlySigned(spoiledVal)
@@ -1622,7 +1624,7 @@ func (c *Consortium) GetBestParentBlock(chain *core.BlockChain) (*types.Block, b
 		}
 		// Miner can create an inturn block which helps the chain to have
 		// greater diffculty
-		if snap.supposeValidator() == signer {
+		if snap.inturnValidator() == signer {
 			if !snap.IsRecentlySigned(signer) {
 				return prevBlock, true
 			}

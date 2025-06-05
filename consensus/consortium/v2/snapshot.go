@@ -16,6 +16,7 @@ import (
 	blsCommon "github.com/ethereum/go-ethereum/crypto/bls/common"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/internal/ethapi"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/hashicorp/golang-lru/arc/v2"
 )
@@ -32,6 +33,7 @@ type Snapshot struct {
 	Hash    common.Hash               `json:"hash"`    // Block hash where the snapshot was created
 	Recents map[uint64]common.Address `json:"recents"` // Set of recent validators for spam protections
 
+	TurnLength uint8 `json:"turn_length"` // Length of `turn`, meaning the consecutive number of blocks a validator receives priority for block production
 	// The block producer list (is able to produce block) before Shillin
 	Validators map[common.Address]struct{} `json:"validators,omitempty"`
 	// After Shillin before Tripp, the block producer list with BLS key
@@ -77,6 +79,7 @@ func newSnapshot(
 		sigCache:    sigcache,
 		Number:      number,
 		Hash:        hash,
+		TurnLength:  defaultTurnLength,
 		Recents:     make(map[uint64]common.Address),
 	}
 
@@ -114,6 +117,9 @@ func loadSnapshot(
 	snap.sigCache = sigcache
 	snap.ethAPI = ethAPI
 	snap.chainConfig = chainConfig
+	if snap.TurnLength == 0 { // no TurnLength field in old snapshots
+		snap.TurnLength = defaultTurnLength
+	}
 
 	return snap, nil
 }
@@ -136,6 +142,7 @@ func (s *Snapshot) copy() *Snapshot {
 		sigCache:             s.sigCache,
 		Number:               s.Number,
 		Hash:                 s.Hash,
+		TurnLength:           s.TurnLength,
 		Recents:              make(map[uint64]common.Address),
 		CurrentPeriod:        s.CurrentPeriod,
 		JustifiedBlockNumber: s.JustifiedBlockNumber,
@@ -217,7 +224,7 @@ func (s *Snapshot) apply(headers []*types.Header, chain consensus.ChainHeaderRea
 	for _, header := range headers {
 		number := header.Number.Uint64()
 		// Delete the oldest validators from the recent list to allow it signing again
-		if limit := uint64(len(snap.validators())/2 + 1); number >= limit {
+		if limit := snap.minerHistoryCheckLen() + 1; number >= limit {
 			delete(snap.Recents, number-limit)
 		}
 		// Resolve the authorization key and check against signers
@@ -239,10 +246,8 @@ func (s *Snapshot) apply(headers []*types.Header, chain consensus.ChainHeaderRea
 		if !snap.inInValidatorSet(validator) {
 			return nil, errUnauthorizedValidator
 		}
-		for _, recent := range snap.Recents {
-			if recent == validator {
-				return nil, errRecentlySigned
-			}
+		if snap.IsRecentlySigned(validator) {
+			return nil, errRecentlySigned
 		}
 		snap.Recents[number] = validator
 
@@ -400,9 +405,14 @@ func (s *Snapshot) inBlsPublicKeySet(publicKey blsCommon.PublicKey) bool {
 
 // inturn returns if a validator at a given block height is in-turn or not.
 func (s *Snapshot) inturn(validator common.Address) bool {
+	return s.inturnValidator() == validator
+}
+
+// inturnValidator returns the validator for the following block height.
+func (s *Snapshot) inturnValidator() common.Address {
 	validators := s.validators()
-	offset := (s.Number + 1) % uint64(len(validators))
-	return validators[offset] == validator
+	offset := (s.Number + 1) / uint64(s.TurnLength) % uint64(len(validators))
+	return validators[offset]
 }
 
 // sealableValidators finds the validators that are not in recent sign list, which mean they can seal
@@ -428,22 +438,39 @@ func (s *Snapshot) sealableValidators(validator common.Address) (position, numOf
 	return unSealableValidator, numOfSealableValidators
 }
 
-// supposeValidator returns the in-turn validator at a given block height
-func (s *Snapshot) supposeValidator() common.Address {
-	validators := s.validators()
-	index := (s.Number + 1) % uint64(len(validators))
-	return validators[index]
+func (s *Snapshot) minerHistoryCheckLen() uint64 {
+	return (uint64(len(s.Validators))/2+1)*uint64(s.TurnLength) - 1
+}
+
+func (s *Snapshot) countRecents() map[common.Address]uint8 {
+	leftHistoryBound := uint64(0) // the bound is excluded
+	checkHistoryLength := s.minerHistoryCheckLen()
+	if s.Number > checkHistoryLength {
+		leftHistoryBound = s.Number - checkHistoryLength
+	}
+	counts := make(map[common.Address]uint8, len(s.Validators))
+	for seen, recent := range s.Recents {
+		if seen <= leftHistoryBound || recent == (common.Address{}) /*when seen == `epochKey`*/ {
+			continue
+		}
+		counts[recent] += 1
+	}
+	return counts
+}
+
+func (s *Snapshot) signRecentlyByCounts(validator common.Address, counts map[common.Address]uint8) bool {
+	if seenTimes, ok := counts[validator]; ok && seenTimes >= s.TurnLength {
+		if seenTimes > s.TurnLength {
+			log.Warn("produce more blocks than expected!", "validator", validator, "seenTimes", seenTimes)
+		}
+		return true
+	}
+
+	return false
 }
 
 func (s *Snapshot) IsRecentlySigned(validator common.Address) bool {
-	for seen, recent := range s.Recents {
-		if recent == validator {
-			if limit := uint64(len(s.validators())/2 + 1); seen > s.Number+1-limit {
-				return true
-			}
-		}
-	}
-	return false
+	return s.signRecentlyByCounts(validator, s.countRecents())
 }
 
 // FindAncientHeader finds the most recent checkpoint header
