@@ -302,10 +302,7 @@ func (api *API) traceChain(start, end *types.Block, config *TraceConfig, closed 
 
 			// Fetch and execute the block trace taskCh
 			for task := range taskCh {
-				var (
-					signer   = types.MakeSigner(api.backend.ChainConfig(), task.block.Number())
-					blockCtx = core.NewEVMBlockContext(task.block.Header(), api.chainContext(ctx), nil)
-				)
+				signer := types.MakeSigner(api.backend.ChainConfig(), task.block.Number())
 				// Trace all the transactions contained within
 				for i, tx := range task.block.Transactions() {
 					msg, _ := tx.AsMessage(signer, task.block.BaseFee())
@@ -315,6 +312,8 @@ func (api *API) traceChain(start, end *types.Block, config *TraceConfig, closed 
 						TxIndex:     i,
 						TxHash:      tx.Hash(),
 					}
+
+					blockCtx := core.NewEVMBlockContext(task.block.Header(), api.chainContext(ctx), nil)
 					res, err := api.traceTx(ctx, msg, txctx, blockCtx, task.statedb, config, task.block)
 					if err != nil {
 						task.results[i] = &txTraceResult{TransactionHash: tx.Hash(), Error: err.Error()}
@@ -720,6 +719,11 @@ func (api *API) traceBlockParallel(ctx context.Context, block *types.Block, stat
 					TxIndex:     task.index,
 					TxHash:      txs[task.index].Hash(),
 				}
+				// Reconstruct the block context for each transaction
+				// as the GetHash function of BlockContext is not safe for
+				// concurrent use.
+				// See: https://github.com/ethereum/go-ethereum/issues/29114
+				blockCtx := core.NewEVMBlockContext(block.Header(), api.chainContext(ctx), nil)
 				res, err := api.traceTx(ctx, msg, txctx, blockCtx, task.statedb, config, block)
 				if err != nil {
 					results[task.index] = &txTraceResult{TransactionHash: txs[task.index].Hash(), Error: err.Error()}
@@ -821,6 +825,11 @@ func (api *API) traceInternalsAndAccounts(ctx context.Context, block *types.Bloc
 					TxIndex:     task.index,
 					TxHash:      txs[task.index].Hash(),
 				}
+				// Reconstruct the block context for each transaction
+				// as the GetHash function of BlockContext is not safe for
+				// concurrent use.
+				// See: https://github.com/ethereum/go-ethereum/issues/29114
+				blockCtx := core.NewEVMBlockContext(block.Header(), api.chainContext(ctx), nil)
 				res, err := api.traceTx(ctx, msg, txctx, blockCtx, task.statedb, config, block)
 				if err != nil {
 					results.InternalTxs[task.index] = &txTraceResult{TransactionHash: txs[task.index].Hash(), Error: err.Error()}
