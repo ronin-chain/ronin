@@ -314,9 +314,11 @@ func TestDeriveFields(t *testing.T) {
 	// Clear all the computed fields and re-derive them
 	number := big.NewInt(1)
 	hash := common.BytesToHash([]byte{0x03, 0x14})
+	blockTime := uint64(2)
+	blobGasPrice := big.NewInt(0)
 
 	clearComputedFieldsOnReceipts(t, receipts)
-	if err := receipts.DeriveFields(params.TestChainConfig, hash, number.Uint64(), nil, txs); err != nil {
+	if err := receipts.DeriveFields(params.TestChainConfig, hash, number.Uint64(), blockTime, blobGasPrice, txs); err != nil {
 		t.Fatalf("DeriveFields(...) = %v, want <nil>", err)
 	}
 	// Iterate over all the computed fields and check that they're correct

@@ -353,7 +353,7 @@ func generateChain(
 		if block.ExcessBlobGas() != nil {
 			blobGasPrice = eip4844.CalcBlobFee(*block.ExcessBlobGas())
 		}
-		if err := receipt.DeriveFields(config, block.Hash(), block.NumberU64(), blobGasPrice, block.Transactions()); err != nil {
+		if err := receipt.DeriveFields(config, block.Hash(), block.NumberU64(), block.Time(), blobGasPrice, block.Transactions()); err != nil {
 			panic(err)
 		}
 

@@ -407,7 +407,7 @@ func (rs Receipts) EncodeIndex(i int, w *bytes.Buffer) {
 
 // DeriveFields fills the receipts with their computed fields based on consensus
 // data and contextual infos like containing block and transactions.
-func (rs Receipts) DeriveFields(config *params.ChainConfig, hash common.Hash, number uint64, blobGasPrice *big.Int, txs Transactions) error {
+func (rs Receipts) DeriveFields(config *params.ChainConfig, hash common.Hash, number, time uint64, blobGasPrice *big.Int, txs Transactions) error {
 	signer := MakeSigner(config, new(big.Int).SetUint64(number))
 
 	logIndex := uint(0)
@@ -446,6 +446,7 @@ func (rs Receipts) DeriveFields(config *params.ChainConfig, hash common.Hash, nu
 		for j := 0; j < len(rs[i].Logs); j++ {
 			rs[i].Logs[j].BlockNumber = number
 			rs[i].Logs[j].BlockHash = hash
+			rs[i].Logs[j].BlockTimestamp = time
 			rs[i].Logs[j].TxHash = rs[i].TxHash
 			rs[i].Logs[j].TxIndex = uint(i)
 			rs[i].Logs[j].Index = logIndex

@@ -554,7 +554,7 @@ func ApplyTransaction(msg types.Message, opts *ApplyTransactOpts) (err error) {
 	receipt.GasUsed = gasUsed
 
 	// Set the receipt logs and create a bloom for filtering
-	receipt.Logs = opts.State.GetLogs(expectedTx.Hash(), header.Hash())
+	receipt.Logs = opts.State.GetLogs(expectedTx.Hash(), header.Number.Uint64(), header.Hash(), header.Time)
 	receipt.Bloom = types.CreateBloom(types.Receipts{receipt})
 	receipt.BlockHash = header.Hash()
 	receipt.BlockNumber = header.Number

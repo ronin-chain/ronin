@@ -616,11 +616,15 @@ func ReadReceipts(db ethdb.Reader, hash common.Hash, number uint64, config *para
 		return nil
 	}
 	header := ReadHeader(db, hash, number)
+	if header == nil {
+		log.Error("Missing header but have receipt", "hash", hash, "number", number)
+		return nil
+	}
 	var blobGasPrice *big.Int
-	if header != nil && header.ExcessBlobGas != nil {
+	if header.ExcessBlobGas != nil {
 		blobGasPrice = eip4844.CalcBlobFee(*header.ExcessBlobGas)
 	}
-	if err := receipts.DeriveFields(config, hash, number, blobGasPrice, body.Transactions); err != nil {
+	if err := receipts.DeriveFields(config, hash, number, header.Time, blobGasPrice, body.Transactions); err != nil {
 		log.Error("Failed to derive block receipts fields", "hash", hash, "number", number, "err", err)
 		return nil
 	}
@@ -680,7 +684,7 @@ func (r *receiptLogs) DecodeRLP(s *rlp.Stream) error {
 }
 
 // DeriveLogFields fills the logs in receiptLogs with information such as block number, txhash, etc.
-func deriveLogFields(receipts []*receiptLogs, hash common.Hash, number uint64, txs types.Transactions) error {
+func deriveLogFields(receipts []*receiptLogs, hash common.Hash, number, time uint64, txs types.Transactions) error {
 	logIndex := uint(0)
 	if len(txs) != len(receipts) {
 		return errors.New("transaction and receipt count mismatch")
@@ -691,6 +695,7 @@ func deriveLogFields(receipts []*receiptLogs, hash common.Hash, number uint64, t
 		for j := 0; j < len(receipts[i].Logs); j++ {
 			receipts[i].Logs[j].BlockNumber = number
 			receipts[i].Logs[j].BlockHash = hash
+			receipts[i].Logs[j].BlockTimestamp = time
 			receipts[i].Logs[j].TxHash = txHash
 			receipts[i].Logs[j].TxIndex = uint(i)
 			receipts[i].Logs[j].Index = logIndex
@@ -725,7 +730,12 @@ func ReadLogs(db ethdb.Reader, hash common.Hash, number uint64, config *params.C
 		log.Error("Missing body but have receipt", "hash", hash, "number", number)
 		return nil
 	}
-	if err := deriveLogFields(receipts, hash, number, body.Transactions); err != nil {
+	header := ReadHeader(db, hash, number)
+	if header == nil {
+		log.Error("Missing header but have receipt", "hash", hash, "number", number)
+		return nil
+	}
+	if err := deriveLogFields(receipts, hash, number, header.Time, body.Transactions); err != nil {
 		log.Error("Failed to derive block receipts fields", "hash", hash, "number", number, "err", err)
 		return nil
 	}
