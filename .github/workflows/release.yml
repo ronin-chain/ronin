@@ -2,8 +2,12 @@ name: release
 on:
   release:
     types: [published]
+  push:
+    branches:
+      - 'hotfix/*'
     tags:
-      - v*.*.*
+      - 'v*.*.*'
+      - 'hotfix-v*.*.*'
 
 env:
   REGISTRY: ghcr.io
@@ -33,7 +37,8 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_REPOSITORY }}
           tags: |
-            type=semver,event=tag,suffix=-{{sha}},pattern={{raw}}
+            type=ref,event=tag,suffix=-{{sha}}
+            type=ref,event=branch,suffix=-{{sha}}
       # Enable Registry Cache
       - name: "Set up Docker Buildx"
         uses: "docker/setup-buildx-action@8c0edbc76e98fa90f69d9a2c020dcb50019dc325" #v2.2.1
