@@ -16,6 +16,7 @@ import (
 	blsCommon "github.com/ethereum/go-ethereum/crypto/bls/common"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/internal/ethapi"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/hashicorp/golang-lru/arc/v2"
 )
@@ -48,6 +49,9 @@ type Snapshot struct {
 	// After Venoki, the period number of an epoch calculated based on the the timestamp of last block
 	// in the previous epoch
 	CurrentPeriod uint64 `json:"currentPeriod,omitempty"`
+
+	// Consecutive
+	TurnLength uint8 `json:"turnLength,omitempty"`
 }
 
 // validatorsAscending implements the sort interface to allow sorting a list of addresses
@@ -436,6 +440,10 @@ func (s *Snapshot) supposeValidator() common.Address {
 }
 
 func (s *Snapshot) IsRecentlySigned(validator common.Address) bool {
+	if s.chainConfig.IsHope(big.NewInt(int64(s.Number))) {
+		return s.signRecentlyByCounts(validator, s.countRecents())
+	}
+
 	for seen, recent := range s.Recents {
 		if recent == validator {
 			if limit := uint64(len(s.validators())/2 + 1); seen > s.Number+1-limit {
@@ -478,4 +486,47 @@ func FindAncientHeader(header *types.Header, ite uint64, chain consensus.ChainHe
 		}
 	}
 	return ancient
+}
+
+func (s *Snapshot) SignRecently(validator common.Address) bool {
+	return s.signRecentlyByCounts(validator, s.countRecents())
+}
+
+func (s *Snapshot) signRecentlyByCounts(validator common.Address, counts map[common.Address]uint8) bool {
+	if seenTimes, ok := counts[validator]; ok && seenTimes >= s.TurnLength {
+		if seenTimes > s.TurnLength {
+			log.Warn("produce more blocks than expected!", "validator", validator, "seenTimes", seenTimes)
+		}
+		return true
+	}
+
+	return false
+}
+
+func (s *Snapshot) countRecents() map[common.Address]uint8 {
+	leftHistoryBound := uint64(0) // the bound is excluded
+	checkHistoryLength := s.minerHistoryCheckLen()
+	if s.Number > checkHistoryLength {
+		leftHistoryBound = s.Number - checkHistoryLength
+	}
+	counts := make(map[common.Address]uint8, len(s.Validators))
+	for seen, recent := range s.Recents {
+		if seen <= leftHistoryBound || recent == (common.Address{}) /*when seen == `epochKey`*/ {
+			continue
+		}
+		counts[recent] += 1
+	}
+	return counts
+}
+
+func (s *Snapshot) minerHistoryCheckLen() uint64 {
+	return (uint64(len(s.Validators))/2+1)*uint64(s.TurnLength) - 1
+}
+
+// getExpectedValidator returns the expected validator for the given header
+func (s *Snapshot) getExpectedValidator(header *types.Header) common.Address {
+	validators := s.validators()
+	expectedSignerIndex := (header.Number.Uint64() / uint64(s.config.ConsecutiveBlockTurnLen)) % uint64(len(validators))
+	expectedSigner := validators[expectedSignerIndex]
+	return expectedSigner
 }

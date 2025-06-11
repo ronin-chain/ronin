@@ -700,9 +700,7 @@ func (c *Consortium) snapshot(chain consensus.ChainHeaderReader, number uint64, 
 
 		// init snapshot if it is at forkedBlock
 		if number == c.forkedBlock-1 {
-			var (
-				err error
-			)
+			var err error
 			snap, err = loadSnapshot(c.config, c.signatures, c.db, hash, c.ethAPI, c.chainConfig)
 			if err == nil {
 				log.Trace("Loaded snapshot from disk", "number", number, "hash", hash.Hex())
@@ -829,6 +827,13 @@ func (c *Consortium) verifySeal(chain consensus.ChainHeaderReader, header *types
 
 	if !snap.inInValidatorSet(signer) {
 		return errUnauthorizedValidator
+	}
+
+	if c.chainConfig.IsHope(header.Number) {
+		expectedValidator := snap.getExpectedValidator(header)
+		if signer != expectedValidator {
+			return errUnauthorizedValidator
+		}
 	}
 
 	if snap.IsRecentlySigned(signer) {
@@ -1107,8 +1112,8 @@ func (c *Consortium) Prepare(chain consensus.ChainHeaderReader, header *types.He
 }
 
 func (c *Consortium) processSystemTransactions(chain consensus.ChainHeaderReader, header *types.Header,
-	transactOpts *consortiumCommon.ApplyTransactOpts, isFinalizeAndAssemble bool) error {
-
+	transactOpts *consortiumCommon.ApplyTransactOpts, isFinalizeAndAssemble bool,
+) error {
 	snap, err := c.snapshot(chain, header.Number.Uint64()-1, header.ParentHash, nil)
 	if err != nil {
 		return err
@@ -1257,7 +1262,8 @@ func verifyValidatorExtraDataWithContract(
 // - Slash the validator who does not sign if it is in-turn
 // - SubmitBlockRewards of the current block
 func (c *Consortium) Finalize(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, txs *[]*types.Transaction,
-	uncles []*types.Header, receipts *[]*types.Receipt, systemTxs *[]*types.Transaction, internalTxs *[]*types.InternalTransaction, usedGas *uint64) error {
+	uncles []*types.Header, receipts *[]*types.Receipt, systemTxs *[]*types.Transaction, internalTxs *[]*types.InternalTransaction, usedGas *uint64,
+) error {
 	_, _, signTxFn, _ := c.readSignerAndContract()
 	evmContext := core.NewEVMBlockContext(header, consortiumCommon.ChainContext{Chain: chain, Consortium: c}, &header.Coinbase, chain.OpEvents()...)
 	transactOpts := &consortiumCommon.ApplyTransactOpts{
@@ -1360,7 +1366,8 @@ func (c *Consortium) Finalize(chain consensus.ChainHeaderReader, header *types.H
 // - Slash the validator who does not sign if it is in-turn
 // - SubmitBlockRewards of the current block
 func (c *Consortium) FinalizeAndAssemble(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB,
-	txs []*types.Transaction, uncles []*types.Header, receipts []*types.Receipt) (*types.Block, []*types.Receipt, error) {
+	txs []*types.Transaction, uncles []*types.Header, receipts []*types.Receipt,
+) (*types.Block, []*types.Receipt, error) {
 	// No block rewards in PoA, so the state remains as is and uncles are dropped
 	if txs == nil {
 		txs = make([]*types.Transaction, 0)
@@ -1568,6 +1575,9 @@ func (c *Consortium) CalcDifficulty(chain consensus.ChainHeaderReader, time uint
 		return nil
 	}
 	coinbase, _, _, _ := c.readSignerAndContract()
+	if c.chainConfig.IsHope(parent.Number) {
+		return CalcDifficultyHope(snap, coinbase)
+	}
 	return CalcDifficulty(snap, coinbase)
 }
 
@@ -2056,4 +2066,22 @@ func (c *Consortium) IsTrippEffective(chain consensus.ChainHeaderReader, header 
 	}
 
 	return false
+}
+
+func (p *Consortium) prepareTurnLength(chain consensus.ChainHeaderReader, header *types.Header) error {
+	epochLength := p.config.EpochV2
+	if header.Number.Uint64()%epochLength != 0 || !p.chainConfig.IsHope(header.Number) {
+		return nil
+	}
+
+	turnLength, err := p.getTurnLength(chain, header)
+	if err != nil {
+		return err
+	}
+
+	if turnLength != nil {
+		header.Extra = append(header.Extra, *turnLength)
+	}
+
+	return nil
 }

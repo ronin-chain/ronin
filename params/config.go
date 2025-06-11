@@ -616,6 +616,7 @@ type ChainConfig struct {
 	CancunBlock   *big.Int `json:"cancunBlock,omitempty"`   // Cancun switch block (nil = no fork, 0 = already on activated)
 	VenokiBlock   *big.Int `json:"venokiBlock,omitempty"`   // Venoki switch block (nil = no fork, 0 = already on activated)
 	KotaroBlock   *big.Int `json:"kotaroBlock,omitempty"`   // Kotaro (Prague) switch block (nil = no fork, 0 = already on activated)
+	HopeBlock     *big.Int `json:"hopeBlock,omitempty"`     // Hope (Consecutive block producer)
 
 	BlacklistContractAddress           *common.Address `json:"blacklistContractAddress,omitempty"`           // Address of Blacklist Contract (nil = no blacklist)
 	FenixValidatorContractAddress      *common.Address `json:"fenixValidatorContractAddress,omitempty"`      // Address of Ronin Contract in the Fenix hardfork (nil = no blacklist)
@@ -667,9 +668,11 @@ func (c *CliqueConfig) String() string {
 
 // ConsortiumConfig is the consensus engine configs for proof-of-authority based sealing.
 type ConsortiumConfig struct {
-	Period  uint64 `json:"period"` // Number of seconds between blocks to enforce
-	Epoch   uint64 `json:"epoch"`  // Epoch length to reset votes and checkpoint
-	EpochV2 uint64 `json:"epochV2"`
+	Period                  uint64 `json:"period"` // Number of seconds between blocks to enforce
+	Epoch                   uint64 `json:"epoch"`  // Epoch length to reset votes and checkpoint
+	EpochV2                 uint64 `json:"epochV2"`
+	ConsecutiveEpoch        uint64 `json:"consecutiveEpoch"`
+	ConsecutiveBlockTurnLen uint8  `json:"consecutiveBlockTurnLen"`
 }
 
 // String implements the stringer interface, returning the consensus engine details.
@@ -958,6 +961,10 @@ func (c *ChainConfig) IsVenoki(num *big.Int) bool {
 // IsKotaro returns whether the num is equals to or larger than the kotaro fork block.
 func (c *ChainConfig) IsKotaro(num *big.Int) bool {
 	return isForked(c.KotaroBlock, num)
+}
+
+func (c *ChainConfig) IsHope(num *big.Int) bool {
+	return isForked(c.HopeBlock, num)
 }
 
 // CheckCompatible checks whether scheduled fork transitions have been imported
