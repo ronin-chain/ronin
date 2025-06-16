@@ -302,7 +302,11 @@ func (api *API) traceChain(start, end *types.Block, config *TraceConfig, closed 
 
 			// Fetch and execute the block trace taskCh
 			for task := range taskCh {
-				signer := types.MakeSigner(api.backend.ChainConfig(), task.block.Number())
+				var (
+					signer   = types.MakeSigner(api.backend.ChainConfig(), task.block.Number())
+					blockCtx = core.NewEVMBlockContext(task.block.Header(), api.chainContext(ctx), nil)
+				)
+
 				// Trace all the transactions contained within
 				for i, tx := range task.block.Transactions() {
 					msg, _ := tx.AsMessage(signer, task.block.BaseFee())
@@ -312,8 +316,6 @@ func (api *API) traceChain(start, end *types.Block, config *TraceConfig, closed 
 						TxIndex:     i,
 						TxHash:      tx.Hash(),
 					}
-
-					blockCtx := core.NewEVMBlockContext(task.block.Header(), api.chainContext(ctx), nil)
 					res, err := api.traceTx(ctx, msg, txctx, blockCtx, task.statedb, config, task.block)
 					if err != nil {
 						task.results[i] = &txTraceResult{TransactionHash: tx.Hash(), Error: err.Error()}
@@ -736,6 +738,7 @@ func (api *API) traceBlockParallel(ctx context.Context, block *types.Block, stat
 
 	// Feed the transactions into the tracers and return
 	var failed error
+
 txloop:
 	for i, tx := range txs {
 		// Send the trace task over for execution
