@@ -297,6 +297,7 @@ var (
 		ShanghaiBlock:        big.NewInt(43447600),
 		CancunBlock:          big.NewInt(43447600),
 		VenokiBlock:          big.NewInt(43447600),
+		KotaroBlock:          big.NewInt(46557383),
 		RoninTreasuryAddress: &RoninMainnetTreasuryAddress,
 	}
 

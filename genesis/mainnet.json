@@ -40,6 +40,7 @@
     "shanghaiBlock": 43447600,
     "cancunBlock": 43447600,
     "venokiBlock": 43447600,
+    "kotaroBlock": 46557383,
     "whiteListDeployerContractV2Address": "0xc1876d5C4BFAF0eE325E4226B2bdf216D9896AE1",
     "roninTreasuryAddress": "0xb903E3936d3ca90b69b29F1df2810083a2DC0d71",
     "roninTrustedOrgUpgrade": {
