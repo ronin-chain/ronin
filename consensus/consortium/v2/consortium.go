@@ -52,8 +52,10 @@ const (
 
 	finalityRatio                  float64 = 2.0 / 3
 	assemblingFinalityVoteDuration         = 1 * time.Second
-	MaxValidatorCandidates                 = 64 // Maximum number of validator candidates.
+	maxValidatorCandidates                 = 64 // Maximum number of validator candidates.
 	dayInSeconds                           = uint64(86400)
+
+	defaultTurnLength = uint8(1) // Default consecutive number of blocks a validator receives priority for block production
 )
 
 // Consortium delegated proof-of-stake protocol constants.
@@ -700,9 +702,7 @@ func (c *Consortium) snapshot(chain consensus.ChainHeaderReader, number uint64, 
 
 		// init snapshot if it is at forkedBlock
 		if number == c.forkedBlock-1 {
-			var (
-				err error
-			)
+			var err error
 			snap, err = loadSnapshot(c.config, c.signatures, c.db, hash, c.ethAPI, c.chainConfig)
 			if err == nil {
 				log.Trace("Loaded snapshot from disk", "number", number, "hash", hash.Hex())
@@ -837,7 +837,14 @@ func (c *Consortium) verifySeal(chain consensus.ChainHeaderReader, header *types
 
 	// Ensure that the difficulty corresponds to the turn-ness of the signer
 	if !c.fakeDiff {
-		inturn := snap.inturn(signer)
+		var inturn bool
+		// After Hope hardfork, use turn length logic
+		if c.chainConfig.IsHope(header.Number) {
+			inturn = snap.inturnWithTurnLength(signer, c.chainConfig, header.Number)
+		} else {
+			inturn = snap.inturn(signer)
+		}
+
 		if inturn && header.Difficulty.Cmp(diffInTurn) != 0 {
 			return consortiumCommon.ErrWrongDifficulty
 		}
@@ -953,8 +960,8 @@ func (c *Consortium) getCheckpointValidatorsFromContract(
 		if err != nil {
 			return nil, nil, err
 		}
-		if len(validatorCandidates) > MaxValidatorCandidates {
-			validatorCandidates = validatorCandidates[:MaxValidatorCandidates]
+		if len(validatorCandidates) > maxValidatorCandidates {
+			validatorCandidates = validatorCandidates[:maxValidatorCandidates]
 		}
 
 		// After Aaron, bit set is used, it is necessary to keep
@@ -1107,8 +1114,8 @@ func (c *Consortium) Prepare(chain consensus.ChainHeaderReader, header *types.He
 }
 
 func (c *Consortium) processSystemTransactions(chain consensus.ChainHeaderReader, header *types.Header,
-	transactOpts *consortiumCommon.ApplyTransactOpts, isFinalizeAndAssemble bool) error {
-
+	transactOpts *consortiumCommon.ApplyTransactOpts, isFinalizeAndAssemble bool,
+) error {
 	snap, err := c.snapshot(chain, header.Number.Uint64()-1, header.ParentHash, nil)
 	if err != nil {
 		return err
@@ -1257,7 +1264,8 @@ func verifyValidatorExtraDataWithContract(
 // - Slash the validator who does not sign if it is in-turn
 // - SubmitBlockRewards of the current block
 func (c *Consortium) Finalize(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, txs *[]*types.Transaction,
-	uncles []*types.Header, receipts *[]*types.Receipt, systemTxs *[]*types.Transaction, internalTxs *[]*types.InternalTransaction, usedGas *uint64) error {
+	uncles []*types.Header, receipts *[]*types.Receipt, systemTxs *[]*types.Transaction, internalTxs *[]*types.InternalTransaction, usedGas *uint64,
+) error {
 	_, _, signTxFn, _ := c.readSignerAndContract()
 	evmContext := core.NewEVMBlockContext(header, consortiumCommon.ChainContext{Chain: chain, Consortium: c}, &header.Coinbase, chain.OpEvents()...)
 	transactOpts := &consortiumCommon.ApplyTransactOpts{
@@ -1360,7 +1368,8 @@ func (c *Consortium) Finalize(chain consensus.ChainHeaderReader, header *types.H
 // - Slash the validator who does not sign if it is in-turn
 // - SubmitBlockRewards of the current block
 func (c *Consortium) FinalizeAndAssemble(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB,
-	txs []*types.Transaction, uncles []*types.Header, receipts []*types.Receipt) (*types.Block, []*types.Receipt, error) {
+	txs []*types.Transaction, uncles []*types.Header, receipts []*types.Receipt,
+) (*types.Block, []*types.Receipt, error) {
 	// No block rewards in PoA, so the state remains as is and uncles are dropped
 	if txs == nil {
 		txs = make([]*types.Transaction, 0)
@@ -1559,23 +1568,24 @@ func (c *Consortium) APIs(chain consensus.ChainHeaderReader) []rpc.API {
 }
 
 // CalcDifficulty is the difficulty adjustment algorithm. It returns the difficulty
-// that a new block should have:
-// * DIFF_NOTURN(3) if (BLOCK_NUMBER + 1) / VALIDATOR_COUNT != VALIDATOR_INDEX
-// * DIFF_INTURN(7) if (BLOCK_NUMBER + 1) / VALIDATOR_COUNT == VALIDATOR_INDEX
-func (c *Consortium) CalcDifficulty(chain consensus.ChainHeaderReader, time uint64, parent *types.Header) *big.Int {
-	snap, err := c.snapshot(chain, parent.Number.Uint64(), parent.Hash(), nil)
-	if err != nil {
-		return nil
-	}
-	coinbase, _, _, _ := c.readSignerAndContract()
-	return CalcDifficulty(snap, coinbase)
-}
-
-// CalcDifficulty is the difficulty adjustment algorithm. It returns the difficulty
 // that a new block should have based on the previous blocks in the chain and the
 // current validator.
 func CalcDifficulty(snap *Snapshot, signer common.Address) *big.Int {
 	if snap.inturn(signer) {
+		return new(big.Int).Set(diffInTurn)
+	}
+	return new(big.Int).Set(diffNoTurn)
+}
+
+// CalcDifficultyWithTurnLength calculates difficulty considering turn length for Hope hardfork.
+func CalcDifficultyWithTurnLength(snap *Snapshot, signer common.Address, chainConfig *params.ChainConfig, blockNumber *big.Int) *big.Int {
+	// Before Hope hardfork, use original logic
+	if !chainConfig.IsHope(blockNumber) {
+		return CalcDifficulty(snap, signer)
+	}
+
+	// After Hope hardfork, use turn length logic
+	if snap.inturnWithTurnLength(signer, chainConfig, blockNumber) {
 		return new(big.Int).Set(diffInTurn)
 	}
 	return new(big.Int).Set(diffNoTurn)
@@ -2056,4 +2066,40 @@ func (c *Consortium) IsTrippEffective(chain consensus.ChainHeaderReader, header 
 	}
 
 	return false
+}
+
+// getTurnLength returns the turn length for consecutive block production.
+// After Hope hardfork, it reads from genesis config; before that, returns 1.
+func (c *Consortium) getTurnLength(header *types.Header) uint8 {
+	// Before Hope hardfork, always return 1 (original behavior)
+	if !c.chainConfig.IsHope(header.Number) {
+		return defaultTurnLength
+	}
+
+	// After Hope hardfork, read from genesis config
+	if c.chainConfig.Consortium != nil && c.chainConfig.Consortium.TurnLength > 0 {
+		return c.chainConfig.Consortium.TurnLength
+	}
+
+	return defaultTurnLength
+}
+
+// CalcDifficulty is the difficulty adjustment algorithm. It returns the difficulty
+// that a new block should have:
+// * DIFF_NOTURN(3) if (BLOCK_NUMBER + 1) / VALIDATOR_COUNT != VALIDATOR_INDEX
+// * DIFF_INTURN(7) if (BLOCK_NUMBER + 1) / VALIDATOR_COUNT == VALIDATOR_INDEX
+func (c *Consortium) CalcDifficulty(chain consensus.ChainHeaderReader, time uint64, parent *types.Header) *big.Int {
+	snap, err := c.snapshot(chain, parent.Number.Uint64(), parent.Hash(), nil)
+	if err != nil {
+		return nil
+	}
+	coinbase, _, _, _ := c.readSignerAndContract()
+
+	// For Hope hardfork, check turn length for the next block
+	blockNumber := new(big.Int).Add(parent.Number, common.Big1)
+	if c.chainConfig.IsHope(blockNumber) {
+		return CalcDifficultyWithTurnLength(snap, coinbase, c.chainConfig, blockNumber)
+	}
+
+	return CalcDifficulty(snap, coinbase)
 }

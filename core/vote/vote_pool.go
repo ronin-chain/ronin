@@ -3,7 +3,6 @@ package vote
 import (
 	"container/heap"
 	"sync"
-	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
@@ -22,9 +21,6 @@ const (
 	lowerLimitOfVoteBlockNumber = 256
 	upperLimitOfVoteBlockNumber = 11 // refer to fetcher.maxUncleDist
 	chainHeadChanSize           = 10 // chainHeadChanSize is the size of channel listening to ChainHeadEvent.
-
-	fetchCheckFrequency = 1 * time.Millisecond
-	fetchRetry          = 500
 )
 
 var (
@@ -435,24 +431,9 @@ func (pool *VotePool) GetVotes() []*types.VoteEnvelope {
 // if it still cannot acquire the lock. This mechanism helps to make this function safer
 // because we cannot control the writers and we don't want this function to block the caller.
 func (pool *VotePool) FetchVoteByBlockHash(blockHash common.Hash) []*types.VoteEnvelope {
-	var retry int
-	for retry = 0; retry < fetchRetry; retry++ {
-		if !pool.mu.TryRLock() {
-			time.Sleep(fetchCheckFrequency)
-		} else {
-			break
-		}
-	}
-
-	// We try to acquire read lock fetchRetry times
-	// but can not do it, so just return nil here
-	if retry == fetchRetry {
-		return nil
-	}
-
-	// We successfully acquire the read lock, read
-	// the vote and remember to release the lock
+	pool.mu.RLock()
 	defer pool.mu.RUnlock()
+
 	if voteBox, ok := pool.curVotes[blockHash]; ok {
 		votes := make([]*types.VoteEnvelope, 0, len(voteBox.voteMessages))
 		for _, vote := range voteBox.voteMessages {

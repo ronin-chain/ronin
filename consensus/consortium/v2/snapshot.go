@@ -48,6 +48,12 @@ type Snapshot struct {
 	// After Venoki, the period number of an epoch calculated based on the the timestamp of last block
 	// in the previous epoch
 	CurrentPeriod uint64 `json:"currentPeriod,omitempty"`
+
+	TurnLength uint8 `json:"turnLength,omitempty"` // Length of `turn`, meaning the consecutive number of blocks a validator receives priority for block production
+
+	// Additional fields for Hope hardfork consecutive mining
+	CurrentTurnValidator  common.Address `json:"currentTurnValidator,omitempty"`  // The validator currently in turn
+	CurrentTurnStartBlock uint64         `json:"currentTurnStartBlock,omitempty"` // Block number when current turn started
 }
 
 // validatorsAscending implements the sort interface to allow sorting a list of addresses
@@ -78,6 +84,7 @@ func newSnapshot(
 		Number:      number,
 		Hash:        hash,
 		Recents:     make(map[uint64]common.Address),
+		TurnLength:  defaultTurnLength,
 	}
 
 	if validators != nil {
@@ -85,6 +92,10 @@ func newSnapshot(
 		for _, v := range validators {
 			snap.Validators[v] = struct{}{}
 		}
+	}
+
+	if config != nil && config.TurnLength != 0 {
+		snap.TurnLength = uint8(config.TurnLength)
 	}
 
 	if valWithBlsPub != nil {
@@ -403,6 +414,40 @@ func (s *Snapshot) inturn(validator common.Address) bool {
 	validators := s.validators()
 	offset := (s.Number + 1) % uint64(len(validators))
 	return validators[offset] == validator
+}
+
+// inturnWithTurnLength returns if a validator is in-turn considering turn length.
+// This method is used after Hope hardfork to support consecutive block production.
+func (s *Snapshot) inturnWithTurnLength(validator common.Address, chainConfig *params.ChainConfig, blockNumber *big.Int) bool {
+	// Before Hope hardfork, use the original logic
+	if chainConfig == nil || !chainConfig.IsHope(blockNumber) {
+		return s.inturn(validator)
+	}
+
+	// Get turn length from config
+	turnLength := defaultTurnLength
+	if chainConfig.Consortium != nil && chainConfig.Consortium.TurnLength > 0 {
+		turnLength = chainConfig.Consortium.TurnLength
+	}
+
+	validators := s.validators()
+	if len(validators) == 0 {
+		return false
+	}
+
+	// Calculate which validator should be in turn based on turn length
+	// Use blockNumber for calculation, not snapshot number
+	totalTurnBlocks := uint64(turnLength) * uint64(len(validators))
+	epochPosition := (blockNumber.Uint64() - 1) % totalTurnBlocks
+
+	validatorIndex := epochPosition / uint64(turnLength)
+
+	// Check if this validator should be in turn
+	if validatorIndex < uint64(len(validators)) && validators[validatorIndex] == validator {
+		return true
+	}
+
+	return false
 }
 
 // sealableValidators finds the validators that are not in recent sign list, which mean they can seal
