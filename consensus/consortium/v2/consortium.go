@@ -871,8 +871,8 @@ func backOffTime(header *types.Header, snapshot *Snapshot, chainConfig *params.C
 
 	// If validator is in turn, skip backOffTime for Hope fork
 	if chainConfig.IsHope(header.Number) {
-		if snapshot.inturnValidator() == header.Coinbase {
-			log.Debug("backOffTime", "header", header.Number, "coinbase", header.Coinbase, "inturnValidator", snapshot.inturnValidator())
+		inturnValidator := snapshot.inturnWithTurnLength(coinbase, chainConfig, header.Number)
+		if inturnValidator {
 			return 0
 		}
 	}
