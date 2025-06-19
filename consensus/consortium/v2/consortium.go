@@ -14,11 +14,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/core"
+	"github.com/hashicorp/golang-lru/arc/v2"
+	"golang.org/x/crypto/sha3"
 
 	"github.com/common-nighthawk/go-figure"
-
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
 	consortiumCommon "github.com/ethereum/go-ethereum/consensus/consortium/common"
@@ -26,6 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/misc"
 	"github.com/ethereum/go-ethereum/consensus/misc/eip1559"
 	"github.com/ethereum/go-ethereum/consensus/misc/eip4844"
+	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -39,16 +40,15 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/ethereum/go-ethereum/trie"
-	"github.com/hashicorp/golang-lru/arc/v2"
-	"golang.org/x/crypto/sha3"
 )
 
 const (
 	inmemorySnapshots  = 128  // Number of recent vote snapshots to keep in memory
 	inmemorySignatures = 4096 // Number of recent block signatures to keep in memory
 
-	wiggleTime          = 1000 * time.Millisecond // Random delay (per signer) to allow concurrent signers
-	unSealableValidator = -1
+	wiggleTime             = 1000 * time.Millisecond // Random delay (per signer) to allow concurrent signers
+	defaultInitBackOffTime = 1000 * time.Millisecond // Default backoff time for the second validator permitted to produce blocks
+	unSealableValidator    = -1
 
 	finalityRatio                  float64 = 2.0 / 3
 	assemblingFinalityVoteDuration         = 1 * time.Second
@@ -56,6 +56,7 @@ const (
 	dayInSeconds                           = uint64(86400)
 
 	defaultTurnLength = uint8(1) // Default consecutive number of blocks a validator receives priority for block production
+
 )
 
 // Consortium delegated proof-of-stake protocol constants.
@@ -70,6 +71,8 @@ var (
 	// The proxy contract's implementation slot
 	// https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/v4.7.3/contracts/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol#L34
 	implementationSlot = common.HexToHash("360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc")
+
+	blockPeriodHope = 1 * time.Second // Block period for Hope fork
 )
 
 var (
@@ -94,6 +97,10 @@ var (
 	// errMismatchingValidators is returned if a sprint block contains a
 	// list of validators different from the one the local node calculated.
 	errMismatchingValidators = errors.New("mismatching validator list")
+
+	// errMismatchingEpochTurnLength is returned if a sprint block contains a
+	// turn length different than the one the local node calculated.
+	errMismatchingEpochTurnLength = errors.New("mismatching turn length on epoch block")
 )
 
 // Consortium is the delegated proof-of-stake consensus engine proposed to support the
@@ -831,7 +838,7 @@ func (c *Consortium) verifySeal(chain consensus.ChainHeaderReader, header *types
 		return errUnauthorizedValidator
 	}
 
-	if snap.IsRecentlySigned(signer) {
+	if snap.IsRecentlySigned(signer, c.chainConfig.Rules(header.Number)) {
 		return consortiumCommon.ErrRecentlySigned
 	}
 
@@ -862,6 +869,14 @@ func backOffTime(header *types.Header, snapshot *Snapshot, chainConfig *params.C
 		return 0
 	}
 
+	// If validator is in turn, skip backOffTime for Hope fork
+	if chainConfig.IsHope(header.Number) {
+		if snapshot.inturnValidator() == header.Coinbase {
+			log.Debug("backOffTime", "header", header.Number, "coinbase", header.Coinbase, "inturnValidator", snapshot.inturnValidator())
+			return 0
+		}
+	}
+
 	position, numOfSealableValidators := snapshot.sealableValidators(coinbase)
 	// This block doesn't pass the recent check and will fail later, returns
 	// dummy value for delay here
@@ -869,7 +884,7 @@ func backOffTime(header *types.Header, snapshot *Snapshot, chainConfig *params.C
 		return 0
 	}
 
-	initialDelay := time.Second
+	initialDelay := defaultInitBackOffTime
 	if chainConfig.IsOlek(new(big.Int).SetUint64(snapshot.Number + 1)) {
 		inturnValidator := snapshot.supposeValidator()
 		pos, _ := snapshot.sealableValidators(inturnValidator)
@@ -878,7 +893,11 @@ func backOffTime(header *types.Header, snapshot *Snapshot, chainConfig *params.C
 		}
 	}
 
-	source := rand.NewSource(header.Number.Int64())
+	randSeed := snapshot.Number
+	if chainConfig.IsHope(header.Number) {
+		randSeed = header.Number.Uint64() / uint64(snapshot.TurnLength)
+	}
+	source := rand.NewSource(int64(randSeed))
 	rand := rand.New(source)
 
 	// Every validator that can seal a block may have different delay
@@ -902,6 +921,12 @@ func backOffTime(header *types.Header, snapshot *Snapshot, chainConfig *params.C
 func (c *Consortium) computeHeaderTime(header, parent *types.Header, snapshot *Snapshot) uint64 {
 	headerTime := parent.Time + c.config.Period
 
+	if c.chainConfig.IsHope(header.Number) {
+		blockTime := uint64(blockPeriodHope) + backOffTime(header, snapshot, c.chainConfig)
+		headerTime = parent.Time + blockTime
+		log.Debug("computeHeaderTime", "header", header.Number, "parent", parent.Number, "headerTime", headerTime, "blockTime", blockTime)
+	}
+
 	if c.chainConfig.IsBuba(header.Number) {
 		headerTime += backOffTime(header, snapshot, c.chainConfig)
 	}
@@ -915,6 +940,15 @@ func (c *Consortium) computeHeaderTime(header, parent *types.Header, snapshot *S
 func (c *Consortium) verifyHeaderTime(header, parent *types.Header, snapshot *Snapshot) error {
 	if header.Time > uint64(time.Now().Unix()) {
 		return consensus.ErrFutureBlock
+	}
+
+	if c.chainConfig.IsHope(header.Number) {
+		blockTime := uint64(blockPeriodHope) + backOffTime(header, snapshot, c.chainConfig)
+		expectedHeaderTime := parent.Time + blockTime
+		if header.Time < expectedHeaderTime {
+			log.Debug("verifyHeaderTime", "header", header.Number, "parent", parent.Number, "headerTime", header.Time, "blockTime", blockTime)
+			return consensus.ErrFutureBlock
+		}
 	}
 
 	if c.chainConfig.IsBuba(header.Number) {
@@ -1098,6 +1132,16 @@ func (c *Consortium) Prepare(chain consensus.ChainHeaderReader, header *types.He
 		}
 	}
 
+	// Apply turn length to the header if it's an epoch block after Hope hardfork
+	if c.chainConfig.IsHope(header.Number) {
+		// If it is the first block of an epoch, apply turn length
+		if header.Number.Uint64()%c.config.EpochV2 == 0 {
+			extraData.TurnLength = c.getTurnLength(header)
+		} else {
+			extraData.TurnLength = defaultTurnLength
+		}
+	}
+
 	// After Shillin, extraData.hasFinalityVote = 0 here as we does
 	// not assemble finality vote yet. Let's wait some time for the
 	// finality votes to be broadcasted around the network. The
@@ -1111,6 +1155,51 @@ func (c *Consortium) Prepare(chain consensus.ChainHeaderReader, header *types.He
 	header.MixDigest = common.Hash{}
 
 	return nil
+}
+
+// Argument leftOver is the time reserved for block finalize(calculate root, distribute income...)
+func (c *Consortium) Delay(chain consensus.ChainReader, header *types.Header, leftOver *time.Duration) *time.Duration {
+	number := header.Number.Uint64()
+	snap, err := c.snapshot(chain, number-1, header.ParentHash, nil)
+	if err != nil {
+		return nil
+	}
+
+	delay := c.delayForHopeFork(snap, header)
+	if *leftOver >= c.getBlockInterval(snap, header) {
+		// ignore invalid leftOver
+		log.Error("Delay invalid argument", "leftOver", leftOver.String(), "Period", c.getBlockInterval(snap, header))
+	} else if *leftOver >= delay {
+		delay = time.Duration(0)
+		return &delay
+	} else {
+		delay = delay - *leftOver
+	}
+
+	// The blocking time should be no more than half of period when snap.TurnLength == 1
+	timeForMining := c.getBlockInterval(snap, header) / 2
+	if !snap.lastBlockInOneTurn(header.Number.Uint64()) {
+		timeForMining = c.getBlockInterval(snap, header) * 4 / 5
+	}
+	if delay > timeForMining {
+		delay = timeForMining
+	}
+	return &delay
+}
+
+const (
+	wiggleTimeBeforeFork       = 500 * time.Millisecond // Random delay (per signer) to allow concurrent signers
+	fixedBackOffTimeBeforeFork = 200 * time.Millisecond
+)
+
+func (c *Consortium) delayForHopeFork(snap *Snapshot, header *types.Header) time.Duration {
+	delay := time.Until(time.Unix(int64(header.Time), 0))
+	if header.Difficulty.Cmp(diffNoTurn) == 0 {
+		// It's not our turn explicitly to sign, delay it a bit
+		wiggle := time.Duration(len(snap.validators())/2+1) * wiggleTimeBeforeFork
+		delay += fixedBackOffTimeBeforeFork + time.Duration(rand.Int63n(int64(wiggle)))
+	}
+	return delay
 }
 
 func (c *Consortium) processSystemTransactions(chain consensus.ChainHeaderReader, header *types.Header,
@@ -1155,7 +1244,7 @@ func (c *Consortium) processSystemTransactions(chain consensus.ChainHeaderReader
 		spoiledVal := snap.supposeValidator()
 		signedRecently := false
 		if c.chainConfig.IsOlek(header.Number) {
-			signedRecently = snap.IsRecentlySigned(spoiledVal)
+			signedRecently = snap.IsRecentlySigned(spoiledVal, c.chainConfig.Rules(header.Number))
 		} else {
 			for _, recent := range snap.Recents {
 				if recent == spoiledVal {
@@ -1349,6 +1438,13 @@ func (c *Consortium) Finalize(chain consensus.ChainHeaderReader, header *types.H
 		}
 	}
 
+	// Verify header turn length for Hope fork epoch blocks
+	if c.chainConfig.IsHope(header.Number) {
+		if err := c.verifyTurnLength(header, snap); err != nil {
+			return err
+		}
+	}
+
 	if err := c.processSystemTransactions(chain, header, transactOpts, false); err != nil {
 		return err
 	}
@@ -1469,7 +1565,7 @@ func (c *Consortium) Seal(chain consensus.ChainHeaderReader, block *types.Block,
 	}
 
 	// If we're amongst the recent signers, wait for the next block
-	if snap.IsRecentlySigned(val) {
+	if snap.IsRecentlySigned(val, c.chainConfig.Rules(header.Number)) {
 		return consortiumCommon.ErrRecentlySigned
 	}
 
@@ -1620,11 +1716,12 @@ func (c *Consortium) readSignerAndContract() (
 // canonical chain.
 func (c *Consortium) GetBestParentBlock(chain *core.BlockChain) (*types.Block, bool) {
 	signer, _, _, _ := c.readSignerAndContract()
-
 	currentBlock := chain.CurrentBlock()
 	block := currentBlock
 	prevBlock := chain.GetBlockByHash(block.ParentHash())
 	diffculty := block.Difficulty().Int64()
+	rules := c.chainConfig.Rules(big.NewInt(int64(block.NumberU64())))
+
 	for diffculty < diffInTurn.Int64() {
 		snap, err := c.snapshot(chain, block.NumberU64()-1, block.ParentHash(), nil)
 		if err != nil {
@@ -1633,7 +1730,7 @@ func (c *Consortium) GetBestParentBlock(chain *core.BlockChain) (*types.Block, b
 		// Miner can create an inturn block which helps the chain to have
 		// greater diffculty
 		if snap.supposeValidator() == signer {
-			if !snap.IsRecentlySigned(signer) {
+			if !snap.IsRecentlySigned(signer, rules) {
 				return prevBlock, true
 			}
 		}
@@ -2084,6 +2181,32 @@ func (c *Consortium) getTurnLength(header *types.Header) uint8 {
 	return defaultTurnLength
 }
 
+func (c *Consortium) getBlockInterval(snap *Snapshot, header *types.Header) time.Duration {
+	if c.chainConfig.IsHope(header.Number) {
+		return time.Second // 1 second
+	}
+	return time.Duration(snap.config.Period) * time.Second
+}
+
+func (c *Consortium) verifyTurnLength(header *types.Header, snap *Snapshot) error {
+	if header.Number.Uint64()%c.config.Epoch != 0 || !c.chainConfig.IsHope(header.Number) {
+		return nil
+	}
+
+	extraData, err := finality.DecodeExtraV2(header.Extra, c.chainConfig, header.Number)
+	if err != nil {
+		return err
+	}
+
+	turnLength := c.getTurnLength(header)
+	log.Trace("verifyTurnLength", "turnLength", turnLength, "extraDataTurnLength", extraData.TurnLength)
+	if turnLength != extraData.TurnLength {
+		return errMismatchingEpochTurnLength
+	}
+
+	return nil
+}
+
 // CalcDifficulty is the difficulty adjustment algorithm. It returns the difficulty
 // that a new block should have:
 // * DIFF_NOTURN(3) if (BLOCK_NUMBER + 1) / VALIDATOR_COUNT != VALIDATOR_INDEX
@@ -2102,4 +2225,13 @@ func (c *Consortium) CalcDifficulty(chain consensus.ChainHeaderReader, time uint
 	}
 
 	return CalcDifficulty(snap, coinbase)
+}
+
+func (c *Consortium) NextProposalBlock(chain consensus.ChainHeaderReader, header *types.Header, proposer common.Address) (uint64, uint64, error) {
+	snap, err := c.snapshot(chain, header.Number.Uint64(), header.Hash(), nil)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return snap.nextProposalBlock(proposer)
 }

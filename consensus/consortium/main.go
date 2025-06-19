@@ -115,7 +115,8 @@ func (c *Consortium) Prepare(chain consensus.ChainHeaderReader, header *types.He
 
 // Finalize implements consensus.Engine as a proxy
 func (c *Consortium) Finalize(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, txs *[]*types.Transaction,
-	uncles []*types.Header, receipts *[]*types.Receipt, systemTxs *[]*types.Transaction, internalTxs *[]*types.InternalTransaction, usedGas *uint64) error {
+	uncles []*types.Header, receipts *[]*types.Receipt, systemTxs *[]*types.Transaction, internalTxs *[]*types.InternalTransaction, usedGas *uint64,
+) error {
 	if c.chainConfig.IsConsortiumV2(header.Number) {
 		return c.v2.Finalize(chain, header, state, txs, uncles, receipts, systemTxs, internalTxs, usedGas)
 	}
@@ -125,7 +126,8 @@ func (c *Consortium) Finalize(chain consensus.ChainHeaderReader, header *types.H
 
 // FinalizeAndAssemble implements consensus.Engine as a proxy
 func (c *Consortium) FinalizeAndAssemble(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB,
-	txs []*types.Transaction, uncles []*types.Header, receipts []*types.Receipt) (*types.Block, []*types.Receipt, error) {
+	txs []*types.Transaction, uncles []*types.Header, receipts []*types.Receipt,
+) (*types.Block, []*types.Receipt, error) {
 	if c.chainConfig.IsConsortiumV2(header.Number) {
 		return c.v2.FinalizeAndAssemble(chain, header, state, txs, uncles, receipts)
 	}
@@ -266,6 +268,10 @@ func (c *Consortium) GetFinalityVoterAt(
 	}
 
 	return nil
+}
+
+func (c *Consortium) NextProposalBlock(chain consensus.ChainHeaderReader, header *types.Header, proposer common.Address) (uint64, uint64, error) {
+	return c.v2.NextProposalBlock(chain, header, proposer)
 }
 
 // HandleSystemTransaction fixes up the statedb when system transaction

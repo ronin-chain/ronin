@@ -45,7 +45,7 @@ func TestSealableValidators(t *testing.T) {
 		validators = append(validators, common.BigToAddress(big.NewInt(int64(i))))
 	}
 
-	snap := newSnapshot(nil, nil, nil, 10, common.Hash{}, validators, nil, nil)
+	snap := newSnapshot(&params.ChainConfig{}, nil, nil, 10, common.Hash{}, validators, nil, nil)
 	for i := 0; i <= 10; i++ {
 		snap.Recents[uint64(i)] = common.BigToAddress(big.NewInt(int64(i)))
 	}
@@ -92,7 +92,7 @@ func TestBackoffTime(t *testing.T) {
 		validators = append(validators, common.BigToAddress(big.NewInt(int64(i))))
 	}
 
-	snap := newSnapshot(nil, nil, nil, 10, common.Hash{}, validators, nil, nil)
+	snap := newSnapshot(&params.ChainConfig{}, nil, nil, 10, common.Hash{}, validators, nil, nil)
 	for i := 0; i <= 10; i++ {
 		snap.Recents[uint64(i)] = common.BigToAddress(big.NewInt(int64(i)))
 	}
@@ -146,7 +146,7 @@ func TestBackoffTimeOlek(t *testing.T) {
 		validators = append(validators, common.BigToAddress(big.NewInt(int64(i))))
 	}
 
-	snap := newSnapshot(nil, nil, nil, 10, common.Hash{}, validators, nil, nil)
+	snap := newSnapshot(c.chainConfig, nil, nil, 10, common.Hash{}, validators, nil, nil)
 	for i := 0; i <= 10; i++ {
 		snap.Recents[uint64(i)] = common.BigToAddress(big.NewInt(int64(i)))
 	}
@@ -182,6 +182,159 @@ func TestBackoffTimeOlek(t *testing.T) {
 	}
 }
 
+func TestBackoffTimeHope(t *testing.T) {
+	const NUM_OF_VALIDATORS = 21
+	const BLOCK_PERIOD = 3
+
+	validators := make([]common.Address, NUM_OF_VALIDATORS)
+	for i := 0; i < NUM_OF_VALIDATORS; i++ {
+		validators = append(validators, common.BigToAddress(big.NewInt(int64(i))))
+	}
+
+	chainConfig := &params.ChainConfig{
+		ChainID:   big.NewInt(2021),
+		HopeBlock: big.NewInt(1), // Enable Hope fork from block 1
+	}
+
+	consortiumConfig := &params.ConsortiumConfig{
+		Period: BLOCK_PERIOD,
+	}
+
+	snap := newSnapshot(chainConfig, consortiumConfig, nil, 10, common.Hash{}, validators, nil, nil)
+	snap.TurnLength = 4 // Set turn length for Hope fork
+	// Only add a few validators to recent list to ensure we have sealable validators
+	for i := 0; i <= 5; i++ {
+		snap.Recents[uint64(i)] = common.BigToAddress(big.NewInt(int64(i)))
+	}
+
+	c := Consortium{
+		chainConfig: chainConfig,
+		config:      consortiumConfig,
+	}
+
+	// Test case 1: In-turn validator should have 0 backoff time
+	inturnValidator := snap.inturnValidator()
+	header := &types.Header{
+		Coinbase: inturnValidator,
+		Number:   big.NewInt(11),
+	}
+
+	t.Logf("In-turn validator: %s, Block number: %d, TurnLength: %d", inturnValidator.Hex(), header.Number.Uint64(), snap.TurnLength)
+
+	backoffTime := backOffTime(header, snap, c.chainConfig)
+	if backoffTime != 0 {
+		t.Errorf("Expected 0 backoff time for in-turn validator, got %d", backoffTime)
+	}
+
+	// Test case 2: Out-of-turn validator should have non-zero backoff time
+	// Let's find a validator that's definitely not in turn
+	var outOfTurnValidator common.Address
+	found := false
+	for i := 0; i < NUM_OF_VALIDATORS; i++ {
+		testValidator := common.BigToAddress(big.NewInt(int64(i)))
+		if testValidator != inturnValidator && !snap.inturn(testValidator) {
+			// Make sure this validator can seal (not in recent list)
+			position, _ := snap.sealableValidators(testValidator)
+			if position != unSealableValidator {
+				outOfTurnValidator = testValidator
+				found = true
+				break
+			}
+		}
+	}
+
+	if !found {
+		t.Skip("Could not find suitable out-of-turn validator for test")
+	}
+
+	header = &types.Header{
+		Coinbase: outOfTurnValidator,
+		Number:   big.NewInt(11),
+	}
+
+	t.Logf("Out-of-turn validator: %s", outOfTurnValidator.Hex())
+
+	backoffTime = backOffTime(header, snap, c.chainConfig)
+	if backoffTime == 0 {
+		t.Error("Expected non-zero backoff time for out-of-turn validator")
+	}
+
+	// Test case 3: Verify deterministic behavior with same block number
+	backoffTime1 := backOffTime(header, snap, c.chainConfig)
+	backoffTime2 := backOffTime(header, snap, c.chainConfig)
+	if backoffTime1 != backoffTime2 {
+		t.Errorf("Backoff time should be deterministic for same block, got %d and %d", backoffTime1, backoffTime2)
+	}
+
+	// Test case 4: Different validators should have different backoff times
+	validator1 := common.BigToAddress(big.NewInt(15))
+	validator2 := common.BigToAddress(big.NewInt(16))
+
+	header1 := &types.Header{
+		Coinbase: validator1,
+		Number:   big.NewInt(11),
+	}
+	header2 := &types.Header{
+		Coinbase: validator2,
+		Number:   big.NewInt(11),
+	}
+
+	backoffTime1 = backOffTime(header1, snap, c.chainConfig)
+	backoffTime2 = backOffTime(header2, snap, c.chainConfig)
+
+	// They should be different (with high probability)
+	if backoffTime1 == backoffTime2 {
+		t.Log("Warning: Different validators got same backoff time (low probability event)")
+	}
+
+	// Test case 5: Verify Hope fork uses turn-based random seed
+	// Block numbers in different turns should use different random seeds
+	headerTurn1 := &types.Header{
+		Coinbase: validator1,
+		Number:   big.NewInt(11), // Turn 2 (11 / 4 = 2)
+	}
+	headerTurn2 := &types.Header{
+		Coinbase: validator1,
+		Number:   big.NewInt(15), // Turn 3 (15 / 4 = 3)
+	}
+
+	backoffTimeTurn1 := backOffTime(headerTurn1, snap, c.chainConfig)
+	backoffTimeTurn2 := backOffTime(headerTurn2, snap, c.chainConfig)
+
+	// Different turns should likely produce different backoff times
+	if backoffTimeTurn1 == backoffTimeTurn2 {
+		t.Log("Warning: Different turns got same backoff time for same validator")
+	}
+
+	// Test case 6: Verify backoff time is within reasonable bounds
+	maxExpectedBackoff := uint64((int(defaultInitBackOffTime) + NUM_OF_VALIDATORS*int(wiggleTime)) / int(time.Second))
+	if backoffTime > maxExpectedBackoff {
+		t.Errorf("Backoff time %d exceeds maximum expected %d", backoffTime, maxExpectedBackoff)
+	}
+
+	// Test case 7: Test before Hope fork (should use old logic)
+	cPreHope := Consortium{
+		chainConfig: &params.ChainConfig{
+			ChainID:   big.NewInt(2021),
+			HopeBlock: big.NewInt(100), // Hope fork at block 100
+		},
+		config: &params.ConsortiumConfig{
+			Period: BLOCK_PERIOD,
+		},
+	}
+
+	headerPreHope := &types.Header{
+		Coinbase: validator1,
+		Number:   big.NewInt(11), // Before Hope fork
+	}
+
+	backoffTimePreHope := backOffTime(headerPreHope, snap, cPreHope.chainConfig)
+	backoffTimeHope := backOffTime(headerPreHope, snap, c.chainConfig)
+
+	// The calculation might be different due to different random seed logic
+	t.Logf("Pre-Hope backoff: %d, Hope backoff: %d", backoffTimePreHope, backoffTimeHope)
+}
+
 // When validator is in recent list we expect the minimum delay is
 // 1s before Olek and 0s after Olek
 func TestBackoffTimeInturnValidatorInRecentList(t *testing.T) {
@@ -198,13 +351,17 @@ func TestBackoffTimeInturnValidatorInRecentList(t *testing.T) {
 		validators = append(validators, common.BigToAddress(big.NewInt(int64(i))))
 	}
 
-	snap := newSnapshot(nil, nil, nil, 10, common.Hash{}, validators, nil, nil)
+	snap := newSnapshot(c.chainConfig, nil, nil, 10, common.Hash{}, validators, nil, nil)
 	for i := 0; i <= 9; i++ {
 		snap.Recents[uint64(i)] = common.BigToAddress(big.NewInt(int64(i)))
 	}
 	snap.Recents[10] = common.BigToAddress(big.NewInt(int64(11)))
 
 	var minDelay uint64 = 10000
+	supposeVal := snap.supposeValidator()
+	supposePos, _ := snap.sealableValidators(supposeVal)
+	t.Logf("Suppose validator: %s, position in sealable: %d", supposeVal.Hex(), supposePos)
+
 	for i := 0; i < NUM_OF_VALIDATORS; i++ {
 		val := common.BigToAddress(big.NewInt(int64(i)))
 		header := &types.Header{
@@ -216,6 +373,9 @@ func TestBackoffTimeInturnValidatorInRecentList(t *testing.T) {
 			delay := backOffTime(header, snap, c.chainConfig)
 			if delay < minDelay {
 				minDelay = delay
+			}
+			if val == supposeVal {
+				t.Logf("Suppose validator %s delay: %d", val.Hex(), delay)
 			}
 		}
 	}
@@ -255,11 +415,6 @@ func TestVerifyBlockHeaderTime(t *testing.T) {
 		validators = append(validators, common.BigToAddress(big.NewInt(int64(i))))
 	}
 
-	snap := newSnapshot(nil, nil, nil, 10, common.Hash{}, validators, nil, nil)
-	for i := 0; i <= 10; i++ {
-		snap.Recents[uint64(i)] = common.BigToAddress(big.NewInt(int64(i)))
-	}
-
 	c := Consortium{
 		chainConfig: &params.ChainConfig{
 			BubaBlock: big.NewInt(12),
@@ -268,7 +423,10 @@ func TestVerifyBlockHeaderTime(t *testing.T) {
 			Period: BLOCK_PERIOD,
 		},
 	}
-
+	snap := newSnapshot(c.chainConfig, nil, nil, 10, common.Hash{}, validators, nil, nil)
+	for i := 0; i <= 10; i++ {
+		snap.Recents[uint64(i)] = common.BigToAddress(big.NewInt(int64(i)))
+	}
 	now := uint64(time.Now().Unix())
 	header := &types.Header{
 		Coinbase: common.BigToAddress(big.NewInt(18)),
@@ -3266,4 +3424,159 @@ func TestVerifyValidatorExtraDataWithContract(t *testing.T) {
 			t.Fatalf("Expect err: %v, got: %v", test.output, output)
 		}
 	}
+}
+
+func TestComputeHeaderTimeHope(t *testing.T) {
+	const NUM_OF_VALIDATORS = 21
+	const BLOCK_PERIOD = 3
+
+	validators := make([]common.Address, NUM_OF_VALIDATORS)
+	for i := 0; i < NUM_OF_VALIDATORS; i++ {
+		validators = append(validators, common.BigToAddress(big.NewInt(int64(i))))
+	}
+
+	chainConfig := &params.ChainConfig{
+		ChainID:   big.NewInt(2021),
+		HopeBlock: big.NewInt(1), // Enable Hope fork from block 1
+	}
+
+	consortiumConfig := &params.ConsortiumConfig{
+		Period: BLOCK_PERIOD,
+	}
+
+	snap := newSnapshot(chainConfig, consortiumConfig, nil, 10, common.Hash{}, validators, nil, nil)
+	snap.TurnLength = 4 // Set turn length for Hope fork
+	for i := 0; i <= 10; i++ {
+		snap.Recents[uint64(i)] = common.BigToAddress(big.NewInt(int64(i)))
+	}
+
+	c := Consortium{
+		chainConfig: chainConfig,
+		config:      consortiumConfig,
+	}
+	cPreHope := Consortium{
+		chainConfig: &params.ChainConfig{
+			ChainID:   big.NewInt(2021),
+			HopeBlock: big.NewInt(100), // Hope fork at block 100
+		},
+		config: &params.ConsortiumConfig{
+			Period: BLOCK_PERIOD,
+		},
+	}
+
+	preHopeParentHeader := &types.Header{
+		Number: big.NewInt(8),
+		Time:   uint64(time.Now().Unix()),
+	}
+	preHopeHeader := &types.Header{
+		Number: big.NewInt(9),
+		Time:   uint64(time.Now().Unix()),
+	}
+	// Pre-Hope should use 3-second period, Hope should use 1-second
+	preHopeHeaderTime := cPreHope.computeHeaderTime(preHopeHeader, preHopeParentHeader, snap)
+	preHopeBackOffTime := preHopeHeaderTime - preHopeParentHeader.Time
+	if preHopeBackOffTime != cPreHope.config.Period {
+		t.Errorf("Expected pre-Hope backoff time is %d, got %d", cPreHope.config.Period, preHopeBackOffTime)
+	}
+
+	// In-turn validator should get 1-second interval (no backoff)
+	inturnValidator := snap.inturnValidator()
+	header := &types.Header{
+		Coinbase: inturnValidator,
+		Number:   big.NewInt(11),
+	}
+	parentHeader := &types.Header{
+		Number: big.NewInt(10),
+		Time:   uint64(time.Now().Unix()),
+	}
+	headerTime := c.computeHeaderTime(header, parentHeader, snap)
+
+	backOffTime := headerTime - parentHeader.Time
+	if backOffTime != uint64(1*time.Second) {
+		t.Errorf("Expected backoff time is 1s, got %d", backOffTime)
+	}
+
+	// Out-of-turn validator should get 1-second + backoff
+	outOfTurnValidator := common.BigToAddress(big.NewInt(18))
+	header = &types.Header{
+		Coinbase: outOfTurnValidator,
+		Number:   big.NewInt(11),
+	}
+
+	headerTime = c.computeHeaderTime(header, parentHeader, snap)
+	backOffTime = headerTime - parentHeader.Time
+	if backOffTime <= uint64(1*time.Second) {
+		t.Errorf("Expected backoff time is 1s + backoff, got %d", backOffTime)
+	}
+
+	// Verify minimum time (current time)
+	pastTime := uint64(time.Now().Unix()) - 100 // 100 seconds ago
+	parentHeader.Time = pastTime
+
+	headerTime = c.computeHeaderTime(header, parentHeader, snap)
+	if headerTime < uint64(time.Now().Unix()) {
+		t.Errorf("Header time %d should not be less than current time %d", headerTime, uint64(time.Now().Unix()))
+	}
+}
+
+func TestGetBlockIntervalHope(t *testing.T) {
+	const NUM_OF_VALIDATORS = 21
+	const BLOCK_PERIOD = 3
+
+	validators := make([]common.Address, NUM_OF_VALIDATORS)
+	for i := 0; i < NUM_OF_VALIDATORS; i++ {
+		validators = append(validators, common.BigToAddress(big.NewInt(int64(i))))
+	}
+
+	chainConfig := &params.ChainConfig{
+		ChainID:   big.NewInt(2021),
+		HopeBlock: big.NewInt(1), // Enable Hope fork from block 1
+	}
+
+	consortiumConfig := &params.ConsortiumConfig{
+		Period: BLOCK_PERIOD,
+	}
+
+	snap := newSnapshot(chainConfig, consortiumConfig, nil, 10, common.Hash{}, validators, nil, nil)
+
+	c := Consortium{
+		chainConfig: chainConfig,
+		config:      consortiumConfig,
+	}
+
+	// Test case 1: Hope fork should return 1 second
+	header := &types.Header{
+		Number: big.NewInt(11), // After Hope fork
+	}
+
+	interval := c.getBlockInterval(snap, header)
+	expectedInterval := 1 * time.Second
+
+	if interval != expectedInterval {
+		t.Errorf("Expected %v interval for Hope fork, got %v", expectedInterval, interval)
+	}
+
+	// Test case 2: Pre-Hope should return configured period
+	cPreHope := Consortium{
+		chainConfig: &params.ChainConfig{
+			ChainID:   big.NewInt(2021),
+			HopeBlock: big.NewInt(100), // Hope fork at block 100
+		},
+		config: &params.ConsortiumConfig{
+			Period: BLOCK_PERIOD,
+		},
+	}
+
+	headerPreHope := &types.Header{
+		Number: big.NewInt(11), // Before Hope fork
+	}
+
+	intervalPreHope := cPreHope.getBlockInterval(snap, headerPreHope)
+	expectedIntervalPreHope := time.Duration(BLOCK_PERIOD) * time.Second
+
+	if intervalPreHope != expectedIntervalPreHope {
+		t.Errorf("Expected %v interval for pre-Hope, got %v", expectedIntervalPreHope, intervalPreHope)
+	}
+
+	t.Logf("Pre-Hope interval: %v, Hope interval: %v", intervalPreHope, interval)
 }
