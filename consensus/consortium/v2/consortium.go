@@ -924,7 +924,6 @@ func (c *Consortium) computeHeaderTime(header, parent *types.Header, snapshot *S
 	if c.chainConfig.IsHope(header.Number) {
 		blockTime := uint64(blockPeriodHope) + backOffTime(header, snapshot, c.chainConfig)
 		headerTime = parent.Time + blockTime
-		log.Debug("computeHeaderTime", "header", header.Number, "parent", parent.Number, "headerTime", headerTime, "blockTime", blockTime)
 	}
 
 	if c.chainConfig.IsBuba(header.Number) {
@@ -946,7 +945,6 @@ func (c *Consortium) verifyHeaderTime(header, parent *types.Header, snapshot *Sn
 		blockTime := uint64(blockPeriodHope) + backOffTime(header, snapshot, c.chainConfig)
 		expectedHeaderTime := parent.Time + blockTime
 		if header.Time < expectedHeaderTime {
-			log.Debug("verifyHeaderTime", "header", header.Number, "parent", parent.Number, "headerTime", header.Time, "blockTime", blockTime)
 			return consensus.ErrFutureBlock
 		}
 	}
@@ -1134,12 +1132,7 @@ func (c *Consortium) Prepare(chain consensus.ChainHeaderReader, header *types.He
 
 	// Apply turn length to the header if it's an epoch block after Hope hardfork
 	if c.chainConfig.IsHope(header.Number) {
-		// If it is the first block of an epoch, apply turn length
-		if header.Number.Uint64()%c.config.EpochV2 == 0 {
-			extraData.TurnLength = c.getTurnLength(header)
-		} else {
-			extraData.TurnLength = defaultTurnLength
-		}
+		extraData.TurnLength = c.getTurnLength(header)
 	}
 
 	// After Shillin, extraData.hasFinalityVote = 0 here as we does
@@ -1241,7 +1234,7 @@ func (c *Consortium) processSystemTransactions(chain consensus.ChainHeaderReader
 	}
 
 	if header.Difficulty.Cmp(diffInTurn) != 0 {
-		spoiledVal := snap.supposeValidator()
+		spoiledVal := snap.inturnValidator()
 		signedRecently := false
 		if c.chainConfig.IsOlek(header.Number) {
 			signedRecently = snap.IsRecentlySigned(spoiledVal, c.chainConfig.Rules(header.Number))
@@ -1257,6 +1250,7 @@ func (c *Consortium) processSystemTransactions(chain consensus.ChainHeaderReader
 			if !isFinalizeAndAssemble {
 				log.Info("Slash validator", "number", header.Number, "spoiled", spoiledVal)
 			}
+			log.Info("Slash validator", "number", header.Number, "spoiled", spoiledVal)
 			if err := contract.Slash(transactOpts, spoiledVal); err != nil {
 				// it is possible that slash validator failed because of the slash channel is disabled.
 				log.Error("Failed to slash validator", "block hash", header.Hash(), "address", spoiledVal)
@@ -1441,6 +1435,7 @@ func (c *Consortium) Finalize(chain consensus.ChainHeaderReader, header *types.H
 	// Verify header turn length for Hope fork epoch blocks
 	if c.chainConfig.IsHope(header.Number) {
 		if err := c.verifyTurnLength(header, snap); err != nil {
+			log.Info("verifyTurnLength", "header", header.Number, "err", err)
 			return err
 		}
 	}
@@ -2199,7 +2194,6 @@ func (c *Consortium) verifyTurnLength(header *types.Header, snap *Snapshot) erro
 	}
 
 	turnLength := c.getTurnLength(header)
-	log.Trace("verifyTurnLength", "turnLength", turnLength, "extraDataTurnLength", extraData.TurnLength)
 	if turnLength != extraData.TurnLength {
 		return errMismatchingEpochTurnLength
 	}

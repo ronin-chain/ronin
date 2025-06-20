@@ -259,7 +259,7 @@ func (s *Snapshot) apply(headers []*types.Header, chain consensus.ChainHeaderRea
 
 		// For Hope fork, we use the consecutive signing count to check if the validator is recently signed
 		if chainRules.IsHope {
-			if s.RecentlySignConsecutive(validator, s.countRecents()) {
+			if s.IsRecentlySigned(validator, chainRules) {
 				return nil, errRecentlySigned
 			}
 		} else {
@@ -506,7 +506,7 @@ func (s *Snapshot) supposeValidator() common.Address {
 }
 
 func (s *Snapshot) IsRecentlySigned(validator common.Address, rules params.Rules) bool {
-	if rules.IsHope {
+	if rules.IsHope && s.TurnLength > 1 {
 		return s.RecentlySignConsecutive(validator, s.countRecents())
 	}
 
@@ -586,6 +586,7 @@ func (s *Snapshot) RecentlySignConsecutive(validator common.Address, counts map[
 		if seenTimes > s.TurnLength {
 			log.Warn("produce more blocks than expected!", "validator", validator, "seenTimes", seenTimes)
 		}
+		log.Warn("RecentlySignConsecutive detected", "validator", validator, "counts", counts, "turnLength", s.TurnLength)
 		return true
 	}
 
