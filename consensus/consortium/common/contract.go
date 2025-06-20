@@ -489,6 +489,12 @@ func ApplyTransaction(msg *core.Message, opts *ApplyTransactOpts) (err error) {
 	usedGas := opts.UsedGas
 	nonce := msg.Nonce
 
+	// Skip system transactions during simulation when signTxFn is not available
+	if mining && signTxFn == nil {
+		log.Debug("Skipping system transaction during simulation", "to", msg.To, "data", hex.EncodeToString(msg.Data))
+		return nil
+	}
+
 	// TODO(linh): This function is deprecated. Shall we replace it with NewTx?
 	expectedTx := types.NewTransaction(nonce, *msg.To, msg.Amount, msg.GasLimit, msg.GasPrice, msg.Data)
 	expectedHash := signer.Hash(expectedTx)
