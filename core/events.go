@@ -49,8 +49,8 @@ type ChainEvent struct {
 }
 
 type FinalizedBlockInfo struct {
-	FinalizedBlockNumber hexutil.Uint64      `json:"finalizedBlockNumber"`
-	FinalizedBlockHash   common.Hash `json:"finalizedBlockHash"`
+	FinalizedBlockNumber hexutil.Uint64 `json:"finalizedBlockNumber"`
+	FinalizedBlockHash   common.Hash    `json:"finalizedBlockHash"`
 }
 
 type ChainSideEvent struct {
@@ -58,4 +58,8 @@ type ChainSideEvent struct {
 }
 
 type ChainHeadEvent struct{ Block *types.Block }
+
+// HighestVerifiedHeaderEvent is posted when a header finishes block finalization logic but before state is fully committed.
+type HighestVerifiedHeaderEvent struct{ Header *types.Header }
+
 type ReorgEvent ChainHeadEvent
