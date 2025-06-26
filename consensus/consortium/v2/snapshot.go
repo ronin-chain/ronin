@@ -449,10 +449,6 @@ func (s *Snapshot) supposeValidator() common.Address {
 	}
 
 	turnLen := s.turnLength(s.Number + 1)
-	if turnLen == 0 {
-		turnLen = 1
-	}
-
 	index := ((s.Number + 1) / turnLen) % uint64(len(validators))
 	return validators[index]
 }
