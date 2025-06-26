@@ -12,7 +12,8 @@ import (
 
 const (
 	voteChannelSize = 50
-	batchInterval   = 100 * time.Millisecond
+	voteBatchSize   = 5
+	batchInterval   = 50 * time.Millisecond
 	maxKnownVote    = 8192
 )
 
@@ -100,6 +101,13 @@ func (p *Peer) batchVote() {
 		select {
 		case vote := <-p.voteCh:
 			pendingVote = append(pendingVote, vote)
+			if len(pendingVote) >= voteBatchSize {
+				if err := p.sendNewVote(pendingVote); err != nil {
+					p.Log().Debug("Failed to send vote", "err", err)
+					return
+				}
+				pendingVote = nil
+			}
 		case <-ticker.C:
 			if len(pendingVote) > 0 {
 				if err := p.sendNewVote(pendingVote); err != nil {

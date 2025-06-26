@@ -447,6 +447,7 @@ func (pool *VotePool) FetchVoteByBlockHash(blockHash common.Hash) []*types.VoteE
 	// We try to acquire read lock fetchRetry times
 	// but can not do it, so just return nil here
 	if retry == fetchRetry {
+		log.Debug("Failed to acquire read lock for FetchVoteByBlockHash", "blockHash", blockHash)
 		return nil
 	}
 
