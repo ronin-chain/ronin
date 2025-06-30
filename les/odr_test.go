@@ -144,6 +144,7 @@ func odrContractCall(ctx context.Context, db ethdb.Database, config *params.Chai
 					true,
 					nil,
 					nil,
+					nil,
 				)
 
 				context := core.NewEVMBlockContext(header, bc, nil)
@@ -171,6 +172,7 @@ func odrContractCall(ctx context.Context, db ethdb.Database, config *params.Chai
 				data,
 				nil,
 				true,
+				nil,
 				nil,
 				nil,
 			)

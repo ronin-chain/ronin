@@ -1662,10 +1662,10 @@ func AccessList(ctx context.Context, b Backend, blockNrOrHash rpc.BlockNumberOrH
 
 		// Lower the basefee to 0 to avoid breaking EVM
 		// invariants (basefee < feecap).
-		if msg.GasPrice().Sign() == 0 {
+		if msg.GasPrice.Sign() == 0 {
 			vmenv.Context.BaseFee = new(big.Int)
 		}
-		if msg.BlobGasFeeCap() != nil && msg.BlobGasFeeCap().BitLen() == 0 {
+		if msg.BlobGasFeeCap != nil && msg.BlobGasFeeCap.BitLen() == 0 {
 			vmenv.Context.BlobBaseFee = new(big.Int)
 		}
 

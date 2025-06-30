@@ -151,10 +151,10 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 // ProcessParentBlockHash stores the parent block hash in the history storage contract
 // as per EIP-2935.
 func ProcessParentBlockHash(prevHash common.Hash, vmenv *vm.EVM) {
-	msg := types.NewMessage(consensus.SystemAddress, &params.HistoryStorageAddress, 0, common.Big0, 30_000_000, common.Big0, common.Big0, common.Big0, prevHash.Bytes(), nil, false, nil, nil, nil)
+	msg := NewMessage(consensus.SystemAddress, &params.HistoryStorageAddress, 0, common.Big0, 30_000_000, common.Big0, common.Big0, common.Big0, prevHash.Bytes(), nil, false, nil, nil, nil)
 	vmenv.Reset(NewEVMTxContext(msg), vmenv.StateDB)
 	vmenv.StateDB.AddAddressToAccessList(params.HistoryStorageAddress)
-	_, _, err := vmenv.Call(vm.AccountRef(msg.From()), *msg.To(), msg.Data(), 30_000_000, common.Big0)
+	_, _, err := vmenv.Call(vm.AccountRef(msg.From), *msg.To, msg.Data, 30_000_000, common.Big0)
 	if err != nil {
 		log.Error("Failed to store parent block hash in history storage contract", "err", err)
 	}
