@@ -202,6 +202,7 @@ func odrContractCall(ctx context.Context, db ethdb.Database, bc *core.BlockChain
 			true,
 			nil,
 			nil,
+			nil,
 		)
 		txContext := core.NewEVMTxContext(msg)
 		context := core.NewEVMBlockContext(header, chain, nil)

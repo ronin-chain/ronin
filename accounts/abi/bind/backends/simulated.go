@@ -638,6 +638,7 @@ func (b *SimulatedBackend) callContract(ctx context.Context, call ethereum.CallM
 		true,
 		nil,
 		nil,
+		nil,
 	)
 
 	txContext := core.NewEVMTxContext(msg)

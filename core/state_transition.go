@@ -78,7 +78,7 @@ type Message struct {
 	GasTipCap         *big.Int
 	Data              []byte
 	AccessList        types.AccessList
-	AuthList      []types.SetCodeAuthorization
+	AuthList          []types.SetCodeAuthorization
 	SkipAccountChecks bool
 	Payer             common.Address
 	ExpiredTime       uint64
@@ -99,6 +99,7 @@ func NewMessage(
 	skipAccountChecks bool,
 	blobFeeCap *big.Int,
 	blobHashes []common.Hash,
+	authList []types.SetCodeAuthorization,
 ) *Message {
 	return &Message{
 		From:              from,
@@ -111,6 +112,7 @@ func NewMessage(
 		GasTipCap:         gasTipCap,
 		Data:              data,
 		AccessList:        accessList,
+		AuthList:          authList,
 		SkipAccountChecks: skipAccountChecks,
 		Payer:             from,
 		ExpiredTime:       0,
@@ -139,6 +141,7 @@ func TransactionToMessage(tx *types.Transaction, signer types.Signer, baseFee *b
 		false,
 		tx.BlobGasFeeCap(),
 		tx.BlobHashes(),
+		nil,
 	)
 
 	// If expired time is set, set it to the message
@@ -399,10 +402,10 @@ func (st *StateTransition) preCheck() error {
 				msg.From.Hex(), stNonce)
 		}
 		// Make sure the sender is an EOA
-		code := st.state.GetCode(msg.From())
+		code := st.state.GetCode(msg.From)
 		_, delegated := types.ParseDelegation(code)
 		if len(code) > 0 && !delegated {
-			return fmt.Errorf("%w: address %v, len(code): %d", ErrSenderNoEOA, msg.From().Hex(), len(code))
+			return fmt.Errorf("%w: address %v, len(code): %d", ErrSenderNoEOA, msg.From.Hex(), len(code))
 		}
 	}
 	// Make sure that transaction gasFeeCap is greater than the baseFee (post london)
@@ -481,12 +484,12 @@ func (st *StateTransition) preCheck() error {
 	}
 
 	// Check that EIP-7702 authorization list signatures are well formed.
-	if msg.SetCodeAuthorizations() != nil {
-		if msg.To() == nil {
-			return fmt.Errorf("%w (sender %v)", ErrSetCodeTxCreate, msg.From())
+	if msg.AuthList != nil {
+		if msg.To == nil {
+			return fmt.Errorf("%w (sender %v)", ErrSetCodeTxCreate, msg.From)
 		}
-		if len(msg.SetCodeAuthorizations()) == 0 {
-			return fmt.Errorf("%w (sender %v)", ErrEmptyAuthList, msg.From())
+		if len(msg.AuthList) == 0 {
+			return fmt.Errorf("%w (sender %v)", ErrEmptyAuthList, msg.From)
 		}
 	}
 
@@ -538,12 +541,12 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	msg := st.msg
 	sender := vm.AccountRef(msg.From)
 	rules := st.evm.ChainConfig().Rules(st.evm.Context.BlockNumber)
-	contractCreation := msg.To() == nil
+	contractCreation := msg.To == nil
 	floorDataGas := uint64(0)
 
 	// Check clauses 4-5, subtract intrinsic gas if everything is correct
 	if !st.evm.Config.IsSystemTransaction {
-		gas, err := IntrinsicGas(st.data, st.msg.AccessList(), st.msg.SetCodeAuthorizations(), contractCreation, rules.IsHomestead, rules.IsIstanbul, rules.IsShanghai)
+		gas, err := IntrinsicGas(st.data, st.msg.AccessList, st.msg.AuthList, contractCreation, rules.IsHomestead, rules.IsIstanbul, rules.IsShanghai)
 		if err != nil {
 			return nil, err
 		}
@@ -552,12 +555,12 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		}
 		// Gas limit suffices for the floor data cost (EIP-7623)
 		if rules.IsKotaro {
-			floorDataGas, err = FloorDataGas(msg.Data())
+			floorDataGas, err = FloorDataGas(msg.Data)
 			if err != nil {
 				return nil, err
 			}
-			if msg.Gas() < floorDataGas {
-				return nil, fmt.Errorf("%w: have %d, want %d", ErrFloorDataGas, msg.Gas(), floorDataGas)
+			if msg.GasLimit < floorDataGas {
+				return nil, fmt.Errorf("%w: have %d, want %d", ErrFloorDataGas, msg.GasLimit, floorDataGas)
 			}
 		}
 		st.gas -= gas
@@ -586,11 +589,11 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		ret, _, st.gas, vmerr = st.evm.Create(sender, st.data, st.gas, st.value)
 	} else {
 		// Increment the nonce for the next transaction.
-		st.state.SetNonce(msg.From(), st.state.GetNonce(msg.From())+1)
+		st.state.SetNonce(msg.From, st.state.GetNonce(msg.From)+1)
 
 		// Apply EIP-7702 authorizations.
-		if msg.SetCodeAuthorizations() != nil {
-			for _, auth := range msg.SetCodeAuthorizations() {
+		if msg.AuthList != nil {
+			for _, auth := range msg.AuthList {
 				// Note errors are ignored, we simply skip invalid authorizations here.
 				_ = st.applyAuthorization(&auth)
 			}
@@ -601,7 +604,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		// the account was deployed during this transaction. To handle correctly,
 		// simply wait until the final state of delegations is determined before
 		// performing the resolution and warming.
-		if addr, ok := types.ParseDelegation(st.state.GetCode(*msg.To())); ok {
+		if addr, ok := types.ParseDelegation(st.state.GetCode(*msg.To)); ok {
 			st.state.AddAddressToAccessList(addr)
 		}
 
