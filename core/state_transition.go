@@ -141,7 +141,7 @@ func TransactionToMessage(tx *types.Transaction, signer types.Signer, baseFee *b
 		false,
 		tx.BlobGasFeeCap(),
 		tx.BlobHashes(),
-		nil,
+		tx.SetCodeAuthorizations(),
 	)
 
 	// If expired time is set, set it to the message
