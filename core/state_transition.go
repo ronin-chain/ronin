@@ -121,7 +121,7 @@ func NewMessage(
 	}
 }
 
-// AsMessage returns the transaction as a core.Message.
+// TransactionToMessage converts a transaction into a Message.
 func TransactionToMessage(tx *types.Transaction, signer types.Signer, baseFee *big.Int) (*Message, error) {
 	from, err := types.Sender(signer, tx)
 	if err != nil {
