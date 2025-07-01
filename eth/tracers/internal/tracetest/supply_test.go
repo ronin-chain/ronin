@@ -153,6 +153,7 @@ func TestSupplyEip1559Burn(t *testing.T) {
 	)
 
 	gspec.Config.VenokiBlock = new(big.Int)
+	gspec.Config.KotaroBlock = new(big.Int)
 	signer := types.LatestSigner(gspec.Config)
 
 	eip1559BlockGenerationFunc := func(b *core.BlockGen) {
@@ -236,6 +237,7 @@ func TestSupplySelfdestruct(t *testing.T) {
 	gspec.Config.CancunBlock = nil
 	gspec.Config.ShanghaiBlock = nil
 	gspec.Config.VenokiBlock = nil
+	gspec.Config.KotaroBlock = nil
 
 	signer := types.LatestSigner(gspec.Config)
 
@@ -420,6 +422,7 @@ func TestSupplySelfdestructItselfAndRevert(t *testing.T) {
 	gspec.Config.CancunBlock = nil
 	gspec.Config.ShanghaiBlock = nil
 	gspec.Config.VenokiBlock = nil
+	gspec.Config.KotaroBlock = nil
 
 	signer := types.LatestSigner(gspec.Config)
 
