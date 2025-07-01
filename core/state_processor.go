@@ -24,6 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/consensus/misc"
 	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -151,6 +152,16 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 // ProcessParentBlockHash stores the parent block hash in the history storage contract
 // as per EIP-2935.
 func ProcessParentBlockHash(prevHash common.Hash, vmenv *vm.EVM) {
+	if tracer := vmenv.Config.Tracer; tracer != nil {
+		if tracer.OnSystemCallStart != nil {
+			tracer.OnSystemCallStart()
+		}
+		onSystemCallStart(tracer, vmenv.GetVMContext())
+		if tracer.OnSystemCallEnd != nil {
+			defer tracer.OnSystemCallEnd()
+		}
+	}
+
 	msg := NewMessage(consensus.SystemAddress, &params.HistoryStorageAddress, 0, common.Big0, 30_000_000, common.Big0, common.Big0, common.Big0, prevHash.Bytes(), nil, false, nil, nil, nil)
 	vmenv.Reset(NewEVMTxContext(msg), vmenv.StateDB)
 	vmenv.StateDB.AddAddressToAccessList(params.HistoryStorageAddress)
@@ -269,4 +280,12 @@ func ApplyTransaction(
 	blockContext := NewEVMBlockContext(header, bc, author, publishEvents...)
 	vmenv := vm.NewEVM(blockContext, vm.TxContext{}, statedb, config, cfg)
 	return ApplyMessageWithEVM(msg, config, gp, statedb, header.Number, header.Hash(), tx, usedGas, vmenv, receiptProcessors)
+}
+
+func onSystemCallStart(tracer *tracing.Hooks, ctx *tracing.VMContext) {
+	if tracer.OnSystemCallStartV2 != nil {
+		tracer.OnSystemCallStartV2(ctx)
+	} else if tracer.OnSystemCallStart != nil {
+		tracer.OnSystemCallStart()
+	}
 }
