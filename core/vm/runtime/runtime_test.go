@@ -975,7 +975,7 @@ func TestDelegatedAccountAccessCost(t *testing.T) {
 			ChainConfig: params.TestChainConfig,
 			State:       statedb,
 			EVMConfig: vm.Config{
-				Tracer: tracer,
+				Tracer: tracer.Hooks(),
 			},
 		})
 		have := tracer.StructLogs()[tc.step].GasCost
