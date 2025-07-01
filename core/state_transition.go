@@ -618,7 +618,11 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		if rules.IsKotaro {
 			// After EIP-7623: Data-heavy transactions pay the floor gas.
 			if st.gasUsed() < floorDataGas {
+				prev := st.gas
 				st.gas = st.initialGas - floorDataGas
+				if t := st.evm.Config.Tracer; t != nil && t.OnGasChange != nil {
+					t.OnGasChange(prev, st.gas, tracing.GasChangeTxDataFloor)
+				}
 			}
 			if peakGasUsed < floorDataGas {
 				peakGasUsed = floorDataGas
