@@ -817,7 +817,7 @@ func TestCall(t *testing.T) {
 					Balance: big.NewInt(params.Ether),
 					Nonce:   1,
 					Storage: map[common.Hash]common.Hash{
-						common.Hash{}: common.HexToHash("0x0000000000000000000000000000000000000000000000000000000000000001"),
+						{}: common.HexToHash("0x0000000000000000000000000000000000000000000000000000000000000001"),
 					},
 				},
 			},
@@ -1582,17 +1582,17 @@ func TestSimulateV1(t *testing.T) {
 			want: []blockRes{{
 				Number:        "0xb",
 				GasLimit:      "0x47e7c4",
-				GasUsed:       "0xa58c",
+				GasUsed:       "0xa6cc",
 				Miner:         coinbase,
 				BaseFeePerGas: "0x0",
 				Calls: []callRes{{
 					ReturnValue: "0xec4916dd28fc4c10d78e287ca5d9cc51ee1ae73cbfde08c6b37324cbfaac8bc5",
-					GasUsed:     "0x52dc",
+					GasUsed:     "0x5366",
 					Logs:        []log{},
 					Status:      "0x1",
 				}, {
 					ReturnValue: "0x0000000000000000000000000000000000000000000000000000000000000001",
-					GasUsed:     "0x52b0",
+					GasUsed:     "0x5366",
 					Logs:        []log{},
 					Status:      "0x1",
 				}},
@@ -1935,22 +1935,22 @@ func TestSimulateV1(t *testing.T) {
 			}, {
 				Number:        "0xc",
 				GasLimit:      "0x47e7c4",
-				GasUsed:       "0xf864",
+				GasUsed:       "0xfa32",
 				Miner:         coinbase,
 				BaseFeePerGas: "0x0",
 				Calls: []callRes{{
 					ReturnValue: "0x",
-					GasUsed:     "0x52cc",
+					GasUsed:     "0x5366",
 					Logs:        []log{},
 					Status:      "0x1",
 				}, {
 					ReturnValue: "0x",
-					GasUsed:     "0x52cc",
+					GasUsed:     "0x5366",
 					Logs:        []log{},
 					Status:      "0x1",
 				}, {
 					ReturnValue: "0x",
-					GasUsed:     "0x52cc",
+					GasUsed:     "0x5366",
 					Logs:        []log{},
 					Status:      "0x1",
 				}},
@@ -1978,17 +1978,17 @@ func TestSimulateV1(t *testing.T) {
 			}, {
 				Number:        "0x10",
 				GasLimit:      "0x47e7c4",
-				GasUsed:       "0xa598",
+				GasUsed:       "0xa6cc",
 				Miner:         coinbase,
 				BaseFeePerGas: "0x0",
 				Calls: []callRes{{
 					ReturnValue: "0x",
-					GasUsed:     "0x52cc",
+					GasUsed:     "0x5366",
 					Logs:        []log{},
 					Status:      "0x1",
 				}, {
 					ReturnValue: "0x",
-					GasUsed:     "0x52cc",
+					GasUsed:     "0x5366",
 					Logs:        []log{},
 					Status:      "0x1",
 				}},
