@@ -18,11 +18,3 @@ RONIN_NODE_PATH=./script/run/ronin GENESIS_FILE=./genesis/devnet.json ./script/b
 ./script/run_node2.sh
 ./script/run_node3.sh
 ```
-
-### Generate new Shadow fork patch with script.
-
-```sh
-git diff main..<target_commit> -- . ':!.github' ':!.golangci.yml' ':!*.log' ':!*.out' ':!*.DS_Store' ':!*.test' > ./shadow_fork.patch
-```
-
-Current patch for commit `e519e3a`
