@@ -1151,7 +1151,7 @@ func TestTracingWithOverrides(t *testing.T) {
 					},
 				},
 			},
-			want: `{"gas":21167,"failed":false,"returnValue":"0000000000000000000000000000000000000000000000000000000000000002"}`,
+			want: `{"gas":21350,"failed":false,"returnValue":"0000000000000000000000000000000000000000000000000000000000000002"}`,
 		},
 		{ // Call to ECREC Precompiled on a different address, expect the original behaviour of ECREC precompile
 			blockNumber: rpc.LatestBlockNumber,
