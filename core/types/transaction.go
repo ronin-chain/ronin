@@ -649,6 +649,7 @@ type InternalTransaction struct {
 
 type InternalTransactionBody struct {
 	Order           uint64
+	ParentOrder     uint64
 	TransactionHash common.Hash
 	Value           *big.Int
 	Input           []byte

@@ -36,7 +36,7 @@ import (
 var emptyCodeHash = crypto.Keccak256Hash(nil)
 
 type OpEvent interface {
-	Publish(op OpCode, order, blockHeight uint64, blockHash common.Hash, timestamp uint64, txHash common.Hash, from, to common.Address, value *big.Int, input, output []byte, err error) *types.InternalTransaction
+	Publish(op OpCode, parentCounter, order, blockHeight uint64, blockHash common.Hash, timestamp uint64, txHash common.Hash, from, to common.Address, value *big.Int, input, output []byte, err error) *types.InternalTransaction
 }
 
 type (
@@ -647,7 +647,7 @@ func (evm *EVM) ChainConfig() *params.ChainConfig { return evm.chainConfig }
 // PublishEvent executes Publish function from OpEvent if OpCode is found in Context.PublishEvents
 func (evm *EVM) PublishEvent(
 	opCode OpCode,
-	counter uint64,
+	parentCounter, counter uint64,
 	from, to common.Address,
 	value *big.Int,
 	input, output []byte,
@@ -665,6 +665,7 @@ func (evm *EVM) PublishEvent(
 			*context.InternalTransactions,
 			event.Publish(
 				opCode,
+				parentCounter,
 				counter,
 				evm.Context.BlockNumber.Uint64(),
 				context.BlockHash,
