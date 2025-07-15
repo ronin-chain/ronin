@@ -252,11 +252,13 @@ func (s *StateDB) AddLog(log *types.Log) {
 	log.TxHash = s.thash
 	log.TxIndex = uint(s.txIndex)
 	log.Index = s.logSize
+
+	s.logs[s.thash] = append(s.logs[s.thash], log)
+	s.logSize++
+
 	if s.logger != nil && s.logger.OnLog != nil {
 		s.logger.OnLog(log)
 	}
-	s.logs[s.thash] = append(s.logs[s.thash], log)
-	s.logSize++
 }
 
 // GetLogs returns the logs matching the specified transaction hash, and annotates
@@ -830,8 +832,9 @@ func (s *StateDB) Copy() *StateDB {
 		// to the snapshot tree, we need to copy that as well. Otherwise, any
 		// block mined by ourselves will cause gaps in the tree, and force the
 		// miner to operate trie-backed only.
-		snaps: s.snaps,
-		snap:  s.snap,
+		snaps:  s.snaps,
+		snap:   s.snap,
+		logger: s.logger,
 	}
 	// Deep copy cached state objects.
 	for addr, obj := range s.stateObjects {

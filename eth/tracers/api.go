@@ -1180,6 +1180,9 @@ func (api *API) traceTx(
 		}
 	}
 
+	// Set the tracer for the stateDB
+	statedb.SetLogger(tracer.Hooks)
+
 	// Run the transaction with tracing enabled.
 	vmenv := vm.NewEVM(vmctx, txContext, statedb, api.backend.ChainConfig(), vm.Config{Tracer: tracer.Hooks, NoBaseFee: true})
 	if precompiles != nil {
