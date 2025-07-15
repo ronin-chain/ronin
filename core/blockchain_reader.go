@@ -528,7 +528,8 @@ type InternalTransactionEvent struct{}
 
 func (tx *InternalTransactionEvent) Publish(
 	opcode vm.OpCode,
-	order, blockHeight uint64,
+	parentOrder, order uint64,
+	blockHeight uint64,
 	blockHash common.Hash,
 	blockTime uint64,
 	hash common.Hash,
@@ -551,6 +552,7 @@ func (tx *InternalTransactionEvent) Publish(
 		Error:   "",
 		Output:  output,
 		InternalTransactionBody: &types.InternalTransactionBody{
+			ParentOrder:     parentOrder,
 			Order:           order,
 			TransactionHash: hash,
 			Value:           value,

@@ -185,6 +185,9 @@ type (
 
 	// BlockHashReadHook is called when EVM reads the blockhash of a block.
 	BlockHashReadHook = func(blockNumber uint64, hash common.Hash)
+
+	// GetParentOrder is called when the parent order is needed.
+	GetParentOrder = func() uint64
 )
 
 type Hooks struct {
@@ -215,6 +218,8 @@ type Hooks struct {
 	OnLog           LogHook
 	// Block hash read
 	OnBlockHashRead BlockHashReadHook
+	// Retrieve internal transaction information
+	GetParentOrder GetParentOrder
 }
 
 // BalanceChangeReason is used to indicate the reason for a balance change, useful

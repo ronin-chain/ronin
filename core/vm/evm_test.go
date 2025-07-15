@@ -15,7 +15,8 @@ type TestOpEvent struct{}
 
 func (tx *TestOpEvent) Publish(
 	opcode OpCode,
-	order, blockHeight uint64,
+	parentOrder, order uint64,
+	blockHeight uint64,
 	blockHash common.Hash,
 	blockTime uint64,
 	hash common.Hash,
@@ -31,6 +32,7 @@ func (tx *TestOpEvent) Publish(
 		Error:   "",
 		Output:  output,
 		InternalTransactionBody: &types.InternalTransactionBody{
+			ParentOrder:     parentOrder,
 			Order:           order,
 			TransactionHash: hash,
 			Value:           value,
@@ -64,7 +66,7 @@ func TestPublishEvents(t *testing.T) {
 
 	evm := &EVM{Context: ctx}
 	evm.SetPrecompiles(activePrecompiledContracts(evm.chainRules))
-	evm.PublishEvent(CALL, 1, common.Address{}, common.Address{}, big.NewInt(0), []byte(""), []byte(""), nil)
+	evm.PublishEvent(CALL, 0, 1, common.Address{}, common.Address{}, big.NewInt(0), []byte(""), []byte(""), nil)
 	if len(*evm.Context.InternalTransactions) != 1 || (*evm.Context.InternalTransactions)[0].Type != "test" {
 		t.Error("Failed to publish opcode event")
 	}
@@ -74,7 +76,8 @@ type InternalTransactionEvent struct{}
 
 func (tx *InternalTransactionEvent) Publish(
 	opcode OpCode,
-	order, blockHeight uint64,
+	parentOrder, order uint64,
+	blockHeight uint64,
 	blockHash common.Hash,
 	blockTime uint64,
 	hash common.Hash,
@@ -97,6 +100,7 @@ func (tx *InternalTransactionEvent) Publish(
 		Error:   "",
 		Output:  output,
 		InternalTransactionBody: &types.InternalTransactionBody{
+			ParentOrder:     parentOrder,
 			Order:           order,
 			TransactionHash: hash,
 			Value:           value,
