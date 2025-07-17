@@ -164,6 +164,8 @@ var (
 		utils.RinkebyFlag,
 		utils.GoerliFlag,
 		utils.VMEnableDebugFlag,
+		utils.VMTraceFlag,
+		utils.VMTraceConfigFlag,
 		utils.NetworkIdFlag,
 		utils.EthStatsURLFlag,
 		utils.FakePoWFlag,
