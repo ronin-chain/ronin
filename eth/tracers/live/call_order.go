@@ -6,7 +6,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/tracing"
-	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/eth/tracers"
 )
 
@@ -20,7 +19,6 @@ type callOrderFrame struct {
 
 type callTracerOrder struct {
 	noop
-	env       *vm.EVM
 	callstack []callOrderFrame
 }
 
@@ -35,9 +33,9 @@ func newCallTracerOrder(_ json.RawMessage) (*tracing.Hooks, error) {
 }
 
 // onEnter is called when EVM enters a new scope (via call, create or selfdestruct).
-func (t *callTracerOrder) onEnter(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int, _ uint64) {
+func (t *callTracerOrder) onEnter(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int, order uint64) {
 	call := callOrderFrame{
-		Order: t.env.Context.Counter,
+		Order: order,
 	}
 	t.callstack = append(t.callstack, call)
 }
