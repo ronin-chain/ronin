@@ -62,6 +62,18 @@ func (bc *BlockChain) FinalizedBlock() *types.Block {
 	return nil
 }
 
+func (bc *BlockChain) JustifiedBlock() *types.Block {
+	if consensusEngine, ok := bc.engine.(consensus.FastFinalityPoSA); ok {
+		currentBlock := bc.CurrentBlock()
+		justifiedNumber, justifiedHash := consensusEngine.GetJustifiedBlock(bc, currentBlock.NumberU64(), currentBlock.Hash())
+		if justifiedNumber == 0 {
+			return nil
+		}
+		return rawdb.ReadBlock(bc.db, justifiedHash, justifiedNumber)
+	}
+	return nil
+}
+
 func (bc *BlockChain) CurrentFinalBlock() *types.Header {
 	if finalizedBlock := bc.FinalizedBlock(); finalizedBlock != nil {
 		return finalizedBlock.Header()

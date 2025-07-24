@@ -550,6 +550,9 @@ func toBlockNumArg(number *big.Int) string {
 	if number.Cmp(big.NewInt(int64(rpc.FinalizedBlockNumber))) == 0 {
 		return "finalized"
 	}
+	if number.Cmp(big.NewInt(int64(rpc.JustifiedBlockNumber))) == 0 {
+		return "justified"
+	}
 	return hexutil.EncodeBig(number)
 }
 

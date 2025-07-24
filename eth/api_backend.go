@@ -84,6 +84,12 @@ func (b *EthAPIBackend) HeaderByNumber(ctx context.Context, number rpc.BlockNumb
 			return nil, errors.New("header not found")
 		}
 	}
+	if number == rpc.JustifiedBlockNumber {
+		justifiedBlock := b.eth.blockchain.JustifiedBlock()
+		if justifiedBlock != nil {
+			return justifiedBlock.Header(), nil
+		}
+	}
 
 	return b.eth.blockchain.GetHeaderByNumber(uint64(number)), nil
 }
@@ -121,6 +127,9 @@ func (b *EthAPIBackend) BlockByNumber(ctx context.Context, number rpc.BlockNumbe
 	}
 	if number == rpc.FinalizedBlockNumber {
 		return b.eth.blockchain.FinalizedBlock(), nil
+	}
+	if number == rpc.JustifiedBlockNumber {
+		return b.eth.blockchain.JustifiedBlock(), nil
 	}
 	return b.eth.blockchain.GetBlockByNumber(uint64(number)), nil
 }
@@ -213,6 +222,9 @@ func (b *EthAPIBackend) BlobSidecarsByNumber(ctx context.Context, number rpc.Blo
 	}
 	if number == rpc.FinalizedBlockNumber {
 		hash = b.eth.blockchain.FinalizedBlock().Hash()
+	}
+	if number == rpc.JustifiedBlockNumber {
+		hash = b.eth.blockchain.JustifiedBlock().Hash()
 	}
 	if hash != (common.Hash{}) {
 		b.eth.blockchain.GetBlobSidecarsByHash(hash)

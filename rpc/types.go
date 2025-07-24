@@ -58,6 +58,7 @@ type jsonWriter interface {
 type BlockNumber int64
 
 const (
+	JustifiedBlockNumber = BlockNumber(-4)
 	FinalizedBlockNumber = BlockNumber(-3)
 	PendingBlockNumber   = BlockNumber(-2)
 	LatestBlockNumber    = BlockNumber(-1)
@@ -86,6 +87,9 @@ func (bn *BlockNumber) UnmarshalJSON(data []byte) error {
 	case "pending":
 		*bn = PendingBlockNumber
 		return nil
+	case "justified":
+		*bn = JustifiedBlockNumber
+		return nil
 	case "finalized":
 		*bn = FinalizedBlockNumber
 		return nil
@@ -113,6 +117,8 @@ func (bn BlockNumber) MarshalText() ([]byte, error) {
 		return []byte("latest"), nil
 	case PendingBlockNumber:
 		return []byte("pending"), nil
+	case JustifiedBlockNumber:
+		return []byte("justified"), nil
 	case FinalizedBlockNumber:
 		return []byte("finalized"), nil
 	default:
@@ -159,6 +165,10 @@ func (bnh *BlockNumberOrHash) UnmarshalJSON(data []byte) error {
 		return nil
 	case "pending":
 		bn := PendingBlockNumber
+		bnh.BlockNumber = &bn
+		return nil
+	case "justified":
+		bn := JustifiedBlockNumber
 		bnh.BlockNumber = &bn
 		return nil
 	case "finalized":
