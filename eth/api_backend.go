@@ -221,10 +221,14 @@ func (b *EthAPIBackend) BlobSidecarsByNumber(ctx context.Context, number rpc.Blo
 		hash = b.eth.blockchain.CurrentBlock().Hash()
 	}
 	if number == rpc.FinalizedBlockNumber {
-		hash = b.eth.blockchain.FinalizedBlock().Hash()
+		if finalizedBlock := b.eth.blockchain.FinalizedBlock(); finalizedBlock != nil {
+			hash = finalizedBlock.Hash()
+		}
 	}
 	if number == rpc.JustifiedBlockNumber {
-		hash = b.eth.blockchain.JustifiedBlock().Hash()
+		if justifiedBlock := b.eth.blockchain.JustifiedBlock(); justifiedBlock != nil {
+			hash = justifiedBlock.Hash()
+		}
 	}
 	if hash != (common.Hash{}) {
 		b.eth.blockchain.GetBlobSidecarsByHash(hash)
