@@ -852,7 +852,9 @@ func TestDeriveLogFields(t *testing.T) {
 	// Derive log metadata fields
 	number := big.NewInt(1)
 	hash := common.BytesToHash([]byte{0x03, 0x14})
-	types.Receipts(receipts).DeriveFields(params.TestChainConfig, hash, number.Uint64(), 12, big.NewInt(0), txs)
+	blockTime := uint64(12)
+	blobGasPrice := big.NewInt(0)
+	types.Receipts(receipts).DeriveFields(params.TestChainConfig, hash, number.Uint64(), blockTime, blobGasPrice, txs)
 
 	// Iterate over all the computed fields and check that they're correct
 	logIndex := uint(0)
@@ -864,8 +866,8 @@ func TestDeriveLogFields(t *testing.T) {
 			if receipts[i].Logs[j].BlockHash != hash {
 				t.Errorf("receipts[%d].Logs[%d].BlockHash = %s, want %s", i, j, receipts[i].Logs[j].BlockHash.String(), hash.String())
 			}
-			if receipts[i].Logs[j].BlockTimestamp != 12 {
-				t.Errorf("receipts[%d].Logs[%d].BlockTimestamp = %d, want %d", i, j, receipts[i].Logs[j].BlockTimestamp, 12)
+			if receipts[i].Logs[j].BlockTimestamp != blockTime {
+				t.Errorf("receipts[%d].Logs[%d].BlockTimestamp = %d, want %d", i, j, receipts[i].Logs[j].BlockTimestamp, blockTime)
 			}
 			if receipts[i].Logs[j].TxHash != txs[i].Hash() {
 				t.Errorf("receipts[%d].Logs[%d].TxHash = %s, want %s", i, j, receipts[i].Logs[j].TxHash.String(), txs[i].Hash().String())

@@ -359,6 +359,9 @@ func TestDeriveFields(t *testing.T) {
 			if receipts[i].Logs[j].BlockHash != hash {
 				t.Errorf("receipts[%d].Logs[%d].BlockHash = %s, want %s", i, j, receipts[i].Logs[j].BlockHash.String(), hash.String())
 			}
+			if receipts[i].Logs[j].BlockTimestamp != blockTime {
+				t.Errorf("receipts[%d].Logs[%d].BlockTimestamp = %d, want %d", i, j, receipts[i].Logs[j].BlockTimestamp, blockTime)
+			}
 			if receipts[i].Logs[j].TxHash != txs[i].Hash() {
 				t.Errorf("receipts[%d].Logs[%d].TxHash = %s, want %s", i, j, receipts[i].Logs[j].TxHash.String(), txs[i].Hash().String())
 			}
