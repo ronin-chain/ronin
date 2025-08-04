@@ -577,11 +577,7 @@ func (test *snapshotTest) checkEqual(state, checkstate *StateDB) error {
 		return fmt.Errorf("got GetLogs(common.Hash{}) == %v, want GetLogs(common.Hash{}) == %v",
 			state.GetLogs(common.Hash{}, 0, common.Hash{}, 0), checkstate.GetLogs(common.Hash{}, 0, common.Hash{}, 0))
 	}
-
-	if !reflect.DeepEqual(state.GetLogs(common.Hash{}, 0, common.Hash{}, 0), checkstate.GetLogs(common.Hash{}, 0, common.Hash{}, 0)) {
-		return fmt.Errorf("got GetLogs(common.Hash{}) == %v, want GetLogs(common.Hash{}) == %v",
-			state.GetLogs(common.Hash{}, 0, common.Hash{}, 0), checkstate.GetLogs(common.Hash{}, 0, common.Hash{}, 0))
-	}
+	
 	if !maps.Equal(state.journal.dirties, checkstate.journal.dirties) {
 		getKeys := func(dirty map[common.Address]int) string {
 			var keys []common.Address
