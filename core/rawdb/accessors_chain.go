@@ -602,8 +602,8 @@ func ReadRawReceipts(db ethdb.Reader, hash common.Hash, number uint64) types.Rec
 // fields then nil is returned.
 //
 // The current implementation populates these metadata fields by reading the receipts'
-// corresponding block body, so if the block body is not found it will return nil even
-// if the receipt itself is stored.
+// corresponding block body, block header, so if the block body or block header is not
+// found it will return nil even if the receipt itself is stored.
 func ReadReceipts(db ethdb.Reader, hash common.Hash, number uint64, config *params.ChainConfig) types.Receipts {
 	// We're deriving many fields from the block body, retrieve beside the receipt
 	receipts := ReadRawReceipts(db, hash, number)
@@ -706,8 +706,8 @@ func deriveLogFields(receipts []*receiptLogs, hash common.Hash, number, time uin
 }
 
 // ReadLogs retrieves the logs for all transactions in a block. The log fields
-// are populated with metadata. In case the receipts or the block body
-// are not found, a nil is returned.
+// are populated with metadata. In case the receipts or the block body, or the
+// block header are not found, a nil is returned.
 func ReadLogs(db ethdb.Reader, hash common.Hash, number uint64, config *params.ChainConfig) [][]*types.Log {
 	// Retrieve the flattened receipt slice
 	data := ReadReceiptsRLP(db, hash, number)
