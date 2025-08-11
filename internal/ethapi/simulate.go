@@ -186,7 +186,6 @@ func (sim *simulator) execute(ctx context.Context, blocks []simBlock) ([]*simBlo
 		cancel  context.CancelFunc
 		timeout = sim.b.RPCEVMTimeout()
 	)
-	timeout = 0
 	if timeout > 0 {
 		ctx, cancel = context.WithTimeout(ctx, timeout)
 	} else {
