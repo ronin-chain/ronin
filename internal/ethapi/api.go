@@ -1784,15 +1784,6 @@ func AccessList(ctx context.Context, b Backend, blockNrOrHash rpc.BlockNumberOrH
 		config := vm.Config{Tracer: tracer.Hooks(), Debug: true, NoBaseFee: true}
 		vmenv, _, err := b.GetEVM(ctx, msg, statedb, header, &config, nil)
 
-		// Lower the basefee to 0 to avoid breaking EVM
-		// invariants (basefee < feecap).
-		if msg.GasPrice.Sign() == 0 {
-			vmenv.Context.BaseFee = new(big.Int)
-		}
-		if msg.BlobGasFeeCap != nil && msg.BlobGasFeeCap.BitLen() == 0 {
-			vmenv.Context.BlobBaseFee = new(big.Int)
-		}
-
 		if err != nil {
 			return nil, 0, nil, err
 		}
