@@ -36,6 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/ethereum/go-ethereum/trie"
 )
 
 const (
@@ -285,7 +286,6 @@ func (sim *simulator) processBlock(ctx context.Context, block *simBlock, header,
 	// 	core.ProcessParentBlockHash(header.ParentHash, evm)
 	// }
 
-	var allLogs []*types.Log
 	for i, call := range block.Calls {
 		if err := ctx.Err(); err != nil {
 			return nil, nil, nil, err
@@ -334,20 +334,16 @@ func (sim *simulator) processBlock(ctx context.Context, block *simBlock, header,
 			}
 		} else {
 			callRes.Status = hexutil.Uint64(types.ReceiptStatusSuccessful)
-			allLogs = append(allLogs, callRes.Logs...)
 		}
 		callResults[i] = callRes
 	}
+	header.Root = sim.state.IntermediateRoot(sim.chainConfig.IsEIP158(header.Number))
 	header.GasUsed = gasUsed
 	if sim.chainConfig.IsCancun(header.Number) {
 		header.BlobGasUsed = &blobGasUsed
 	}
 
-	chainHeadReader := &simChainHeadReader{ctx, sim.b}
-	b, _, err := sim.b.Engine().FinalizeAndAssemble(chainHeadReader, header, sim.state, txes, nil, receipts)
-	if err != nil {
-		return nil, nil, nil, err
-	}
+	b := types.NewBlock(header, txes, nil, receipts, trie.NewStackTrie(nil))
 	repairLogs(callResults, b.Hash())
 	return b, callResults, senders, nil
 }
