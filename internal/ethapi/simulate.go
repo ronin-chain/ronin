@@ -281,10 +281,9 @@ func (sim *simulator) processBlock(ctx context.Context, block *simBlock, header,
 	if precompiles != nil {
 		evm.SetPrecompiles(precompiles)
 	}
-	// TODO(kuro): enable this after Prague is merged
-	// if sim.chainConfig.IsPrague(header.Number, header.Time) || sim.chainConfig.IsVerkle(header.Number, header.Time) {
-	// 	core.ProcessParentBlockHash(header.ParentHash, evm)
-	// }
+	if sim.chainConfig.IsKotaro(header.Number) {
+		core.ProcessParentBlockHash(header.ParentHash, evm)
+	}
 
 	for i, call := range block.Calls {
 		if err := ctx.Err(); err != nil {
