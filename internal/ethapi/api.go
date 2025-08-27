@@ -1144,7 +1144,7 @@ func doCall(
 		&blockCtx,
 		&vm.Config{NoBaseFee: true},
 		precompiles,
-		false,
+		true,
 	)
 }
 
