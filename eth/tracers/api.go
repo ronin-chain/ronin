@@ -1122,7 +1122,7 @@ func (api *API) TraceCall(ctx context.Context, args ethapi.TransactionArgs, bloc
 	if err := args.CallDefaults(api.backend.RPCGasCap(), vmctx.BaseFee, api.backend.ChainConfig().ChainID); err != nil {
 		return nil, err
 	}
-	msg := args.ToMessage(api.backend.RPCGasCap(), block.BaseFee())
+	msg := args.ToMessage(api.backend.RPCGasCap(), block.BaseFee(), true)
 
 	// Lower the basefee to 0 to avoid breaking EVM
 	// invariants (basefee < feecap).
