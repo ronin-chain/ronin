@@ -300,9 +300,7 @@ func (sim *simulator) processBlock(ctx context.Context, block *simBlock, header,
 		senders[txHash] = call.from()
 		tracer.reset(txHash, uint(i))
 		sim.state.SetTxContext(txHash, i)
-		// EoA check is always skipped, even in validation mode.
 		msg := call.ToMessage(sim.base.GasLimit, header.BaseFee, !sim.validate)
-		msg.SkipAccountChecks = !sim.validate
 
 		evm.TxContext = core.NewEVMTxContext(msg)
 		result, err := applyMessageWithEVM(ctx, evm, msg, timeout, sim.gp)
