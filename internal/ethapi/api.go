@@ -1175,7 +1175,7 @@ func applyMessage(
 	if msg.BlobGasFeeCap != nil && msg.BlobGasFeeCap.BitLen() == 0 {
 		blockContext.BlobBaseFee = new(big.Int)
 	}
-	evm, vmError, err := b.GetEVM(ctx, msg, state, header, &vm.Config{NoBaseFee: true}, blockContext)
+	evm, vmError, err := b.GetEVM(ctx, msg, state, header, vmConfig, blockContext)
 	if err != nil {
 		return nil, err
 	}
