@@ -196,6 +196,10 @@ func Estimate(ctx context.Context, call *core.Message, opts *Options, gasCap uin
 // not enough gas. A non-nil error means execution failed due to reasons unrelated
 // to the gas limit.
 func execute(ctx context.Context, msg *core.Message, opts *Options, gasLimit uint64) (bool, *core.ExecutionResult, error) {
+	// Configure the call for this specific execution (and revert the change after)
+	defer func(gas uint64) { msg.GasLimit = gas }(msg.GasLimit)
+	msg.GasLimit = gasLimit
+
 	// Execute the call and separate execution faults caused by a lack of gas or
 	// other non-fixable conditions
 	result, err := run(ctx, msg, opts)
