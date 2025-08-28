@@ -61,7 +61,7 @@ type TransactionArgs struct {
 
 	// Introduced by BlobTxType transaction
 	BlobFeeCap *hexutil.Big  `json:"maxFeePerBlobGas,omitempty"`
-	BlobHashes []common.Hash `json:"blobVersionHashes,omitempty"`
+	BlobHashes []common.Hash `json:"blobVersionedHashes,omitempty"`
 
 	Blobs       []kzg4844.Blob       `json:"blobs"`
 	Commitments []kzg4844.Commitment `json:"commitments"`
