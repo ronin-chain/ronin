@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
 	"gopkg.in/yaml.v2"
@@ -175,7 +176,7 @@ func (s *shadowSwitch) updateValidatorSet() {
 	// inserting the new validators
 	for i, val := range s.NewValidators {
 		// add balance for consensus address
-		s.state.AddBalance(common.HexToAddress(val.ConsensusAddr.Hex()), amount)
+		s.state.AddBalance(common.HexToAddress(val.ConsensusAddr.Hex()), amount, tracing.BalanceChangeUnspecified)
 		// update _candidateIds: []address
 		iloc := state.GetLocDynamicArrAtElement(candidateIdsLoc, uint64(i), 1)
 		s.state.SetState(s.ValidatorSetAddress, iloc, val.ConsensusAddr)
@@ -199,7 +200,7 @@ func (s *shadowSwitch) updateProfile() {
 	amount := new(big.Int).Mul(big.NewInt(1e18), s.BlankWalletBalance)
 	for _, val := range s.NewValidators {
 		// add balance for admin address
-		s.state.AddBalance(common.HexToAddress(val.AdminAddr.Hex()), amount)
+		s.state.AddBalance(common.HexToAddress(val.AdminAddr.Hex()), amount, tracing.BalanceChangeUnspecified)
 		// update _id2Profile: mapping[address] => CandidateProfile
 		profileLoc := state.GetLocMappingAtKey(val.ConsensusAddr, s.ProfileStoragesSlot.Id2ProfileSlot)
 		s.updateCandidateProfile(profileLoc, &val.CandidateProfile)
@@ -281,7 +282,7 @@ func (s *shadowSwitch) updateTrustedOrg() {
 		// only update new trusted orgs with the first 6 validators.
 		if i < int(NumberOfTrustedOrgs) {
 			// add balance for governor address
-			s.state.AddBalance(common.HexToAddress(val.GovernorAddr.Hex()), amount)
+			s.state.AddBalance(common.HexToAddress(val.GovernorAddr.Hex()), amount, tracing.BalanceChangeUnspecified)
 			// update _consensusList: []TConsensus
 			cLoc := state.GetLocDynamicArrAtElement(consensusLoc, uint64(i), 1)
 			s.state.SetState(s.TrustedOrgAddress, cLoc, val.ConsensusAddr)
@@ -314,7 +315,7 @@ func (s *shadowSwitch) createBlankWallets() {
 	// We add a balance of `BlankWalletBalance` RON to each blank wallet.
 	amount := new(big.Int).Mul(big.NewInt(1e18), s.BlankWalletBalance)
 	for _, w := range s.NewBlankWallets {
-		s.state.AddBalance(w.WalletAddr, amount)
+		s.state.AddBalance(w.WalletAddr, amount, tracing.BalanceChangeUnspecified)
 	}
 }
 

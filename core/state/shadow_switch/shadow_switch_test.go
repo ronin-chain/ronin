@@ -11,6 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
 )
@@ -296,7 +297,7 @@ func TestAddBalanceToBlankWallet(t *testing.T) {
 	assert.Equal(t, 10, len(s.NewBlankWallets))
 
 	for _, w := range s.NewBlankWallets {
-		s.state.AddBalance(w.WalletAddr, s.BlankWalletBalance)
+		s.state.AddBalance(w.WalletAddr, s.BlankWalletBalance, tracing.BalanceChangeUnspecified)
 	}
 
 	for i := range s.NewBlankWallets {
