@@ -645,9 +645,9 @@ func (evm *EVM) resolveCodeHash(addr common.Address) common.Hash {
 func (evm *EVM) ChainConfig() *params.ChainConfig { return evm.chainConfig }
 
 // PublishEvent executes Publish function from OpEvent if OpCode is found in Context.PublishEvents
-func (evm *EVM) PublishEvent(
+func (evm *EVM) publishEvent(
 	opCode OpCode,
-	parentCounter, counter uint64,
+	counter uint64,
 	from, to common.Address,
 	value *big.Int,
 	input, output []byte,
@@ -661,6 +661,12 @@ func (evm *EVM) PublishEvent(
 	if event, ok := evm.Context.PublishEvents[opCode]; ok {
 		txHash := context.CurrentTransaction.Hash()
 		log.Debug("[EVM] PublishEvent", "transaction", txHash.Hex(), "opCode", opCode.String(), "from", from.Hash().Hex())
+		parentCounter := uint64(0)
+		if tracer := evm.Config.Tracer; tracer != nil {
+			if tracer.GetParentOrder != nil {
+				parentCounter = tracer.GetParentOrder()
+			}
+		}
 		*context.InternalTransactions = append(
 			*context.InternalTransactions,
 			event.Publish(

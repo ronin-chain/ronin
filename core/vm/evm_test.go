@@ -66,7 +66,7 @@ func TestPublishEvents(t *testing.T) {
 
 	evm := &EVM{Context: ctx}
 	evm.SetPrecompiles(activePrecompiledContracts(evm.chainRules))
-	evm.PublishEvent(CALL, 0, 1, common.Address{}, common.Address{}, big.NewInt(0), []byte(""), []byte(""), nil)
+	evm.publishEvent(CALL, 1, common.Address{}, common.Address{}, big.NewInt(0), []byte(""), []byte(""), nil)
 	if len(*evm.Context.InternalTransactions) != 1 || (*evm.Context.InternalTransactions)[0].Type != "test" {
 		t.Error("Failed to publish opcode event")
 	}
