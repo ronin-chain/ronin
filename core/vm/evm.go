@@ -23,6 +23,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/vm/tracer"
 	"github.com/ethereum/go-ethereum/log"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -159,7 +160,8 @@ type EVM struct {
 
 	precompiles PrecompiledContracts
 
-	evmHook EVMHook
+	evmHook           EVMHook
+	callStackRecorder *tracer.CallStackRecorder
 }
 
 type EVMHook interface {
@@ -170,13 +172,16 @@ type EVMHook interface {
 // NewEVM returns a new EVM. The returned EVM is not thread safe and should
 // only ever be used *once*.
 func NewEVM(blockCtx BlockContext, txCtx TxContext, statedb StateDB, chainConfig *params.ChainConfig, config Config) *EVM {
+	callStackRecorder, decoratedTracer := tracer.NewCallTracerOrder(config.Tracer)
+	config.Tracer = decoratedTracer
 	evm := &EVM{
-		Context:     blockCtx,
-		TxContext:   txCtx,
-		StateDB:     statedb,
-		Config:      config,
-		chainConfig: chainConfig,
-		chainRules:  chainConfig.Rules(blockCtx.BlockNumber),
+		Context:           blockCtx,
+		TxContext:         txCtx,
+		StateDB:           statedb,
+		Config:            config,
+		chainConfig:       chainConfig,
+		chainRules:        chainConfig.Rules(blockCtx.BlockNumber),
+		callStackRecorder: callStackRecorder,
 	}
 	evm.precompiles = activePrecompiledContracts(evm.chainRules)
 	evm.interpreter = NewEVMInterpreter(evm, config)
@@ -661,17 +666,11 @@ func (evm *EVM) publishEvent(
 	if event, ok := evm.Context.PublishEvents[opCode]; ok {
 		txHash := context.CurrentTransaction.Hash()
 		log.Debug("[EVM] PublishEvent", "transaction", txHash.Hex(), "opCode", opCode.String(), "from", from.Hash().Hex())
-		parentCounter := uint64(0)
-		if tracer := evm.Config.Tracer; tracer != nil {
-			if tracer.GetParentOrder != nil {
-				parentCounter = tracer.GetParentOrder()
-			}
-		}
 		*context.InternalTransactions = append(
 			*context.InternalTransactions,
 			event.Publish(
 				opCode,
-				parentCounter,
+				evm.callStackRecorder.GetParentOrder(),
 				counter,
 				evm.Context.BlockNumber.Uint64(),
 				context.BlockHash,
