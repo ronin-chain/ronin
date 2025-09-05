@@ -2,29 +2,53 @@ package tracer
 
 import (
 	"math/big"
+	"sync"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/tracing"
 )
 
-type CallStackRecorder struct {
+var (
+	callStackRecorderInit sync.Once
+	recorder              *callStackRecorder
+)
+
+func WithTracer(hooks *tracing.Hooks) *tracing.Hooks {
+	callStackRecorderInit.Do(func() {
+		recorder = newRecorder()
+	})
+	return recorder.withHooks(hooks)
+}
+
+func GetParentOrder() uint64 {
+	if recorder == nil {
+		return 0
+	}
+	return recorder.getParentOrder()
+}
+
+type callStackRecorder struct {
 	hooks  *tracing.Hooks
 	orders []uint64
 }
 
-func NewCallTracerOrder(hooks *tracing.Hooks) (*CallStackRecorder, *tracing.Hooks) {
-	t := &CallStackRecorder{orders: make([]uint64, 1), hooks: hooks}
+func newRecorder() *callStackRecorder {
+	return &callStackRecorder{orders: make([]uint64, 1)}
+}
+
+func (c *callStackRecorder) withHooks(hooks *tracing.Hooks) *tracing.Hooks {
+	c.hooks = hooks
 	if hooks == nil {
-		return t, &tracing.Hooks{
-			OnEnter: t.onEnter,
-			OnExit:  t.onExit,
+		return &tracing.Hooks{
+			OnEnter: c.onEnter,
+			OnExit:  c.onExit,
 		}
 	}
-	return t, &tracing.Hooks{
+	return &tracing.Hooks{
 		OnTxStart:           hooks.OnTxStart,
 		OnTxEnd:             hooks.OnTxEnd,
-		OnEnter:             t.onEnter,
-		OnExit:              t.onExit,
+		OnEnter:             c.onEnter,
+		OnExit:              c.onExit,
 		OnOpcode:            hooks.OnOpcode,
 		OnFault:             hooks.OnFault,
 		OnGasChange:         hooks.OnGasChange,
@@ -48,29 +72,29 @@ func NewCallTracerOrder(hooks *tracing.Hooks) (*CallStackRecorder, *tracing.Hook
 	}
 }
 
-func (t *CallStackRecorder) onEnter(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int, order uint64) {
-	t.orders = append(t.orders, order)
+func (c *callStackRecorder) onEnter(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int, order uint64) {
+	c.orders = append(c.orders, order)
 	// call underlying hooks if any
-	if t.hooks != nil {
-		t.hooks.OnEnter(depth, typ, from, to, input, gas, value, order)
+	if c.hooks != nil {
+		c.hooks.OnEnter(depth, typ, from, to, input, gas, value, order)
 	}
 }
 
-func (t *CallStackRecorder) onExit(depth int, output []byte, gasUsed uint64, err error, reverted bool) {
-	size := len(t.orders)
+func (c *callStackRecorder) onExit(depth int, output []byte, gasUsed uint64, err error, reverted bool) {
+	size := len(c.orders)
 	if size <= 1 {
 		return
 	}
 	// pop call
-	t.orders = t.orders[:size-1]
-	if t.hooks != nil {
-		t.hooks.OnExit(depth, output, gasUsed, err, reverted)
+	c.orders = c.orders[:size-1]
+	if c.hooks != nil {
+		c.hooks.OnExit(depth, output, gasUsed, err, reverted)
 	}
 }
 
-func (t *CallStackRecorder) GetParentOrder() uint64 {
-	if len(t.orders) <= 1 {
+func (c *callStackRecorder) getParentOrder() uint64 {
+	if len(c.orders) <= 1 {
 		return 0
 	}
-	return t.orders[len(t.orders)-2]
+	return c.orders[len(c.orders)-2]
 }
