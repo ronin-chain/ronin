@@ -217,6 +217,8 @@ func ActivePrecompiles(rules params.Rules) []common.Address {
 
 func activePrecompiledContracts(rules params.Rules) PrecompiledContracts {
 	switch {
+	case rules.IsKotaro:
+		return PrecompiledContractsPrague
 	case rules.IsCancun:
 		return PrecompiledContractsCancun
 	case rules.IsBerlin:
