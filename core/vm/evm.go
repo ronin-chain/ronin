@@ -172,17 +172,15 @@ type EVMHook interface {
 // NewEVM returns a new EVM. The returned EVM is not thread safe and should
 // only ever be used *once*.
 func NewEVM(blockCtx BlockContext, txCtx TxContext, statedb StateDB, chainConfig *params.ChainConfig, config Config) *EVM {
-	callStackRecorder, decoratedTracer := tracer.NewCallTracerOrder(config.Tracer)
-	config.Tracer = decoratedTracer
 	evm := &EVM{
-		Context:           blockCtx,
-		TxContext:         txCtx,
-		StateDB:           statedb,
-		Config:            config,
-		chainConfig:       chainConfig,
-		chainRules:        chainConfig.Rules(blockCtx.BlockNumber),
-		callStackRecorder: callStackRecorder,
+		Context:     blockCtx,
+		TxContext:   txCtx,
+		StateDB:     statedb,
+		Config:      config,
+		chainConfig: chainConfig,
+		chainRules:  chainConfig.Rules(blockCtx.BlockNumber),
 	}
+	evm.callStackRecorder, evm.Config.Tracer = tracer.NewCallTracerOrder(config.Tracer)
 	evm.precompiles = activePrecompiledContracts(evm.chainRules)
 	evm.interpreter = NewEVMInterpreter(evm, config)
 	return evm
