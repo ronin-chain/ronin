@@ -24,14 +24,14 @@ func NewTracer(hooks *tracing.Hooks) (*CallStackRecorder, *tracing.Hooks) {
 }
 
 func (c *CallStackRecorder) onEnter(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int, order uint64) {
-	if c.hooks != nil {
+	if c.hooks != nil && c.hooks.OnEnter != nil {
 		c.hooks.OnEnter(depth, typ, from, to, input, gas, value, order)
 	}
 	c.orders = append(c.orders, order)
 }
 
 func (c *CallStackRecorder) onExit(depth int, output []byte, gasUsed uint64, err error, reverted bool) {
-	if c.hooks != nil {
+	if c.hooks != nil && c.hooks.OnExit != nil {
 		c.hooks.OnExit(depth, output, gasUsed, err, reverted)
 	}
 	size := len(c.orders)
@@ -43,7 +43,7 @@ func (c *CallStackRecorder) onExit(depth int, output []byte, gasUsed uint64, err
 }
 
 func (c *CallStackRecorder) GetParentOrder() uint64 {
-	if len(c.orders) <= 1 {
+	if c == nil || len(c.orders) <= 1 {
 		return 0
 	}
 	return c.orders[len(c.orders)-2]
