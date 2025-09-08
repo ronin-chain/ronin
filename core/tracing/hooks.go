@@ -217,6 +217,38 @@ type Hooks struct {
 	OnBlockHashRead BlockHashReadHook
 }
 
+func (h *Hooks) Clone() *Hooks {
+	return &Hooks{
+		// VM events
+		OnTxStart:   h.OnTxStart,
+		OnTxEnd:     h.OnTxEnd,
+		OnEnter:     h.OnEnter,
+		OnExit:      h.OnExit,
+		OnOpcode:    h.OnOpcode,
+		OnFault:     h.OnFault,
+		OnGasChange: h.OnGasChange,
+		// Chain events
+		OnBlockchainInit:    h.OnBlockchainInit,
+		OnClose:             h.OnClose,
+		OnBlockStart:        h.OnBlockStart,
+		OnBlockEnd:          h.OnBlockEnd,
+		OnSkippedBlock:      h.OnSkippedBlock,
+		OnGenesisBlock:      h.OnGenesisBlock,
+		OnSystemCallStart:   h.OnSystemCallStart,
+		OnSystemCallStartV2: h.OnSystemCallStartV2,
+		OnSystemCallEnd:     h.OnSystemCallEnd,
+		// State events
+		OnBalanceChange: h.OnBalanceChange,
+		OnNonceChange:   h.OnNonceChange,
+		OnNonceChangeV2: h.OnNonceChangeV2,
+		OnCodeChange:    h.OnCodeChange,
+		OnStorageChange: h.OnStorageChange,
+		OnLog:           h.OnLog,
+		// Block hash read
+		OnBlockHashRead: h.OnBlockHashRead,
+	}
+}
+
 // BalanceChangeReason is used to indicate the reason for a balance change, useful
 // for tracing and reporting.
 type BalanceChangeReason byte

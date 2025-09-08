@@ -14,37 +14,13 @@ type CallStackRecorder struct {
 
 func NewTracer(hooks *tracing.Hooks) (*CallStackRecorder, *tracing.Hooks) {
 	t := &CallStackRecorder{orders: make([]uint64, 1), hooks: hooks}
-	if hooks == nil {
-		return t, &tracing.Hooks{
-			OnEnter: t.onEnter,
-			OnExit:  t.onExit,
-		}
+	wrapped := &tracing.Hooks{}
+	if hooks != nil {
+		wrapped = hooks.Clone()
 	}
-	return t, &tracing.Hooks{
-		OnTxStart:           hooks.OnTxStart,
-		OnTxEnd:             hooks.OnTxEnd,
-		OnEnter:             t.onEnter,
-		OnExit:              t.onExit,
-		OnOpcode:            hooks.OnOpcode,
-		OnFault:             hooks.OnFault,
-		OnGasChange:         hooks.OnGasChange,
-		OnBlockchainInit:    hooks.OnBlockchainInit,
-		OnClose:             hooks.OnClose,
-		OnBlockStart:        hooks.OnBlockStart,
-		OnBlockEnd:          hooks.OnBlockEnd,
-		OnSkippedBlock:      hooks.OnSkippedBlock,
-		OnGenesisBlock:      hooks.OnGenesisBlock,
-		OnSystemCallStart:   hooks.OnSystemCallEnd,
-		OnSystemCallStartV2: hooks.OnSystemCallStartV2,
-		OnSystemCallEnd:     hooks.OnSystemCallEnd,
-		OnBalanceChange:     hooks.OnBalanceChange,
-		OnNonceChange:       hooks.OnNonceChange,
-		OnNonceChangeV2:     hooks.OnNonceChangeV2,
-		OnCodeChange:        hooks.OnCodeChange,
-		OnStorageChange:     hooks.OnStorageChange,
-		OnLog:               hooks.OnLog,
-		OnBlockHashRead:     hooks.OnBlockHashRead,
-	}
+	wrapped.OnEnter = t.onEnter
+	wrapped.OnExit = t.onExit
+	return t, wrapped
 }
 
 func (c *CallStackRecorder) onEnter(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int, order uint64) {
