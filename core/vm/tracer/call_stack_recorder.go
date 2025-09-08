@@ -12,7 +12,7 @@ type CallStackRecorder struct {
 	orders []uint64
 }
 
-func NewCallTracerOrder(hooks *tracing.Hooks) (*CallStackRecorder, *tracing.Hooks) {
+func NewTracer(hooks *tracing.Hooks) (*CallStackRecorder, *tracing.Hooks) {
 	t := &CallStackRecorder{orders: make([]uint64, 1), hooks: hooks}
 	if hooks == nil {
 		return t, &tracing.Hooks{
@@ -47,28 +47,28 @@ func NewCallTracerOrder(hooks *tracing.Hooks) (*CallStackRecorder, *tracing.Hook
 	}
 }
 
-func (t *CallStackRecorder) onEnter(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int, order uint64) {
-	if t.hooks != nil {
-		t.hooks.OnEnter(depth, typ, from, to, input, gas, value, order)
+func (c *CallStackRecorder) onEnter(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int, order uint64) {
+	if c.hooks != nil {
+		c.hooks.OnEnter(depth, typ, from, to, input, gas, value, order)
 	}
-	t.orders = append(t.orders, order)
+	c.orders = append(c.orders, order)
 }
 
-func (t *CallStackRecorder) onExit(depth int, output []byte, gasUsed uint64, err error, reverted bool) {
-	if t.hooks != nil {
-		t.hooks.OnExit(depth, output, gasUsed, err, reverted)
+func (c *CallStackRecorder) onExit(depth int, output []byte, gasUsed uint64, err error, reverted bool) {
+	if c.hooks != nil {
+		c.hooks.OnExit(depth, output, gasUsed, err, reverted)
 	}
-	size := len(t.orders)
+	size := len(c.orders)
 	if size <= 1 {
 		return
 	}
 	// pop call
-	t.orders = t.orders[:size-1]
+	c.orders = c.orders[:size-1]
 }
 
-func (t *CallStackRecorder) GetParentOrder() uint64 {
-	if len(t.orders) <= 1 {
+func (c *CallStackRecorder) GetParentOrder() uint64 {
+	if len(c.orders) <= 1 {
 		return 0
 	}
-	return t.orders[len(t.orders)-2]
+	return c.orders[len(c.orders)-2]
 }

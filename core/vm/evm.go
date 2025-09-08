@@ -180,7 +180,7 @@ func NewEVM(blockCtx BlockContext, txCtx TxContext, statedb StateDB, chainConfig
 		chainConfig: chainConfig,
 		chainRules:  chainConfig.Rules(blockCtx.BlockNumber),
 	}
-	evm.callStackRecorder, evm.Config.Tracer = tracer.NewCallTracerOrder(config.Tracer)
+	evm.callStackRecorder, evm.Config.Tracer = tracer.NewTracer(config.Tracer)
 	evm.precompiles = activePrecompiledContracts(evm.chainRules)
 	evm.interpreter = NewEVMInterpreter(evm, config)
 	return evm
