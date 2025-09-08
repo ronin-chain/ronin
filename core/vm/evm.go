@@ -160,7 +160,8 @@ type EVM struct {
 
 	precompiles PrecompiledContracts
 
-	evmHook EVMHook
+	evmHook           EVMHook
+	callStackRecorder *tracer.CallStackRecorder
 }
 
 type EVMHook interface {
@@ -171,14 +172,16 @@ type EVMHook interface {
 // NewEVM returns a new EVM. The returned EVM is not thread safe and should
 // only ever be used *once*.
 func NewEVM(blockCtx BlockContext, txCtx TxContext, statedb StateDB, chainConfig *params.ChainConfig, config Config) *EVM {
-	config.Tracer = tracer.WithTracer(config.Tracer)
+	callStackRecorder, decoratedTracer := tracer.NewCallTracerOrder(config.Tracer)
+	config.Tracer = decoratedTracer
 	evm := &EVM{
-		Context:     blockCtx,
-		TxContext:   txCtx,
-		StateDB:     statedb,
-		Config:      config,
-		chainConfig: chainConfig,
-		chainRules:  chainConfig.Rules(blockCtx.BlockNumber),
+		Context:           blockCtx,
+		TxContext:         txCtx,
+		StateDB:           statedb,
+		Config:            config,
+		chainConfig:       chainConfig,
+		chainRules:        chainConfig.Rules(blockCtx.BlockNumber),
+		callStackRecorder: callStackRecorder,
 	}
 	evm.precompiles = activePrecompiledContracts(evm.chainRules)
 	evm.interpreter = NewEVMInterpreter(evm, config)
@@ -667,7 +670,7 @@ func (evm *EVM) publishEvent(
 			*context.InternalTransactions,
 			event.Publish(
 				opCode,
-				tracer.GetParentOrder(),
+				evm.callStackRecorder.GetParentOrder(),
 				counter,
 				evm.Context.BlockNumber.Uint64(),
 				context.BlockHash,
