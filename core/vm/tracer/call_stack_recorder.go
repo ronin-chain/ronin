@@ -48,23 +48,22 @@ func NewCallTracerOrder(hooks *tracing.Hooks) (*CallStackRecorder, *tracing.Hook
 }
 
 func (t *CallStackRecorder) onEnter(depth int, typ byte, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int, order uint64) {
-	t.orders = append(t.orders, order)
-	// call underlying hooks if any
 	if t.hooks != nil {
 		t.hooks.OnEnter(depth, typ, from, to, input, gas, value, order)
 	}
+	t.orders = append(t.orders, order)
 }
 
 func (t *CallStackRecorder) onExit(depth int, output []byte, gasUsed uint64, err error, reverted bool) {
+	if t.hooks != nil {
+		t.hooks.OnExit(depth, output, gasUsed, err, reverted)
+	}
 	size := len(t.orders)
 	if size <= 1 {
 		return
 	}
 	// pop call
 	t.orders = t.orders[:size-1]
-	if t.hooks != nil {
-		t.hooks.OnExit(depth, output, gasUsed, err, reverted)
-	}
 }
 
 func (t *CallStackRecorder) GetParentOrder() uint64 {
