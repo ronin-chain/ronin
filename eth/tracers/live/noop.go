@@ -41,7 +41,6 @@ func newNoopTracer(_ json.RawMessage) (*tracing.Hooks, error) {
 		OnCodeChange:     t.OnCodeChange,
 		OnStorageChange:  t.OnStorageChange,
 		OnLog:            t.OnLog,
-		GetParentOrder:   t.GetParentOrder,
 	}, nil
 }
 
@@ -94,8 +93,4 @@ func (t *noop) OnLog(l *types.Log) {
 }
 
 func (t *noop) OnGasChange(old, new uint64, reason tracing.GasChangeReason) {
-}
-
-func (t *noop) GetParentOrder() uint64 {
-	return 0
 }

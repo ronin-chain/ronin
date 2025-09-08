@@ -44,7 +44,6 @@ func NewCallTracerOrder(hooks *tracing.Hooks) (*CallStackRecorder, *tracing.Hook
 		OnStorageChange:     hooks.OnStorageChange,
 		OnLog:               hooks.OnLog,
 		OnBlockHashRead:     hooks.OnBlockHashRead,
-		GetParentOrder:      nil,
 	}
 }
 
