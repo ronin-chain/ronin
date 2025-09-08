@@ -89,10 +89,6 @@ func (*noopTracer) OnStorageChange(a common.Address, k, prev, new common.Hash) {
 
 func (*noopTracer) OnLog(log *types.Log) {}
 
-func (*noopTracer) GetParentOrder() uint64 {
-	return 0
-}
-
 // GetResult returns an empty json object.
 func (t *noopTracer) GetResult() (json.RawMessage, error) {
 	return json.RawMessage(`{}`), nil
