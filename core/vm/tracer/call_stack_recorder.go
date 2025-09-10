@@ -43,8 +43,8 @@ func (c *CallStackRecorder) onExit(depth int, output []byte, gasUsed uint64, err
 }
 
 func (c *CallStackRecorder) GetParentOrder() uint64 {
-	if c == nil || len(c.orders) <= 1 {
+	if c == nil || len(c.orders) < 1 {
 		return 0
 	}
-	return c.orders[len(c.orders)-2]
+	return c.orders[len(c.orders)-1]
 }
