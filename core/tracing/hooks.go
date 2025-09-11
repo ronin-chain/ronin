@@ -215,54 +215,6 @@ type Hooks struct {
 	OnLog           LogHook
 	// Block hash read
 	OnBlockHashRead BlockHashReadHook
-	// Original hooks to keep all hooks of the original hooks if cloned
-	originalHooks *Hooks
-}
-
-func (h *Hooks) OriginalHooks() *Hooks {
-	return h.originalHooks
-}
-
-func (h *Hooks) clone() *Hooks {
-	clone := &Hooks{
-		// VM events
-		OnTxStart:   h.OnTxStart,
-		OnTxEnd:     h.OnTxEnd,
-		OnEnter:     h.OnEnter,
-		OnExit:      h.OnExit,
-		OnOpcode:    h.OnOpcode,
-		OnFault:     h.OnFault,
-		OnGasChange: h.OnGasChange,
-		// Chain events
-		OnBlockchainInit:    h.OnBlockchainInit,
-		OnClose:             h.OnClose,
-		OnBlockStart:        h.OnBlockStart,
-		OnBlockEnd:          h.OnBlockEnd,
-		OnSkippedBlock:      h.OnSkippedBlock,
-		OnGenesisBlock:      h.OnGenesisBlock,
-		OnSystemCallStart:   h.OnSystemCallStart,
-		OnSystemCallStartV2: h.OnSystemCallStartV2,
-		OnSystemCallEnd:     h.OnSystemCallEnd,
-		// State events
-		OnBalanceChange: h.OnBalanceChange,
-		OnNonceChange:   h.OnNonceChange,
-		OnNonceChangeV2: h.OnNonceChangeV2,
-		OnCodeChange:    h.OnCodeChange,
-		OnStorageChange: h.OnStorageChange,
-		OnLog:           h.OnLog,
-		// Block hash read
-		OnBlockHashRead: h.OnBlockHashRead,
-		// Original hooks
-		originalHooks: h,
-	}
-	return clone
-}
-
-func (h *Hooks) Clone() *Hooks {
-	if h.originalHooks != nil {
-		return h.originalHooks.clone()
-	}
-	return h.clone()
 }
 
 // BalanceChangeReason is used to indicate the reason for a balance change, useful

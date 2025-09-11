@@ -173,14 +173,14 @@ type EVMHook interface {
 // only ever be used *once*.
 func NewEVM(blockCtx BlockContext, txCtx TxContext, statedb StateDB, chainConfig *params.ChainConfig, config Config) *EVM {
 	evm := &EVM{
-		Context:     blockCtx,
-		TxContext:   txCtx,
-		StateDB:     statedb,
-		Config:      config,
-		chainConfig: chainConfig,
-		chainRules:  chainConfig.Rules(blockCtx.BlockNumber),
+		Context:           blockCtx,
+		TxContext:         txCtx,
+		StateDB:           statedb,
+		Config:            config,
+		chainConfig:       chainConfig,
+		chainRules:        chainConfig.Rules(blockCtx.BlockNumber),
+		callStackRecorder: tracer.NewCallStackRecorder(),
 	}
-	evm.callStackRecorder, evm.Config.Tracer = tracer.NewTracer(config.Tracer)
 	evm.precompiles = activePrecompiledContracts(evm.chainRules)
 	evm.interpreter = NewEVMInterpreter(evm, config)
 	return evm
@@ -706,6 +706,7 @@ func (evm *EVM) captureBegin(depth int, typ OpCode, from common.Address, to comm
 	if tracer.OnGasChange != nil {
 		tracer.OnGasChange(0, startGas, tracing.GasChangeCallInitialBalance)
 	}
+	evm.callStackRecorder.CaptureBegin(evm.Context.Counter)
 }
 
 func (evm *EVM) captureEnd(depth int, startGas uint64, leftOverGas uint64, ret []byte, err error) {
@@ -723,6 +724,7 @@ func (evm *EVM) captureEnd(depth int, startGas uint64, leftOverGas uint64, ret [
 	if tracer.OnExit != nil {
 		tracer.OnExit(depth, ret, startGas-leftOverGas, VMErrorFromErr(err), reverted)
 	}
+	evm.callStackRecorder.CaptureEnd()
 }
 
 // GetVMContext provides context about the block being executed as well as state
