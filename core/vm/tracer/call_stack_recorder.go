@@ -16,7 +16,11 @@ func NewTracer(hooks *tracing.Hooks) (*CallStackRecorder, *tracing.Hooks) {
 	t := &CallStackRecorder{orders: make([]uint64, 1)}
 	wrapped := &tracing.Hooks{}
 	if hooks != nil {
-		t.hooks = hooks.OriginalHooks()
+		if hooks.OriginalHooks() != nil {
+			t.hooks = hooks.OriginalHooks()
+		} else {
+			t.hooks = hooks
+		}
 		wrapped = hooks.Clone()
 	}
 	wrapped.OnEnter = t.onEnter
