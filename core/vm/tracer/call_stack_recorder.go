@@ -13,9 +13,10 @@ type CallStackRecorder struct {
 }
 
 func NewTracer(hooks *tracing.Hooks) (*CallStackRecorder, *tracing.Hooks) {
-	t := &CallStackRecorder{orders: make([]uint64, 1), hooks: hooks}
+	t := &CallStackRecorder{orders: make([]uint64, 1)}
 	wrapped := &tracing.Hooks{}
 	if hooks != nil {
+		t.hooks = hooks.OriginalHooks()
 		wrapped = hooks.Clone()
 	}
 	wrapped.OnEnter = t.onEnter
@@ -47,4 +48,11 @@ func (c *CallStackRecorder) GetParentOrder() uint64 {
 		return 0
 	}
 	return c.orders[len(c.orders)-1]
+}
+
+// For testing purpose only
+func (c *CallStackRecorder) GetOrders() []uint64 {
+	orders := make([]uint64, len(c.orders))
+	copy(orders, c.orders)
+	return orders
 }

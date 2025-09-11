@@ -7,7 +7,9 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/vm/tracer"
 	"github.com/ethereum/go-ethereum/params"
 )
 
@@ -130,5 +132,60 @@ func TestInternalTransactionParentOrder_NestedCalls(t *testing.T) {
 	wantParent := internalTxs[0].InternalTransactionBody.Order
 	if gotParent != wantParent {
 		t.Fatalf("parent order mismatch for nested call; got %d, want %d", gotParent, wantParent)
+	}
+}
+
+func newTestEVMWithTracer(tr *tracing.Hooks) *EVM {
+	cfg := Config{Tracer: tr}
+	blockCtx := BlockContext{BlockNumber: big.NewInt(1)}
+	txCtx := TxContext{}
+	return NewEVM(blockCtx, txCtx, nil, params.TestChainConfig, cfg)
+}
+
+func TestTracerRewrap_Isolation_ShouldNotMutateOtherEVMs(t *testing.T) {
+	// Build a chain of 3 EVMs by repeatedly reusing the previous EVM's wrapped tracer
+	base := &tracing.Hooks{}
+	evm1 := newTestEVMWithTracer(base)
+	evm2 := newTestEVMWithTracer(evm1.Config.Tracer)
+	evm3 := newTestEVMWithTracer(evm2.Config.Tracer)
+
+	rec := []*tracer.CallStackRecorder{evm1.callStackRecorder, evm2.callStackRecorder, evm3.callStackRecorder}
+	for i, r := range rec {
+		if r == nil {
+			t.Fatalf("recorder[%d] is nil", i)
+		}
+	}
+
+	pre := []int{len(rec[0].GetOrders()), len(rec[1].GetOrders()), len(rec[2].GetOrders())}
+	for i, L := range pre {
+		if L != 1 {
+			t.Fatalf("unexpected initial orders length at %d: got %d, want 1", i, L)
+		}
+	}
+
+	// Trigger a single begin on the last EVM only. Correct isolation would mutate only evm3.
+	evm3.captureBegin(0, CALL, common.Address{}, common.Address{}, nil, 1, nil)
+
+	// Assert isolation: evm1 and evm2 should remain unchanged, evm3 should grow by 1.
+	if got := len(rec[0].GetOrders()); got != pre[0] {
+		t.Fatalf("isolation violated: evm1 recorder mutated; got %d, want %d", got, pre[0])
+	}
+	if got := len(rec[1].GetOrders()); got != pre[1] {
+		t.Fatalf("isolation violated: evm2 recorder mutated; got %d, want %d", got, pre[1])
+	}
+	if got := len(rec[2].GetOrders()); got != pre[2]+1 {
+		t.Fatalf("unexpected evm3 orders length: got %d, want %d", got, pre[2]+1)
+	}
+
+	// Complete the frame; only evm3 should return to baseline.
+	evm3.captureEnd(0, 1, 0, nil, nil)
+	if got := len(rec[0].GetOrders()); got != pre[0] {
+		t.Fatalf("isolation violated after end: evm1 recorder mutated; got %d, want %d", got, pre[0])
+	}
+	if got := len(rec[1].GetOrders()); got != pre[1] {
+		t.Fatalf("isolation violated after end: evm2 recorder mutated; got %d, want %d", got, pre[1])
+	}
+	if got := len(rec[2].GetOrders()); got != pre[2] {
+		t.Fatalf("unexpected evm3 orders length after end: got %d, want %d", got, pre[2])
 	}
 }

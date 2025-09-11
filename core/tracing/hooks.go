@@ -215,10 +215,16 @@ type Hooks struct {
 	OnLog           LogHook
 	// Block hash read
 	OnBlockHashRead BlockHashReadHook
+	// Original hooks to keep all hooks of the original hooks if cloned
+	originalHooks *Hooks
 }
 
-func (h *Hooks) Clone() *Hooks {
-	return &Hooks{
+func (h *Hooks) OriginalHooks() *Hooks {
+	return h.originalHooks
+}
+
+func (h *Hooks) clone() *Hooks {
+	clone := &Hooks{
 		// VM events
 		OnTxStart:   h.OnTxStart,
 		OnTxEnd:     h.OnTxEnd,
@@ -246,7 +252,17 @@ func (h *Hooks) Clone() *Hooks {
 		OnLog:           h.OnLog,
 		// Block hash read
 		OnBlockHashRead: h.OnBlockHashRead,
+		// Original hooks
+		originalHooks: h,
 	}
+	return clone
+}
+
+func (h *Hooks) Clone() *Hooks {
+	if h.originalHooks != nil {
+		return h.originalHooks.clone()
+	}
+	return h.clone()
 }
 
 // BalanceChangeReason is used to indicate the reason for a balance change, useful
