@@ -173,13 +173,16 @@ type EVMHook interface {
 // only ever be used *once*.
 func NewEVM(blockCtx BlockContext, txCtx TxContext, statedb StateDB, chainConfig *params.ChainConfig, config Config) *EVM {
 	evm := &EVM{
-		Context:           blockCtx,
-		TxContext:         txCtx,
-		StateDB:           statedb,
-		Config:            config,
-		chainConfig:       chainConfig,
-		chainRules:        chainConfig.Rules(blockCtx.BlockNumber),
-		callStackRecorder: tracer.NewCallStackRecorder(),
+		Context:     blockCtx,
+		TxContext:   txCtx,
+		StateDB:     statedb,
+		Config:      config,
+		chainConfig: chainConfig,
+		chainRules:  chainConfig.Rules(blockCtx.BlockNumber),
+	}
+	// If the tracer is not set, set it to a noop tracer to make sure call or
+	if evm.Config.Tracer == nil {
+		evm.Config.Tracer = &tracing.Hooks{}
 	}
 	evm.precompiles = activePrecompiledContracts(evm.chainRules)
 	evm.interpreter = NewEVMInterpreter(evm, config)
