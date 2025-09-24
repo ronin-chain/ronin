@@ -18,6 +18,7 @@ package vm
 
 import (
 	"errors"
+	"fmt"
 	"math/big"
 	"sync/atomic"
 
@@ -225,11 +226,12 @@ func (evm *EVM) SetPrecompiles(precompiles PrecompiledContracts) {
 // the necessary steps to create accounts and reverses the state in case of an
 // execution error or failed value transfer.
 func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas uint64, value *big.Int) (ret []byte, leftOverGas uint64, err error) {
+	fmt.Println("Call", caller.Address(), addr, input, gas, value)
 	// Capture the tracer start/end events in debug mode
 	if evm.Config.Tracer != nil {
-		evm.captureBegin(evm.depth, CALL, caller.Address(), addr, input, gas, value)
+		evm.captureBegin(evm.depth, CALL, caller.Address(), addr, input, gas, value, true)
 		defer func(startGas uint64) {
-			evm.captureEnd(evm.depth, startGas, leftOverGas, ret, err)
+			evm.captureEnd(evm.depth, startGas, leftOverGas, ret, err, true)
 		}(gas)
 	}
 
@@ -302,9 +304,9 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 func (evm *EVM) CallCode(caller ContractRef, addr common.Address, input []byte, gas uint64, value *big.Int) (ret []byte, leftOverGas uint64, err error) {
 	// Invoke tracer hooks that signal entering/exiting a call frame
 	if evm.Config.Tracer != nil {
-		evm.captureBegin(evm.depth, CALLCODE, caller.Address(), addr, input, gas, value)
+		evm.captureBegin(evm.depth, CALLCODE, caller.Address(), addr, input, gas, value, false)
 		defer func(startGas uint64) {
-			evm.captureEnd(evm.depth, startGas, leftOverGas, ret, err)
+			evm.captureEnd(evm.depth, startGas, leftOverGas, ret, err, false)
 		}(gas)
 	}
 	if evm.Config.NoRecursion && evm.depth > 0 {
@@ -359,9 +361,9 @@ func (evm *EVM) DelegateCall(caller ContractRef, addr common.Address, input []by
 		// that caller is something other than a Contract.
 		parent := caller.(*Contract)
 		// DELEGATECALL inherits value from parent call
-		evm.captureBegin(evm.depth, DELEGATECALL, caller.Address(), addr, input, gas, parent.value)
+		evm.captureBegin(evm.depth, DELEGATECALL, caller.Address(), addr, input, gas, parent.value, true)
 		defer func(startGas uint64) {
-			evm.captureEnd(evm.depth, startGas, leftOverGas, ret, err)
+			evm.captureEnd(evm.depth, startGas, leftOverGas, ret, err, true)
 		}(gas)
 	}
 
@@ -402,11 +404,12 @@ func (evm *EVM) DelegateCall(caller ContractRef, addr common.Address, input []by
 // Opcodes that attempt to perform such modifications will result in exceptions
 // instead of performing the modifications.
 func (evm *EVM) StaticCall(caller ContractRef, addr common.Address, input []byte, gas uint64) (ret []byte, leftOverGas uint64, err error) {
+	fmt.Println("StaticCall", caller.Address(), addr, input, gas)
 	// Invoke tracer hooks that signal entering/exiting a call frame
 	if evm.Config.Tracer != nil {
-		evm.captureBegin(evm.depth, STATICCALL, caller.Address(), addr, input, gas, nil)
+		evm.captureBegin(evm.depth, STATICCALL, caller.Address(), addr, input, gas, nil, false)
 		defer func(startGas uint64) {
-			evm.captureEnd(evm.depth, startGas, leftOverGas, ret, err)
+			evm.captureEnd(evm.depth, startGas, leftOverGas, ret, err, false)
 		}(gas)
 	}
 	if evm.Config.NoRecursion && evm.depth > 0 {
@@ -455,6 +458,7 @@ func (evm *EVM) StaticCall(caller ContractRef, addr common.Address, input []byte
 			gas = 0
 		}
 	}
+	fmt.Println("StaticCall", ret, gas, err)
 	return ret, gas, err
 }
 
@@ -473,9 +477,9 @@ func (c *codeAndHash) Hash() common.Hash {
 // create creates a new contract using code as deployment code.
 func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64, value *big.Int, address common.Address, typ OpCode) (ret []byte, createAddress common.Address, leftOverGas uint64, err error) {
 	if evm.Config.Tracer != nil {
-		evm.captureBegin(evm.depth, typ, caller.Address(), address, codeAndHash.code, gas, value)
+		evm.captureBegin(evm.depth, typ, caller.Address(), address, codeAndHash.code, gas, value, true)
 		defer func(startGas uint64) {
-			evm.captureEnd(evm.depth, startGas, leftOverGas, ret, err)
+			evm.captureEnd(evm.depth, startGas, leftOverGas, ret, err, true)
 		}(gas)
 	}
 
@@ -702,7 +706,7 @@ func (evm *EVM) SetHook(evmHook EVMHook) {
 	evm.evmHook = evmHook
 }
 
-func (evm *EVM) captureBegin(depth int, typ OpCode, from common.Address, to common.Address, input []byte, startGas uint64, value *big.Int) {
+func (evm *EVM) captureBegin(depth int, typ OpCode, from common.Address, to common.Address, input []byte, startGas uint64, value *big.Int, recordCallStack bool) {
 	tracer := evm.Config.Tracer
 	if tracer.OnEnter != nil {
 		tracer.OnEnter(depth, byte(typ), from, to, input, startGas, value, evm.Context.Counter)
@@ -710,10 +714,12 @@ func (evm *EVM) captureBegin(depth int, typ OpCode, from common.Address, to comm
 	if tracer.OnGasChange != nil {
 		tracer.OnGasChange(0, startGas, tracing.GasChangeCallInitialBalance)
 	}
-	evm.callStackRecorder.CaptureBegin(evm.Context.Counter)
+	if recordCallStack {
+		evm.callStackRecorder.CaptureBegin(evm.Context.Counter)
+	}
 }
 
-func (evm *EVM) captureEnd(depth int, startGas uint64, leftOverGas uint64, ret []byte, err error) {
+func (evm *EVM) captureEnd(depth int, startGas uint64, leftOverGas uint64, ret []byte, err error, recordCallStack bool) {
 	tracer := evm.Config.Tracer
 	if leftOverGas != 0 && tracer.OnGasChange != nil {
 		tracer.OnGasChange(leftOverGas, 0, tracing.GasChangeCallLeftOverReturned)
@@ -728,7 +734,9 @@ func (evm *EVM) captureEnd(depth int, startGas uint64, leftOverGas uint64, ret [
 	if tracer.OnExit != nil {
 		tracer.OnExit(depth, ret, startGas-leftOverGas, VMErrorFromErr(err), reverted)
 	}
-	evm.callStackRecorder.CaptureEnd()
+	if recordCallStack {
+		evm.callStackRecorder.CaptureEnd()
+	}
 }
 
 // GetVMContext provides context about the block being executed as well as state
