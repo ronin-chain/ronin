@@ -54,6 +54,9 @@ const (
 	assemblingFinalityVoteDuration         = 1 * time.Second
 	MaxValidatorCandidates                 = 64 // Maximum number of validator candidates.
 	dayInSeconds                           = uint64(86400)
+
+	hopePeriod     = uint64(1)              // Target block period (seconds) after Hope fork
+	hopeWiggleTime = 500 * time.Millisecond // Reduced wiggle time after Hope fork
 )
 
 // Consortium delegated proof-of-stake protocol constants.
@@ -134,8 +137,14 @@ func New(
 ) *Consortium {
 	consortiumConfig := chainConfig.Consortium
 
-	if consortiumConfig != nil && consortiumConfig.EpochV2 == 0 {
-		consortiumConfig.EpochV2 = epochLength
+	if consortiumConfig != nil {
+		if consortiumConfig.EpochV2 == 0 {
+			consortiumConfig.EpochV2 = epochLength
+		}
+		// Default turn length to 1 (single block) if not set
+		if consortiumConfig.TurnLength == 0 {
+			consortiumConfig.TurnLength = 1
+		}
 	}
 
 	// Allocate the snapshot caches and create the engine
@@ -883,22 +892,34 @@ func backOffTime(header *types.Header, snapshot *Snapshot, chainConfig *params.C
 		delayMultiplier[i], delayMultiplier[j] = delayMultiplier[j], delayMultiplier[i]
 	})
 
-	if chainConfig.IsOlek(new(big.Int).SetUint64(snapshot.Number + 1)) {
-		return uint64((int(initialDelay) + (delayMultiplier[position]-1)*int(wiggleTime)) / int(time.Second))
-	} else {
-		return uint64((int(initialDelay) + delayMultiplier[position]*int(wiggleTime)/2) / int(time.Second))
+	// adjust wiggle time after Hope fork
+	wiggleDuration := wiggleTime
+	if chainConfig.IsHope(header.Number) {
+		wiggleDuration = hopeWiggleTime
 	}
+
+	if chainConfig.IsOlek(new(big.Int).SetUint64(snapshot.Number + 1)) {
+		return uint64((int(initialDelay) + (delayMultiplier[position]-1)*int(wiggleDuration)) / int(time.Second))
+	}
+	return uint64((int(initialDelay) + delayMultiplier[position]*int(wiggleDuration)/2) / int(time.Second))
 }
 
 func (c *Consortium) computeHeaderTime(header, parent *types.Header, snapshot *Snapshot) uint64 {
-	headerTime := parent.Time + c.config.Period
+	// effective period: 1s after Hope, else config.Period
+	period := c.config.Period
+	if c.chainConfig.IsHope(header.Number) {
+		period = hopePeriod
+	}
+
+	headerTime := parent.Time + period
 
 	if c.chainConfig.IsBuba(header.Number) {
 		headerTime += backOffTime(header, snapshot, c.chainConfig)
 	}
 
-	if headerTime < uint64(time.Now().Unix()) {
-		headerTime = uint64(time.Now().Unix())
+	now := uint64(time.Now().Unix())
+	if headerTime < now {
+		headerTime = now
 	}
 	return headerTime
 }
@@ -909,7 +930,11 @@ func (c *Consortium) verifyHeaderTime(header, parent *types.Header, snapshot *Sn
 	}
 
 	if c.chainConfig.IsBuba(header.Number) {
-		expectedHeaderTime := parent.Time + c.config.Period + backOffTime(header, snapshot, c.chainConfig)
+		period := c.config.Period
+		if c.chainConfig.IsHope(header.Number) {
+			period = hopePeriod
+		}
+		expectedHeaderTime := parent.Time + period + backOffTime(header, snapshot, c.chainConfig)
 		if header.Time < expectedHeaderTime {
 			return consensus.ErrFutureBlock
 		}

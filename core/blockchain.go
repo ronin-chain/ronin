@@ -223,7 +223,10 @@ type BlockChain struct {
 	chainFeed     event.Feed
 	chainSideFeed event.Feed
 	// reorgFeed is used when canonical turns into side
-	reorgFeed        event.Feed
+	reorgFeed event.Feed
+	// highestVerifiedHeaderFeed notifies subscribers of headers that passed validation before full state commit.
+	highestVerifiedHeaderFeed event.Feed
+
 	chainHeadFeed    event.Feed
 	logsFeed         event.Feed
 	blockProcFeed    event.Feed
@@ -268,6 +271,9 @@ type BlockChain struct {
 	evmHook                    vm.EVMHook
 
 	blobPrunePeriod uint64
+
+	// verifiedHeaders holds a recent-window cache of headers already verified but perhaps not fully committed.
+	verifiedHeaders *lru.Cache[common.Hash, *types.Header]
 }
 
 type futureBlock struct {
@@ -332,6 +338,10 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, genesis *Genesis
 
 		blobSidecarsCache: blobSidecarsCache,
 		blobPrunePeriod:   params.BlobPrunePeriod,
+		verifiedHeaders: func() *lru.Cache[common.Hash, *types.Header] {
+			cache, _ := lru.New[common.Hash, *types.Header](1024)
+			return cache
+		}(),
 	}
 
 	if chainConfig.ChainID != nil && chainConfig.ChainID.Cmp(big.NewInt(testnetChainId)) == 0 {
@@ -1511,6 +1521,13 @@ func (bc *BlockChain) writeBlockWithoutState(
 	if err := batch.Write(); err != nil {
 		log.Crit("Failed to write block into disk", "err", err)
 	}
+
+	// broadcast verified header event
+	if bc.verifiedHeaders != nil {
+		bc.verifiedHeaders.Add(block.Hash(), block.Header())
+	}
+	bc.highestVerifiedHeaderFeed.Send(HighestVerifiedHeaderEvent{Header: block.Header()})
+
 	return nil
 }
 
@@ -1631,6 +1648,13 @@ func (bc *BlockChain) writeBlockWithState(
 	if err := blockBatch.Write(); err != nil {
 		log.Crit("Failed to write block into disk", "err", err)
 	}
+
+	// Publish verified header before state commit, enabling downstream components (vote pool) to react early.
+	if bc.verifiedHeaders != nil {
+		bc.verifiedHeaders.Add(block.Hash(), block.Header())
+	}
+	bc.highestVerifiedHeaderFeed.Send(HighestVerifiedHeaderEvent{Header: block.Header()})
+
 	// Commit all cached state changes into underlying memory database.
 	dirtyAccounts := state.DirtyAccounts(block.Hash(), block.NumberU64())
 	root, err := state.Commit(block.NumberU64(), bc.chainConfig.IsEIP158(block.Number()))
@@ -2709,4 +2733,23 @@ func (bc *BlockChain) InsertHeaderChain(chain []*types.Header, checkFreq int) (i
 // DB returns database object that blockchain is using
 func (bc *BlockChain) DB() ethdb.Database {
 	return bc.db
+}
+
+// GetVerifiedBlockByHash returns a header that has passed consensus verification but may not yet
+// be durably committed to disk. This is populated by writeBlockWithState / writeBlockWithoutState.
+// It returns nil if the header is not in the verified cache.
+func (bc *BlockChain) GetVerifiedBlockByHash(hash common.Hash) *types.Header {
+	if bc.verifiedHeaders == nil {
+		return nil
+	}
+	if h, ok := bc.verifiedHeaders.Get(hash); ok {
+		return h
+	}
+	return nil
+}
+
+// SubscribeHighestVerifiedHeaderEvent allows callers (e.g., vote pool) to receive notifications
+// whenever a new header is verified but before full state commit.
+func (bc *BlockChain) SubscribeHighestVerifiedHeaderEvent(ch chan<- HighestVerifiedHeaderEvent) event.Subscription {
+	return bc.scope.Track(bc.highestVerifiedHeaderFeed.Subscribe(ch))
 }

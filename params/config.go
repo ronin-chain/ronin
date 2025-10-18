@@ -617,6 +617,8 @@ type ChainConfig struct {
 	CancunBlock   *big.Int `json:"cancunBlock,omitempty"`   // Cancun switch block (nil = no fork, 0 = already on activated)
 	VenokiBlock   *big.Int `json:"venokiBlock,omitempty"`   // Venoki switch block (nil = no fork, 0 = already on activated)
 	KotaroBlock   *big.Int `json:"kotaroBlock,omitempty"`   // Kotaro (Prague) switch block (nil = no fork, 0 = already on activated)
+	// Hope hardfork allows consecutive block production
+	HopeBlock *big.Int `json:"hopeBlock,omitempty"` // Hope switch block (nil = no fork, 0 = already on activated)
 
 	BlacklistContractAddress           *common.Address `json:"blacklistContractAddress,omitempty"`           // Address of Blacklist Contract (nil = no blacklist)
 	FenixValidatorContractAddress      *common.Address `json:"fenixValidatorContractAddress,omitempty"`      // Address of Ronin Contract in the Fenix hardfork (nil = no blacklist)
@@ -668,9 +670,10 @@ func (c *CliqueConfig) String() string {
 
 // ConsortiumConfig is the consensus engine configs for proof-of-authority based sealing.
 type ConsortiumConfig struct {
-	Period  uint64 `json:"period"` // Number of seconds between blocks to enforce
-	Epoch   uint64 `json:"epoch"`  // Epoch length to reset votes and checkpoint
-	EpochV2 uint64 `json:"epochV2"`
+	Period     uint64 `json:"period"` // Number of seconds between blocks to enforce
+	Epoch      uint64 `json:"epoch"`  // Epoch length to reset votes and checkpoint
+	EpochV2    uint64 `json:"epochV2"`
+	TurnLength uint64 `json:"turnLength,omitempty"` // Number of consecutive blocks a validator can produce (default 1)
 }
 
 // String implements the stringer interface, returning the consensus engine details.
@@ -750,7 +753,7 @@ func (c *ChainConfig) String() string {
 	chainConfigFmt += "Engine: %v, Blacklist Contract: %v, Fenix Validator Contract: %v, ConsortiumV2: %v, ConsortiumV2.RoninValidatorSet: %v, "
 	chainConfigFmt += "ConsortiumV2.SlashIndicator: %v, ConsortiumV2.StakingContract: %v, Puffy: %v, Buba: %v, Olek: %v, Shillin: %v, Antenna: %v, "
 	chainConfigFmt += "ConsortiumV2.ProfileContract: %v, ConsortiumV2.FinalityTracking: %v, whiteListDeployerContractV2Address: %v, roninTreasuryAddress: %v, "
-	chainConfigFmt += "Miko: %v, Tripp: %v, TrippPeriod: %v, Aaron: %v, Shanghai: %v, Cancun: %v, Venoki: %v, Kotaro: %v}"
+	chainConfigFmt += "Miko: %v, Tripp: %v, TrippPeriod: %v, Aaron: %v, Shanghai: %v, Cancun: %v, Venoki: %v, Kotaro: %v, Hope: %v}"
 
 	return fmt.Sprintf(chainConfigFmt,
 		c.ChainID,
@@ -794,6 +797,7 @@ func (c *ChainConfig) String() string {
 		c.CancunBlock,
 		c.VenokiBlock,
 		c.KotaroBlock,
+		c.HopeBlock,
 	)
 }
 
@@ -961,6 +965,11 @@ func (c *ChainConfig) IsKotaro(num *big.Int) bool {
 	return isForked(c.KotaroBlock, num)
 }
 
+// IsHope returns whether num is either equal to the Hope fork block or greater.
+func (c *ChainConfig) IsHope(num *big.Int) bool {
+	return isForked(c.HopeBlock, num)
+}
+
 // CheckCompatible checks whether scheduled fork transitions have been imported
 // with a mismatching chain configuration.
 func (c *ChainConfig) CheckCompatible(newcfg *ChainConfig, height uint64) *ConfigCompatError {
@@ -1119,6 +1128,9 @@ func (c *ChainConfig) checkCompatible(newcfg *ChainConfig, head *big.Int) *Confi
 	if isForkIncompatible(c.KotaroBlock, newcfg.KotaroBlock, head) {
 		return newCompatError("Kotaro fork block", c.KotaroBlock, newcfg.KotaroBlock)
 	}
+	if isForkIncompatible(c.HopeBlock, newcfg.HopeBlock, head) {
+		return newCompatError("Hope fork block", c.HopeBlock, newcfg.HopeBlock)
+	}
 	return nil
 }
 
@@ -1190,6 +1202,7 @@ type Rules struct {
 	IsFenix, IsShillin, IsConsortiumV2, IsAntenna           bool
 	IsMiko, IsTripp, IsAaron, IsShanghai, IsCancun          bool
 	IsVenoki, IsLastConsortiumV1Block, IsKotaro             bool
+	IsHope                                                  bool
 }
 
 // Rules ensures c's ChainID is not nil.
@@ -1223,5 +1236,6 @@ func (c *ChainConfig) Rules(num *big.Int) Rules {
 		IsCancun:                c.IsCancun(num),
 		IsVenoki:                c.IsVenoki(num),
 		IsKotaro:                c.IsKotaro(num),
+		IsHope:                  c.IsHope(num),
 	}
 }

@@ -72,6 +72,10 @@ type VotePool struct {
 	justifiedBlockNumber uint64
 
 	dropPeer peerDropFn
+
+	// Receive early verified header notifications
+	highestVerifiedBlockCh  chan core.HighestVerifiedHeaderEvent
+	highestVerifiedBlockSub event.Subscription
 }
 
 type votesPriorityQueue []*types.VoteData
@@ -96,10 +100,12 @@ func NewVotePool(
 		lastFutureVoteBlock:      make(map[string]uint64),
 		originatedFrom:           make(map[common.Hash]string),
 		dropPeer:                 dropPeer,
+		highestVerifiedBlockCh:   make(chan core.HighestVerifiedHeaderEvent, chainHeadChanSize),
 	}
 
 	// Subscribe events from blockchain and start the main event loop.
 	votePool.chainHeadSub = votePool.chain.SubscribeChainHeadEvent(votePool.chainHeadCh)
+	votePool.highestVerifiedBlockSub = votePool.chain.SubscribeHighestVerifiedHeaderEvent(votePool.highestVerifiedBlockCh)
 
 	go votePool.loop()
 	return votePool
@@ -121,6 +127,16 @@ func (pool *VotePool) loop() {
 				pool.transferVotesFromFutureToCur(ev.Block.Header())
 				pool.mu.Unlock()
 			}
+		case ev := <-pool.highestVerifiedBlockCh:
+			if ev.Header != nil {
+				latest := ev.Header.Number.Uint64()
+				pool.mu.Lock()
+				pool.prune(latest)
+				pool.transferVotesFromFutureToCur(ev.Header)
+				pool.mu.Unlock()
+			}
+		case <-pool.highestVerifiedBlockSub.Err():
+			return
 		case <-pool.chainHeadSub.Err():
 			return
 
@@ -182,7 +198,7 @@ func (pool *VotePool) putIntoVotePool(voteWithPeerInfo *voteWithPeer) bool {
 	var votes map[common.Hash]*VoteBox
 	var votesPq *votesPriorityQueue
 
-	voteBlock := pool.chain.GetHeaderByHash(targetHash)
+	voteBlock := pool.chain.GetVerifiedBlockByHash(targetHash)
 	if voteBlock == nil {
 		votes = pool.futureVotes
 		votesPq = pool.futureVotesPq
@@ -295,7 +311,7 @@ func (pool *VotePool) transferVotesFromFutureToCur(latestBlockHeader *types.Head
 	futurePqBuffer := make([]*types.VoteData, 0)
 	for futurePq.Len() > 0 && futurePq.Peek().TargetNumber <= latestBlockNumber {
 		blockHash := futurePq.Peek().TargetHash
-		header := pool.chain.GetHeaderByHash(blockHash)
+		header := pool.chain.GetVerifiedBlockByHash(blockHash)
 		if header == nil {
 			// Put into pq buffer used for later put again into futurePq
 			futurePqBuffer = append(futurePqBuffer, heap.Pop(futurePq).(*types.VoteData))
@@ -447,6 +463,7 @@ func (pool *VotePool) FetchVoteByBlockHash(blockHash common.Hash) []*types.VoteE
 	// We try to acquire read lock fetchRetry times
 	// but can not do it, so just return nil here
 	if retry == fetchRetry {
+		log.Debug("Failed to acquire read lock for FetchVoteByBlockHash", "blockHash", blockHash)
 		return nil
 	}
 

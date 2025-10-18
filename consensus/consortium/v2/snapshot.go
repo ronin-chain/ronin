@@ -239,9 +239,13 @@ func (s *Snapshot) apply(headers []*types.Header, chain consensus.ChainHeaderRea
 		if !snap.inInValidatorSet(validator) {
 			return nil, errUnauthorizedValidator
 		}
-		for _, recent := range snap.Recents {
+		for seenBlock, recent := range snap.Recents {
 			if recent == validator {
-				return nil, errRecentlySigned
+				diff := number - seenBlock
+				turnLen := s.turnLength(number)
+				if diff >= turnLen {
+					return nil, errRecentlySigned
+				}
 			}
 		}
 		snap.Recents[number] = validator
@@ -400,9 +404,18 @@ func (s *Snapshot) inBlsPublicKeySet(publicKey blsCommon.PublicKey) bool {
 
 // inturn returns if a validator at a given block height is in-turn or not.
 func (s *Snapshot) inturn(validator common.Address) bool {
+	turnLen := s.turnLength(s.Number + 1)
+	if turnLen == 0 {
+		turnLen = 1
+	}
+
 	validators := s.validators()
-	offset := (s.Number + 1) % uint64(len(validators))
-	return validators[offset] == validator
+	if len(validators) == 0 {
+		return false
+	}
+
+	slot := ((s.Number + 1) / turnLen) % uint64(len(validators))
+	return validators[slot] == validator
 }
 
 // sealableValidators finds the validators that are not in recent sign list, which mean they can seal
@@ -431,13 +444,29 @@ func (s *Snapshot) sealableValidators(validator common.Address) (position, numOf
 // supposeValidator returns the in-turn validator at a given block height
 func (s *Snapshot) supposeValidator() common.Address {
 	validators := s.validators()
-	index := (s.Number + 1) % uint64(len(validators))
+	if len(validators) == 0 {
+		return common.Address{}
+	}
+
+	turnLen := s.turnLength(s.Number + 1)
+	index := ((s.Number + 1) / turnLen) % uint64(len(validators))
 	return validators[index]
 }
 
 func (s *Snapshot) IsRecentlySigned(validator common.Address) bool {
+	turnLen := s.turnLength(s.Number + 1)
+	if turnLen == 0 {
+		turnLen = 1
+	}
+
 	for seen, recent := range s.Recents {
 		if recent == validator {
+			diff := (s.Number + 1) - seen
+			if diff < turnLen {
+				// Allow consecutive blocks within turnLen
+				return false
+			}
+
 			if limit := uint64(len(s.validators())/2 + 1); seen > s.Number+1-limit {
 				return true
 			}
@@ -478,4 +507,15 @@ func FindAncientHeader(header *types.Header, ite uint64, chain consensus.ChainHe
 		}
 	}
 	return ancient
+}
+
+// turnLength returns the effective turn length at the next block height (s.Number + 1)
+// or a provided block height, falling back to 1 before the Hope fork.
+func (s *Snapshot) turnLength(nextNumber uint64) uint64 {
+	if s.chainConfig != nil && s.chainConfig.IsHope(new(big.Int).SetUint64(nextNumber)) {
+		if s.config != nil && s.config.TurnLength > 0 {
+			return s.config.TurnLength
+		}
+	}
+	return 1
 }

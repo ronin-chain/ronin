@@ -16,7 +16,8 @@
     "consortium": {
       "period": 3,
       "epoch": 30,
-      "epochV2": 200
+      "epochV2": 200,
+      "turnLength": 5
     },
     "consortiumV2Block": 0,
     "consortiumV2Contracts": {
@@ -35,6 +36,7 @@
     "mikoBlock": 5,
     "trippBlock": 10,
     "trippPeriod": 59451,
+    "hopeBlock": 15,
     "whiteListDeployerContractV2Address": "0x50a7e07Aa75eB9C04281713224f50403cA79851F",
     "roninTrustedOrgUpgrade": {
       "proxyAddress": "0x7507dc433a98E1fE105d69f19f3B40E4315A4F32",
