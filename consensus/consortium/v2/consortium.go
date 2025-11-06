@@ -62,8 +62,9 @@ var (
 
 	uncleHash = types.CalcUncleHash(nil) // Always Keccak256(RLP([])) as uncles are meaningless outside of PoW
 
-	diffInTurn = big.NewInt(7) // Block difficulty for in-turn signatures
-	diffNoTurn = big.NewInt(3) // Block difficulty for out-of-turn signatures
+	diffInTurn  = big.NewInt(7) // Block difficulty for in-turn signatures
+	diffNoTurn  = big.NewInt(3) // Block difficulty for out-of-turn signatures
+	diffL2Block = big.NewInt(0) // Block difficulty for the conjunction block in migration process L1 -> L2
 
 	// The proxy contract's implementation slot
 	// https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/v4.7.3/contracts/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol#L34
@@ -1043,7 +1044,7 @@ func (c *Consortium) Prepare(chain consensus.ChainHeaderReader, header *types.He
 	header.Time = c.computeHeaderTime(header, parent, snap)
 
 	// Set the correct difficulty
-	header.Difficulty = CalcDifficulty(snap, coinbase)
+	header.Difficulty = CalcDifficulty(snap, coinbase, header.Number)
 
 	var extraData finality.HeaderExtraData
 
@@ -1572,13 +1573,17 @@ func (c *Consortium) CalcDifficulty(chain consensus.ChainHeaderReader, time uint
 		return nil
 	}
 	coinbase, _, _, _ := c.readSignerAndContract()
-	return CalcDifficulty(snap, coinbase)
+	nextBlock := new(big.Int).Add(parent.Number, big.NewInt(1))
+	return CalcDifficulty(snap, coinbase, nextBlock)
 }
 
 // CalcDifficulty is the difficulty adjustment algorithm. It returns the difficulty
 // that a new block should have based on the previous blocks in the chain and the
 // current validator.
-func CalcDifficulty(snap *Snapshot, signer common.Address) *big.Int {
+func CalcDifficulty(snap *Snapshot, signer common.Address, forBlock *big.Int) *big.Int {
+	if snap.chainConfig.IsL2Migration(forBlock) {
+		return new(big.Int).Set(diffL2Block)
+	}
 	if snap.inturn(signer) {
 		return new(big.Int).Set(diffInTurn)
 	}
