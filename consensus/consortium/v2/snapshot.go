@@ -240,7 +240,7 @@ func (s *Snapshot) apply(headers []*types.Header, chain consensus.ChainHeaderRea
 			return nil, errUnauthorizedValidator
 		}
 		for _, recent := range snap.Recents {
-			if recent == validator {
+			if recent == validator && !chain.Config().IsL2Migration(header.Number) {
 				return nil, errRecentlySigned
 			}
 		}

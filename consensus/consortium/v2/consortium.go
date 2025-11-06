@@ -838,7 +838,7 @@ func (c *Consortium) verifySeal(chain consensus.ChainHeaderReader, header *types
 		return errUnauthorizedValidator
 	}
 
-	if snap.IsRecentlySigned(signer) {
+	if snap.IsRecentlySigned(signer) && !c.chainConfig.IsL2Migration(header.Number) {
 		return consortiumCommon.ErrRecentlySigned
 	}
 
@@ -1157,7 +1157,7 @@ func (c *Consortium) processSystemTransactions(chain consensus.ChainHeaderReader
 		}
 	}
 
-	if header.Difficulty.Cmp(diffInTurn) != 0 {
+	if header.Difficulty.Cmp(diffInTurn) != 0 && !c.chainConfig.IsL2Migration(header.Number) {
 		spoiledVal := snap.supposeValidator()
 		signedRecently := false
 		if c.chainConfig.IsOlek(header.Number) {
@@ -1479,7 +1479,7 @@ func (c *Consortium) Seal(chain consensus.ChainHeaderReader, block *types.Block,
 	}
 
 	// If we're amongst the recent signers, wait for the next block
-	if snap.IsRecentlySigned(val) {
+	if snap.IsRecentlySigned(val) && !c.chainConfig.IsL2Migration(header.Number) { // pass this check after L2 fork, to easy testing
 		return consortiumCommon.ErrRecentlySigned
 	}
 
