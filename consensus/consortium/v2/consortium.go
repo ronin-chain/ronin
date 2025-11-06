@@ -1033,7 +1033,7 @@ func (c *Consortium) getCheckpointValidatorsFromContract(
 // Prepare implements consensus.Engine, preparing all the consensus fields of the
 // header for running the transactions on top.
 func (c *Consortium) Prepare(chain consensus.ChainHeaderReader, header *types.Header) error {
-	if header.Number.Cmp(c.chainConfig.L2MigrationBlock) > 0 {
+	if c.chainConfig.L2MigrationBlock != nil && header.Number.Cmp(c.chainConfig.L2MigrationBlock) > 0 {
 		return fmt.Errorf("stop preparing block %d: %w", header.Number.Uint64(), consensus.ErrL2Block)
 	}
 	coinbase, _, _, _ := c.readSignerAndContract()
