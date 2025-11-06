@@ -1559,6 +1559,13 @@ func (bc *BlockChain) reorgNeeded(localBlock *types.Block, localTd *big.Int, ext
 		}
 	}
 
+	if bc.chainConfig.IsL2Migration(externBlock.Number()) {
+		ok, err := bc.Engine().InTurn(bc, externBlock.Header())
+		if err == nil && ok {
+			return true
+		}
+	}
+
 	// If the total difficulty is higher than our known, add it to the canonical chain
 	// Second clause in the if statement reduces the vulnerability to selfish mining.
 	// Please refer to http://www.cs.cornell.edu/~ie53/publications/btcProcFC.pdf

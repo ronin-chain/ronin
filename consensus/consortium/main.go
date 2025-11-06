@@ -155,6 +155,14 @@ func (c *Consortium) SealHash(header *types.Header) common.Hash {
 	return c.v1.SealHash(header)
 }
 
+func (c *Consortium) InTurn(chain consensus.ChainHeaderReader, header *types.Header) (bool, error) {
+	if c.chainConfig.IsConsortiumV2(header.Number) {
+		return c.v2.InTurn(chain, header)
+	}
+
+	return c.v1.InTurn(chain, header)
+}
+
 // Close implements consensus.Engine. It's a noop for Consortium as there are no background threads.
 func (c *Consortium) Close() error {
 	return nil

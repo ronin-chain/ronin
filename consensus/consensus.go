@@ -131,6 +131,10 @@ type Engine interface {
 	// that a new block should have.
 	CalcDifficulty(chain ChainHeaderReader, time uint64, parent *types.Header) *big.Int
 
+	// InTurn helps engine decide whether the header is convinced in the process of choosing canonical chain
+	// at the L2 migration block, because now, header extra signature is zero
+	InTurn(chain ChainHeaderReader, header *types.Header) (bool, error)
+
 	// APIs returns the RPC APIs this consensus engine provides.
 	APIs(chain ChainHeaderReader) []rpc.API
 

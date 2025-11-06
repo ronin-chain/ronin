@@ -708,6 +708,10 @@ func (c *Clique) APIs(chain consensus.ChainHeaderReader) []rpc.API {
 	}}
 }
 
+func (c *Clique) InTurn(chain consensus.ChainHeaderReader, header *types.Header) (bool, error) {
+	return false, errors.New("not supported")
+}
+
 // SealHash returns the hash of a block prior to it being sealed.
 func SealHash(header *types.Header) (hash common.Hash) {
 	hasher := sha3.NewLegacyKeccak256()

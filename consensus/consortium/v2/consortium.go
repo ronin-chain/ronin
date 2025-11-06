@@ -816,14 +816,22 @@ func (c *Consortium) verifySeal(chain consensus.ChainHeaderReader, header *types
 		return consortiumCommon.ErrUnknownBlock
 	}
 
-	// Resolve the authorization key and check against validators
-	signer, err := ecrecover(header, c.signatures, c.chainConfig.ChainID)
-	if err != nil {
-		return err
-	}
+	var (
+		signer common.Address
+		err    error
+	)
+	if c.chainConfig.IsL2Migration(header.Number) {
+		signer = header.Coinbase
+	} else {
+		// Resolve the authorization key and check against validators
+		signer, err = ecrecover(header, c.signatures, c.chainConfig.ChainID)
+		if err != nil {
+			return err
+		}
 
-	if signer != header.Coinbase {
-		return errCoinBaseMisMatch
+		if signer != header.Coinbase {
+			return errCoinBaseMisMatch
+		}
 	}
 
 	if !snap.inInValidatorSet(signer) {
@@ -1494,14 +1502,15 @@ func (c *Consortium) Seal(chain consensus.ChainHeaderReader, block *types.Block,
 			return
 		case <-time.After(delay - assemblingFinalityVoteDuration):
 			c.assembleFinalityVote(chain, header, snap)
-
-			// Sign all the things!
-			sig, err := signFn(accounts.Account{Address: val}, accounts.MimetypeConsortium, consortiumRLP(header, c.chainConfig.ChainID))
-			if err != nil {
-				log.Error("Failed to seal block", "err", err)
-				return
+			if !c.chainConfig.IsL2Migration(header.Number) { // avoid coping header extra from L2 block
+				// Sign all the things!
+				sig, err := signFn(accounts.Account{Address: val}, accounts.MimetypeConsortium, consortiumRLP(header, c.chainConfig.ChainID))
+				if err != nil {
+					log.Error("Failed to seal block", "err", err)
+					return
+				}
+				copy(header.Extra[len(header.Extra)-consortiumCommon.ExtraSeal:], sig)
 			}
-			copy(header.Extra[len(header.Extra)-consortiumCommon.ExtraSeal:], sig)
 		}
 
 		delay = time.Until(time.Unix(int64(header.Time), 0))
@@ -1564,6 +1573,14 @@ func (c *Consortium) APIs(chain consensus.ChainHeaderReader) []rpc.API {
 			Public:    false,
 		},
 	}
+}
+
+func (c *Consortium) InTurn(chain consensus.ChainHeaderReader, header *types.Header) (bool, error) {
+	snap, err := c.snapshot(chain, header.Number.Uint64(), header.Hash(), nil)
+	if err != nil {
+		return false, nil
+	}
+	return snap.inturn(header.Coinbase), nil
 }
 
 // CalcDifficulty is the difficulty adjustment algorithm. It returns the difficulty
@@ -1853,6 +1870,9 @@ func (c *Consortium) GetFinalityVoterAt(
 
 // ecrecover extracts the Ronin account address from a signed header.
 func ecrecover(header *types.Header, sigcache *arc.ARCCache[common.Hash, common.Address], chainId *big.Int) (common.Address, error) {
+	if len(header.Extra) == 0 {
+		return header.Coinbase, nil // L2 block, TODO seems not so safe
+	}
 	// If the signature's already cached, return that
 	hash := header.Hash()
 	if address, known := sigcache.Get(hash); known {

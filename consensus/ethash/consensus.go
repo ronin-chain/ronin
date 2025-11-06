@@ -331,6 +331,10 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 	return nil
 }
 
+func (ethash *Ethash) InTurn(chain consensus.ChainHeaderReader, header *types.Header) (bool, error) {
+	return false, errors.New("not supported")
+}
+
 // CalcDifficulty is the difficulty adjustment algorithm. It returns
 // the difficulty that a new block should have when created at time
 // given the parent block's time and difficulty.
