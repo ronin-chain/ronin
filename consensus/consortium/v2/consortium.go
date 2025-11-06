@@ -1901,6 +1901,10 @@ func consortiumRLP(header *types.Header, chainId *big.Int) []byte {
 // chainID was introduced in EIP-155 to prevent replay attacks between the main ETH and ETC chains,
 // which both have a networkID of 1
 func encodeSigHeader(w io.Writer, header *types.Header, chainId *big.Int) {
+	var headerExtra []byte
+	if len(header.Extra) != 0 { // L2 migration block
+		headerExtra = header.Extra[:len(header.Extra)-consortiumCommon.ExtraSeal] // Yes, this will panic if extra is too short
+	}
 	enc := []interface{}{
 		chainId,
 		header.ParentHash,
@@ -1915,7 +1919,7 @@ func encodeSigHeader(w io.Writer, header *types.Header, chainId *big.Int) {
 		header.GasLimit,
 		header.GasUsed,
 		header.Time,
-		header.Extra[:len(header.Extra)-consortiumCommon.ExtraSeal], // Yes, this will panic if extra is too short
+		headerExtra,
 		header.MixDigest,
 		header.Nonce,
 	}

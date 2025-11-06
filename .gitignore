@@ -53,3 +53,7 @@ profile.cov
 
 # spec-tests fixtures
 tests/spec-tests/fixtures/
+
+# local run
+/script/run_node*.sh
+/script/run
