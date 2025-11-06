@@ -1438,6 +1438,10 @@ func RPCMarshalHeader(head *types.Header) map[string]interface{} {
 	if head.ExcessBlobGas != nil {
 		result["excessBlobGas"] = (*hexutil.Uint64)(head.ExcessBlobGas)
 	}
+
+	if head.WithdrawalsHash != nil {
+		result["withdrawalsRoot"] = head.WithdrawalsHash
+	}
 	return result
 }
 
@@ -1470,6 +1474,9 @@ func RPCMarshalBlock(block *types.Block, inclTx bool, fullTx bool, config *param
 		uncleHashes[i] = uncle.Hash()
 	}
 	fields["uncles"] = uncleHashes
+	if block.Withdrawals() != nil {
+		fields["withdrawals"] = block.Withdrawals()
+	}
 	return fields
 }
 
