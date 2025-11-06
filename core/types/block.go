@@ -23,6 +23,7 @@ import (
 	"io"
 	"math/big"
 	"reflect"
+	"slices"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -465,6 +466,17 @@ func NewBlock(header *Header, txs []*Transaction, uncles []*Header, receipts []*
 		for i := range uncles {
 			b.uncles[i] = CopyHeader(uncles[i])
 		}
+	}
+
+	if withdrawals == nil {
+		b.header.WithdrawalsHash = nil
+	} else if len(withdrawals) == 0 {
+		b.header.WithdrawalsHash = &EmptyWithdrawalsHash
+		b.withdrawals = Withdrawals{}
+	} else {
+		hash := DeriveSha(Withdrawals(withdrawals), hasher)
+		b.header.WithdrawalsHash = &hash
+		b.withdrawals = slices.Clone(withdrawals)
 	}
 
 	return b
