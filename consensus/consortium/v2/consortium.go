@@ -1361,6 +1361,10 @@ func (c *Consortium) Finalize(chain consensus.ChainHeaderReader, header *types.H
 func (c *Consortium) FinalizeAndAssemble(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB,
 	txs []*types.Transaction, uncles []*types.Header, receipts []*types.Receipt,
 ) (*types.Block, []*types.Receipt, error) {
+	var withdrawals []*types.Withdrawal
+	if c.chainConfig.IsL2Migration(header.Number) {
+		withdrawals = make([]*types.Withdrawal, 0)
+	}
 	// No block rewards in PoA, so the state remains as is and uncles are dropped
 	if txs == nil {
 		txs = make([]*types.Transaction, 0)
@@ -1407,7 +1411,7 @@ func (c *Consortium) FinalizeAndAssemble(chain consensus.ChainHeaderReader, head
 		wg.Done()
 	}()
 	go func() {
-		blk = types.NewBlock(header, *transactOpts.Txs, nil, *transactOpts.Receipts, trie.NewStackTrie(nil), nil)
+		blk = types.NewBlock(header, *transactOpts.Txs, nil, *transactOpts.Receipts, trie.NewStackTrie(nil), withdrawals)
 		wg.Done()
 	}()
 	wg.Wait()
