@@ -272,7 +272,7 @@ func insertBlockParamsToBlock(config *chainParams.ChainConfig, parent *types.Hea
 	if config.IsLondon(number) {
 		header.BaseFee = eip1559.CalcBaseFee(config, parent)
 	}
-	block := types.NewBlockWithHeader(header).WithBody(txs, nil /* uncles */)
+	block := types.NewBlockWithHeader(header).WithBody(txs, nil /* uncles */, nil)
 	return block, nil
 }
 
