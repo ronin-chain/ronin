@@ -34,4 +34,7 @@ var (
 	// ErrInvalidNumber is returned if a block's number doesn't equal its parent's
 	// plus one.
 	ErrInvalidNumber = errors.New("invalid block number")
+
+	// ErrL2Block is returned after L2 chain migration, L2 will stop to produce new blocks
+	ErrL2Block = errors.New("block should be in L2 chain")
 )

@@ -1168,6 +1168,10 @@ func (w *worker) commitNewWork(interrupt *int32, noempty bool, timestamp int64) 
 		header.Coinbase = w.coinbase
 	}
 	if err := w.engine.Prepare(w.chain, header); err != nil {
+		if errors.Is(err, consensus.ErrL2Block) {
+			log.Info("stop processing new blocks and wait for L2 migration", "number", header.Number.Uint64())
+			return
+		}
 		log.Error("Failed to prepare header for mining", "err", err, "number", header.Number.Uint64())
 		return
 	}
