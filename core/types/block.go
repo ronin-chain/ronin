@@ -317,6 +317,9 @@ type Header struct {
 	// These fields were added by EIP-4844 and is ignored in legacy headers.
 	BlobGasUsed   *uint64 `json:"blobGasUsed" rlp:"optional"`
 	ExcessBlobGas *uint64 `json:"excessBlobGas" rlp:"optional"`
+
+	// WithdrawalsHash was added by EIP-4895 and is ignored in legacy headers.
+	WithdrawalsHash *common.Hash `json:"withdrawalsRoot" rlp:"optional"`
 }
 
 // field type overrides for gencodec
