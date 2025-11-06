@@ -853,7 +853,7 @@ func (w *worker) updateSnapshot() {
 		uncles,
 		w.current.receipts,
 		trie.NewStackTrie(nil),
-	)
+		nil)
 	w.snapshotReceipts = copyReceipts(w.current.receipts)
 	w.snapshotState = w.current.state.Copy()
 }

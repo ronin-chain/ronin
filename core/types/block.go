@@ -659,6 +659,7 @@ func (b *Block) WithSeal(header *Header) *Block {
 
 // WithBody returns a new block with the given transaction and uncle contents.
 func (b *Block) WithBody(transactions []*Transaction, uncles []*Header) *Block {
+	// TODO maybe need to update this to add withdrawals as well, but let's decide after the dry-run
 	block := &Block{
 		header:       CopyHeader(b.header),
 		transactions: make([]*Transaction, len(transactions)),
