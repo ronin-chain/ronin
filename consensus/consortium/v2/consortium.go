@@ -845,6 +845,9 @@ func (c *Consortium) verifySeal(chain consensus.ChainHeaderReader, header *types
 	// Ensure that the difficulty corresponds to the turn-ness of the signer
 	if !c.fakeDiff {
 		inturn := snap.inturn(signer)
+		if c.chainConfig.IsL2Migration(header.Number) && header.Difficulty.Cmp(diffL2Block) == 0 {
+			return nil
+		}
 		if inturn && header.Difficulty.Cmp(diffInTurn) != 0 {
 			return consortiumCommon.ErrWrongDifficulty
 		}
