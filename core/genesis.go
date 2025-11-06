@@ -363,7 +363,7 @@ func (g *Genesis) ToBlock() *types.Block {
 			head.BaseFee = new(big.Int).SetUint64(params.InitialBaseFee)
 		}
 	}
-	return types.NewBlock(head, nil, nil, nil, trie.NewStackTrie(nil))
+	return types.NewBlock(head, nil, nil, nil, trie.NewStackTrie(nil), nil)
 }
 
 // Commit writes the block and state of a genesis specification to the database.

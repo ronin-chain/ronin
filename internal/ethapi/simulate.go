@@ -340,7 +340,7 @@ func (sim *simulator) processBlock(ctx context.Context, block *simBlock, header,
 		header.BlobGasUsed = &blobGasUsed
 	}
 
-	b := types.NewBlock(header, txes, nil, receipts, trie.NewStackTrie(nil))
+	b := types.NewBlock(header, txes, nil, receipts, trie.NewStackTrie(nil), nil)
 	repairLogs(callResults, b.Hash())
 	return b, callResults, senders, nil
 }

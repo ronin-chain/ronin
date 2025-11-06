@@ -595,7 +595,7 @@ func (c *Consortium) FinalizeAndAssemble(chain consensus.ChainHeaderReader, head
 			wg.Done()
 		}()
 		go func() {
-			blk = types.NewBlock(header, txs, nil, receipts, trie.NewStackTrie(nil))
+			blk = types.NewBlock(header, txs, nil, receipts, trie.NewStackTrie(nil), nil)
 			wg.Done()
 		}()
 		wg.Wait()
@@ -605,7 +605,7 @@ func (c *Consortium) FinalizeAndAssemble(chain consensus.ChainHeaderReader, head
 	}
 
 	// Assemble and return the final block for sealing
-	return types.NewBlock(header, txs, nil, receipts, new(trie.Trie)), receipts, nil
+	return types.NewBlock(header, txs, nil, receipts, new(trie.Trie), nil), receipts, nil
 }
 
 // Authorize injects a private key into the consensus engine to mint new blocks

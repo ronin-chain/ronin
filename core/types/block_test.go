@@ -279,7 +279,7 @@ func makeBenchBlock() *Block {
 			Extra:      []byte("benchmark uncle"),
 		}
 	}
-	return NewBlock(header, txs, uncles, receipts, newHasher())
+	return NewBlock(header, txs, uncles, receipts, newHasher(), nil)
 }
 
 func TestCopyHeaderEIP4844(t *testing.T) {

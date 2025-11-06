@@ -585,7 +585,7 @@ func (c *Clique) FinalizeAndAssemble(chain consensus.ChainHeaderReader, header *
 	c.Finalize(chain, header, state, &txs, uncles, nil, nil, nil, nil)
 
 	// Assemble and return the final block for sealing
-	return types.NewBlock(header, txs, nil, receipts, trie.NewStackTrie(nil)), receipts, nil
+	return types.NewBlock(header, txs, nil, receipts, trie.NewStackTrie(nil), nil), receipts, nil
 }
 
 // Authorize injects a private key into the consensus engine to mint new blocks

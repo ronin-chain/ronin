@@ -2225,7 +2225,7 @@ func testSystemTransactionOrder(t *testing.T, scheme string) {
 
 	// Mock contract does not create system transaction so right now len(block.transactions) == 1.
 	// Add the system transaction before normal transaction.
-	block := types.NewBlock(blocks[0].Header(), []*types.Transaction{systemTx, normalTx}, nil, receipts[0], trie.NewStackTrie(nil))
+	block := types.NewBlock(blocks[0].Header(), []*types.Transaction{systemTx, normalTx}, nil, receipts[0], trie.NewStackTrie(nil), nil)
 	header := block.Header()
 	hash := calculateSealHash(header, big.NewInt(2021))
 	sig, err := crypto.Sign(hash[:], secretKey)
@@ -2234,7 +2234,7 @@ func testSystemTransactionOrder(t *testing.T, scheme string) {
 	}
 	copy(header.Extra[len(header.Extra)-consortiumCommon.ExtraSeal:], sig)
 	block = types.NewBlockWithHeader(header)
-	block = types.NewBlock(block.Header(), []*types.Transaction{systemTx, normalTx}, nil, receipts[0], trie.NewStackTrie(nil))
+	block = types.NewBlock(block.Header(), []*types.Transaction{systemTx, normalTx}, nil, receipts[0], trie.NewStackTrie(nil), nil)
 
 	_, err = chain.InsertChain(types.Blocks{block}, nil)
 	if !errors.Is(err, core.ErrOutOfOrderSystemTx) {
@@ -2936,7 +2936,7 @@ func TestVerifyBlobHeader(t *testing.T) {
 	// Test 1: Block with expired blobs, valid sidecars
 	block := types.NewBlock(&types.Header{
 		Time: uint64(time.Now().Unix() - int64(params.BlobKeepPeriod) - 1000),
-	}, txs, []*types.Header{}, []*types.Receipt{}, trie.NewStackTrie(nil))
+	}, txs, []*types.Header{}, []*types.Receipt{}, trie.NewStackTrie(nil), nil)
 
 	err := c.VerifyBlobHeader(block, &sidecars)
 	if err != nil {
@@ -2949,7 +2949,7 @@ func TestVerifyBlobHeader(t *testing.T) {
 	// Test 2: Block with expired blobs, invalid sidecars
 	block = types.NewBlock(&types.Header{
 		Time: uint64(time.Now().Unix() - int64(params.BlobKeepPeriod) - 1000),
-	}, txs, []*types.Header{}, []*types.Receipt{}, trie.NewStackTrie(nil))
+	}, txs, []*types.Header{}, []*types.Receipt{}, trie.NewStackTrie(nil), nil)
 
 	err = c.VerifyBlobHeader(block, &fakeSidecars)
 	if err != nil {
@@ -2976,7 +2976,7 @@ func TestVerifyBlobHeader(t *testing.T) {
 	// Test 3: Block with valid blobs, valid sidecars
 	block = types.NewBlock(&types.Header{
 		Time: uint64(time.Now().Unix()),
-	}, txs, []*types.Header{}, []*types.Receipt{}, trie.NewStackTrie(nil))
+	}, txs, []*types.Header{}, []*types.Receipt{}, trie.NewStackTrie(nil), nil)
 
 	err = c.VerifyBlobHeader(block, &sidecars)
 	if err != nil {
@@ -2989,7 +2989,7 @@ func TestVerifyBlobHeader(t *testing.T) {
 	// Test 4: Block with valid blobs, invalid sidecars
 	block = types.NewBlock(&types.Header{
 		Time: uint64(time.Now().Unix()),
-	}, txs, []*types.Header{}, []*types.Receipt{}, trie.NewStackTrie(nil))
+	}, txs, []*types.Header{}, []*types.Receipt{}, trie.NewStackTrie(nil), nil)
 
 	err = c.VerifyBlobHeader(block, &fakeSidecars)
 	if err == nil {
@@ -3002,7 +3002,7 @@ func TestVerifyBlobHeader(t *testing.T) {
 	// Test 5: Block with valid blobs, valid commitments, but invalid proofs
 	block = types.NewBlock(&types.Header{
 		Time: uint64(time.Now().Unix()),
-	}, txs, []*types.Header{}, []*types.Receipt{}, trie.NewStackTrie(nil))
+	}, txs, []*types.Header{}, []*types.Receipt{}, trie.NewStackTrie(nil), nil)
 
 	err = c.VerifyBlobHeader(block, &[]*types.BlobTxSidecar{
 		{
@@ -3020,7 +3020,7 @@ func TestVerifyBlobHeader(t *testing.T) {
 	// Test 6: Block with valid blobs, invalid sidecars' length
 	block = types.NewBlock(&types.Header{
 		Time: uint64(time.Now().Unix()),
-	}, txs, []*types.Header{}, []*types.Receipt{}, trie.NewStackTrie(nil))
+	}, txs, []*types.Header{}, []*types.Receipt{}, trie.NewStackTrie(nil), nil)
 	missingSidecars := sidecars[:len(sidecars)-1]
 	err = c.VerifyBlobHeader(block, &missingSidecars)
 	if err == nil {
@@ -3037,7 +3037,7 @@ func TestVerifyBlobHeader(t *testing.T) {
 
 	block = types.NewBlock(&types.Header{
 		Time: uint64(time.Now().Unix()),
-	}, txs, []*types.Header{}, []*types.Receipt{}, trie.NewStackTrie(nil))
+	}, txs, []*types.Header{}, []*types.Receipt{}, trie.NewStackTrie(nil), nil)
 
 	err = c.VerifyBlobHeader(block, &sidecars)
 	if err == nil {

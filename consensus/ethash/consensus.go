@@ -620,7 +620,7 @@ func (ethash *Ethash) FinalizeAndAssemble(chain consensus.ChainHeaderReader, hea
 	ethash.Finalize(chain, header, state, &txs, uncles, nil, nil, nil, nil)
 
 	// Header seems complete, assemble into a block and return
-	return types.NewBlock(header, txs, uncles, receipts, trie.NewStackTrie(nil)), receipts, nil
+	return types.NewBlock(header, txs, uncles, receipts, trie.NewStackTrie(nil), nil), receipts, nil
 }
 
 // SealHash returns the hash of a block prior to it being sealed.

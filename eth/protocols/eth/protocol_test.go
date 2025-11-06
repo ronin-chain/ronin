@@ -281,7 +281,7 @@ func TestNewBlockPacket100SanityCheck(t *testing.T) {
 		},
 	}))
 	txs = append(txs, types.NewTx(&types.LegacyTx{}))
-	block := types.NewBlock(&types.Header{}, txs, []*types.Header{}, []*types.Receipt{}, trie.NewStackTrie(nil))
+	block := types.NewBlock(&types.Header{}, txs, []*types.Header{}, []*types.Receipt{}, trie.NewStackTrie(nil), nil)
 	packet := NewBlockPacket100{
 		Block: block,
 		TD:    big.NewInt(1),
@@ -296,7 +296,7 @@ func TestNewBlockPacket100SanityCheck(t *testing.T) {
 	txs = append(txs, types.NewTx(&types.BlobTx{}))
 	txs = append(txs, types.NewTx(&types.LegacyTx{}))
 	txs = append(txs, types.NewTx(&types.AccessListTx{}))
-	block = types.NewBlock(&types.Header{}, txs, []*types.Header{}, []*types.Receipt{}, trie.NewStackTrie(nil))
+	block = types.NewBlock(&types.Header{}, txs, []*types.Header{}, []*types.Receipt{}, trie.NewStackTrie(nil), nil)
 	packet = NewBlockPacket100{
 		Block: block,
 		TD:    big.NewInt(1),
