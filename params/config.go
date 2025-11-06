@@ -637,7 +637,6 @@ type ChainConfig struct {
 	RoninTrustedOrgUpgrade      *ContractUpgrade       `json:"roninTrustedOrgUpgrade"`
 	TransparentProxyCodeUpgrade *ContractCodeUpgrade   `json:"transparentProxyCodeUpgrade"`
 	L2Upgrade                   *L2Upgrade             `json:"l2Upgrade"`
-	L2TxsCutOffBlocks           uint                   `json:"l2TxsCutOffBlocks"`
 }
 
 type ContractUpgrade struct {
