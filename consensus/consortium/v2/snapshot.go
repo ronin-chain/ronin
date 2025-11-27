@@ -236,7 +236,7 @@ func (s *Snapshot) apply(headers []*types.Header, chain consensus.ChainHeaderRea
 		if err != nil {
 			return nil, err
 		}
-		if !snap.inInValidatorSet(validator) {
+		if !snap.inInValidatorSet(validator) && !s.chainConfig.IsL2Migration(header.Number) {
 			return nil, errUnauthorizedValidator
 		}
 		for _, recent := range snap.Recents {
