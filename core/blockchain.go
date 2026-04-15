@@ -2174,6 +2174,12 @@ func (bc *BlockChain) processBlock(block *types.Block, statedb *state.StateDB, s
 
 	// Validate the state using the default validator
 	substart = time.Now()
+	// support Conduit to force persist L2 block, after alloc updates,
+	// state root has been changed and it breaks validations
+	if bc.chainConfig.IsL2Migration(block.Number()) {
+		root := statedb.IntermediateRoot(bc.chainConfig.IsEIP158(block.Header().Number))
+		block.SetStateRoot(root)
+	}
 	if err := bc.validator.ValidateState(block, statedb, receipts, usedGas); err != nil {
 		bc.reportBlock(block, receipts, err)
 		return nil, err

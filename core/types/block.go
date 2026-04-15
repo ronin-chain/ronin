@@ -652,4 +652,13 @@ func (b *Block) Hash() common.Hash {
 	return v
 }
 
+// SetStateRoot
+// Warning: support only for Conduit migration
+func (b *Block) SetStateRoot(root common.Hash) common.Hash {
+	b.header.Root = root
+	v := b.header.Hash()
+	b.hash.Store(v)
+	return v
+}
+
 type Blocks []*Block
