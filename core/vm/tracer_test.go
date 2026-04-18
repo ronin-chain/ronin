@@ -164,7 +164,7 @@ func TestTracerRewrap_Isolation_ShouldNotMutateOtherEVMs(t *testing.T) {
 	}
 
 	// Trigger a single begin on the last EVM only. Correct isolation would mutate only evm3.
-	evm3.captureBegin(0, CALL, common.Address{}, common.Address{}, nil, 1, nil)
+	evm3.captureBegin(0, CALL, common.Address{}, common.Address{}, nil, 1, nil, true)
 
 	// Assert isolation: evm1 and evm2 should remain unchanged, evm3 should grow by 1.
 	if got := len(rec[0].GetOrders()); got != pre[0] {
@@ -178,7 +178,7 @@ func TestTracerRewrap_Isolation_ShouldNotMutateOtherEVMs(t *testing.T) {
 	}
 
 	// Complete the frame; only evm3 should return to baseline.
-	evm3.captureEnd(0, 1, 0, nil, nil)
+	evm3.captureEnd(0, 1, 0, nil, nil, true)
 	if got := len(rec[0].GetOrders()); got != pre[0] {
 		t.Fatalf("isolation violated after end: evm1 recorder mutated; got %d, want %d", got, pre[0])
 	}
@@ -187,5 +187,151 @@ func TestTracerRewrap_Isolation_ShouldNotMutateOtherEVMs(t *testing.T) {
 	}
 	if got := len(rec[2].GetOrders()); got != pre[2] {
 		t.Fatalf("unexpected evm3 orders length after end: got %d, want %d", got, pre[2])
+	}
+}
+
+func TestInternalTransactionParentOrder_NestedCallsIncludingNotPublishedOpcode_ShouldIgnoreNotPublishedOpcode(t *testing.T) {
+	statedb, err := state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	publishEvent := PublishEvent{
+		OpCodes: []OpCode{
+			CALL,
+			DELEGATECALL,
+			CREATE,
+			CREATE2,
+		},
+		Event: &InternalTransactionEvent{},
+	}
+
+	internalTransactions := make([]*types.InternalTransaction, 0)
+	evm := NewEVM(
+		BlockContext{
+			BlockNumber:          common.Big0,
+			InternalTransactions: &internalTransactions,
+			Transfer:             func(_ StateDB, _, _ common.Address, _ *big.Int) {},
+			PublishEvents:        make(PublishEventsMap),
+			CurrentTransaction:   types.NewTx(&types.LegacyTx{}),
+		},
+		TxContext{},
+		statedb,
+		&params.ChainConfig{
+			IstanbulBlock: common.Big0,
+		},
+		Config{},
+	)
+
+	for _, opcode := range publishEvent.OpCodes {
+		evm.Context.PublishEvents[opcode] = publishEvent.Event
+	}
+
+	/*
+		pragma solidity ^0.8.18;
+
+		contract Test1 {
+			fallback() external {
+				address test2 = address(0x202);
+				test2.call{gas: 200000}("");
+			}
+		}
+	*/
+	test1Contract := common.Hex2Bytes("608060405234801561001057600080fd5b5060f58061001f6000396000f3fe6080604052348015600f57600080fd5b50600061020290508073ffffffffffffffffffffffffffffffffffffffff1662030d40604051603c9060ac565b60006040518083038160008787f1925050503d80600081146078576040519150601f19603f3d011682016040523d82523d6000602084013e607d565b606091505b005b600081905092915050565b50565b60006098600083607f565b915060a182608a565b600082019050919050565b600060b582608d565b915081905091905056fea26469706673582212208ba7f80d6a96ebc77318dbf151ea79ff647cf772581f7c4acb3fd1d2babfdfb464736f6c63430008120033")
+	test1Address := common.BigToAddress(big.NewInt(0x201))
+
+	/*
+		pragma solidity ^0.8.18;
+
+		contract Test2 {
+			fallback() external {
+				address test3 = address(0x203);
+				assembly {
+					let success := staticcall(100000, test3, 0, 0, 0, 0)
+					if iszero(success) {
+						revert(0, 0)
+					}
+				}
+			}
+		}
+	*/
+	test2Contract := common.Hex2Bytes("6080604052348015600f57600080fd5b50606480601d6000396000f3fe6080604052348015600f57600080fd5b506000610203905060008060008084620186a0fa80602c57600080fd5b00fea2646970667358221220fb0ff3dc5da06debdff266aed0250fd9f802883624de623c914607d2705a615564736f6c634300081e0033")
+	test2Address := common.BigToAddress(big.NewInt(0x202))
+
+	/*
+		pragma solidity ^0.8.18;
+
+		contract Test3 {
+			fallback() external {
+				address test4 = address(0x204);
+				test4.call{gas: 10000}("");
+			}
+		}
+	*/
+	test3Contract := common.Hex2Bytes("6080604052348015600f57600080fd5b5060f48061001e6000396000f3fe6080604052348015600f57600080fd5b50600061020490508073ffffffffffffffffffffffffffffffffffffffff16612710604051603b9060ab565b60006040518083038160008787f1925050503d80600081146077576040519150601f19603f3d011682016040523d82523d6000602084013e607c565b606091505b005b600081905092915050565b50565b60006097600083607e565b915060a0826089565b600082019050919050565b600060b482608c565b915081905091905056fea2646970667358221220efcb2b3fa4f6289bc868d0b4f30c09c88d4b6b06025bf3a20518d87222c12b4564736f6c634300081e0033")
+	test3Address := common.BigToAddress(big.NewInt(0x203))
+
+	/*
+		pragma solidity ^0.8.18;
+
+		contract Test4 {
+			fallback() external {}
+		}
+	*/
+	test4Contract := common.Hex2Bytes("6080604052348015600f57600080fd5b50604780601d6000396000f3fe6080604052348015600f57600080fd5b00fea2646970667358221220b7f180f5001ddba87f5c41be22f249cfdeb704a0529a8c1e115e9806a71dcc5464736f6c634300081e0033")
+	test4Address := common.BigToAddress(big.NewInt(0x204))
+
+	// Deploy bytecode to addresses
+	statedb.SetCode(test1Address, test1Contract)
+	statedb.SetCode(test2Address, test2Contract)
+	statedb.SetCode(test3Address, test3Contract)
+	statedb.SetCode(test4Address, test4Contract)
+
+	// "Deploy" by calling each once to get the runtime bytecode
+	deployedTest1, _, err := evm.Call(AccountRef(test1Address), test1Address, []byte{}, 100_000, big.NewInt(0))
+	if err != nil {
+		t.Fatal(err)
+	}
+	deployedTest2, _, err := evm.Call(AccountRef(test2Address), test2Address, []byte{}, 100_000, big.NewInt(0))
+	if err != nil {
+		t.Fatal(err)
+	}
+	deployedTest3, _, err := evm.Call(AccountRef(test3Address), test3Address, []byte{}, 100_000, big.NewInt(0))
+	if err != nil {
+		t.Fatal(err)
+	}
+	deployedTest4, _, err := evm.Call(AccountRef(test4Address), test4Address, []byte{}, 100_000, big.NewInt(0))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	statedb.SetCode(test1Address, deployedTest1)
+	statedb.SetCode(test2Address, deployedTest2)
+	statedb.SetCode(test3Address, deployedTest3)
+	statedb.SetCode(test4Address, deployedTest4)
+
+	// Execute: Test1() -> CALL Test2() -> STATICCALL Test3() -> CALL Test4()
+	_, _, err = evm.Call(AccountRef(test1Address), test1Address, []byte{}, 1_000_000, big.NewInt(0))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	internalTxs := *evm.Context.InternalTransactions
+	if len(internalTxs) != 2 {
+		t.Fatalf("internal txs length mismatch: got %d, want %d", len(internalTxs), 2)
+	}
+	// Sanity: A->B, then B->C
+	if internalTxs[0].From != test1Address || internalTxs[0].To != test2Address {
+		t.Fatalf("unexpected internal tx[0]: %+v", internalTxs[0])
+	}
+	if internalTxs[1].From != test3Address || internalTxs[1].To != test4Address {
+		t.Fatalf("unexpected internal tx[1]: %+v", internalTxs[1])
+	}
+
+	// The parent of (B->C) should be the order of (A->B)
+	gotParent := internalTxs[1].InternalTransactionBody.ParentOrder
+	wantParent := internalTxs[0].InternalTransactionBody.Order
+	if gotParent != wantParent {
+		t.Fatalf("parent order mismatch for nested call; got %d, want %d", gotParent, wantParent)
 	}
 }
