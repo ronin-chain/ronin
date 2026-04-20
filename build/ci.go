@@ -323,6 +323,62 @@ func doTest(cmdline []string) {
 	build.MustRun(gotest)
 }
 
+// getChangedFiles returns a list of packages containing files that have been changed
+// in the current git repository compared to the default branch or the previous commit.
+func getChangedFiles() []string {
+	// Default to a dummy package if we can't determine the changed files
+	defaultPackages := []string{"./..."}
+
+	// Try to get the changed Go files using git
+	cmd := exec.Command("git", "diff", "--name-only", "origin/main", "HEAD")
+	output, err := cmd.Output()
+	if err != nil {
+		// Fall back to comparing with HEAD~1 if comparing with main fails
+		cmd = exec.Command("git", "diff", "--name-only", "HEAD~1", "HEAD")
+		output, err = cmd.Output()
+		if err != nil {
+			log.Printf("Warning: Failed to get changed files: %v, using all packages", err)
+			return defaultPackages
+		}
+	}
+
+	// Parse the output to get file paths
+	files := strings.Split(strings.TrimSpace(string(output)), "\n")
+	if len(files) == 0 || (len(files) == 1 && files[0] == "") {
+		return defaultPackages
+	}
+
+	// Map to store unique package directories
+	packageDirs := make(map[string]bool)
+
+	// Filter only Go files and extract their package directories
+	for _, file := range files {
+		if strings.HasSuffix(file, ".go") && len(file) > 0 {
+			// Skip files in the build directory which often has build constraints
+			if !strings.HasPrefix(file, "build/") {
+				// Get the directory containing the file
+				dir := filepath.Dir(file)
+				packageDirs[dir] = true
+			}
+		}
+	}
+
+	if len(packageDirs) == 0 {
+		log.Printf("No Go packages changed, using all packages")
+		return defaultPackages
+	}
+
+	// Convert directory map to slice of package paths for linting
+	packages := make([]string, 0, len(packageDirs))
+	for dir := range packageDirs {
+		// Format as package path with ./ prefix for linting
+		packages = append(packages, "./"+dir)
+	}
+
+	log.Printf("Found %d changed packages", len(packages))
+	return packages
+}
+
 // doLint runs golangci-lint on requested packages.
 func doLint(cmdline []string) {
 	cachedir := flag.String("cachedir", "./build/cache", "directory for caching golangci-lint binary.")
@@ -332,8 +388,18 @@ func doLint(cmdline []string) {
 		packages = flag.CommandLine.Args()
 	}
 
+	// Run lint for changed packages only
+	changedPackages := getChangedFiles()
+	if len(changedPackages) > 0 && changedPackages[0] != "./..." {
+		packages = changedPackages
+		log.Printf("Running lint on %d changed packages", len(packages))
+	}
+
 	linter := downloadLinter(*cachedir)
-	lflags := []string{"run", "--config", ".golangci.yml"}
+	lflags := []string{
+		"run",
+		"--config", ".golangci.yml",
+	}
 	build.MustRunCommand(linter, append(lflags, packages...)...)
 	fmt.Println("You have achieved perfection.")
 }

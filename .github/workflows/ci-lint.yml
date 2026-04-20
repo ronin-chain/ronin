@@ -3,7 +3,10 @@ name: Run Lint
 on:
   push:
     branches:
-      - master # TODO: This quite tricky, disable linting for now. Will turn on once we fix all lint errors.
+      - main
+  pull_request:
+    branches:
+      - main
 
 concurrency:
   group: ${{ github.head_ref || github.run_id }}-lint
@@ -25,4 +28,4 @@ jobs:
 
       - name: Run code linting
         run: |
-          make lint 
+          make lint
